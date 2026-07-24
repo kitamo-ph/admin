@@ -8,7 +8,7 @@ export function GET() {
       status: "ok",
       service: "kitamo-admin",
       mode: "mock",
-      timestamp: new Date().toISOString(),
+      checkedAt: new Date().toISOString(),
     },
     {
       headers: {
