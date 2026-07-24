@@ -24,9 +24,7 @@ export function PageHeader({
         <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[#173f30] sm:text-[1.8rem]">
           {title}
         </h1>
-        <p className="mt-2 max-w-2xl leading-6 text-[#69736d]">
-          {description}
-        </p>
+        <p className="mt-2 max-w-2xl leading-6 text-[#69736d]">{description}</p>
       </div>
       {actions ? (
         <div className="flex shrink-0 flex-wrap items-center gap-2">
@@ -46,7 +44,10 @@ export function Breadcrumbs({
     <nav aria-label="Breadcrumb" className="mb-4">
       <ol className="flex flex-wrap items-center gap-2 text-xs font-medium text-[#69736d]">
         {items.map((item, index) => (
-          <li className="flex items-center gap-2" key={`${item.label}-${index}`}>
+          <li
+            className="flex items-center gap-2"
+            key={`${item.label}-${index}`}
+          >
             {index > 0 ? <span aria-hidden="true">/</span> : null}
             {item.href ? (
               <Link
@@ -146,12 +147,7 @@ export function MetricCard({
 }
 
 export type BadgeTone =
-  | "neutral"
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "forest";
+  "neutral" | "success" | "warning" | "danger" | "info" | "forest";
 
 const badgeTones: Record<BadgeTone, string> = {
   neutral: "border-[#dfe4df] bg-[#f4f5f2] text-[#59625c]",
@@ -285,11 +281,7 @@ export function DataTable({
 }) {
   return (
     <div className="table-scroll">
-      <table
-        className="data-table"
-        aria-label={label}
-        style={{ minWidth }}
-      >
+      <table className="data-table" aria-label={label} style={{ minWidth }}>
         {children}
       </table>
     </div>
@@ -308,5 +300,76 @@ export function PaginationSummary({
       Showing <strong className="text-[#364039]">{shown}</strong> of{" "}
       <strong className="text-[#364039]">{total}</strong> records
     </p>
+  );
+}
+
+export function PaginationControls({
+  basePath,
+  offset,
+  limit,
+  total,
+  query,
+}: {
+  basePath: string;
+  offset: number;
+  limit: number;
+  total: number;
+  query: Record<string, string | undefined>;
+}) {
+  const hasPrevious = offset > 0;
+  const hasNext = offset + limit < total;
+
+  function pageHref(nextOffset: number) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (value) params.set(key, value);
+    }
+    if (nextOffset > 0) params.set("offset", String(nextOffset));
+    return `${basePath}?${params.toString()}`;
+  }
+
+  return (
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-between gap-4 border-t border-[#e7ebe7] px-5 py-3"
+    >
+      <p className="text-xs text-[#69736d]">
+        {total === 0
+          ? "No records"
+          : `${offset + 1}–${Math.min(offset + limit, total)} of ${total}`}
+      </p>
+      <div className="flex gap-2">
+        {hasPrevious ? (
+          <Link
+            className="rounded-md border border-[#cbd3cc] bg-white px-3 py-1.5 text-xs font-semibold text-[#173f30] hover:bg-[#f0f6f2]"
+            href={pageHref(Math.max(0, offset - limit))}
+          >
+            Previous
+          </Link>
+        ) : (
+          <span
+            aria-disabled="true"
+            className="cursor-not-allowed rounded-md border border-[#e3e7e3] bg-[#f8f8f5] px-3 py-1.5 text-xs font-semibold text-[#a0a7a2]"
+          >
+            Previous
+          </span>
+        )}
+        {hasNext ? (
+          <Link
+            className="rounded-md border border-[#cbd3cc] bg-white px-3 py-1.5 text-xs font-semibold text-[#173f30] hover:bg-[#f0f6f2]"
+            href={pageHref(offset + limit)}
+          >
+            Next
+          </Link>
+        ) : (
+          <span
+            aria-disabled="true"
+            className="cursor-not-allowed rounded-md border border-[#e3e7e3] bg-[#f8f8f5] px-3 py-1.5 text-xs font-semibold text-[#a0a7a2]"
+          >
+            Next
+          </span>
+        )}
+      </div>
+    </nav>
   );
 }

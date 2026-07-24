@@ -9,11 +9,7 @@ type ServiceErrorShape = {
   retryable: boolean;
 };
 
-export function ServiceErrorState({
-  error,
-}: {
-  error: ServiceErrorShape;
-}) {
+export function ServiceErrorState({ error }: { error: ServiceErrorShape }) {
   const state = errorState(error.code);
 
   return (

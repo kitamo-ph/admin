@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AdminNavLink } from "./nav-link";
+
 type NavigationItem = {
   href: string;
   label: string;
@@ -89,21 +91,18 @@ function Navigation({
 
   if (mobile) {
     return (
-      <nav aria-label="Mobile admin navigation" className="grid gap-1 px-2 pb-3">
+      <nav
+        aria-label="Mobile admin navigation"
+        className="grid gap-1 px-2 pb-3"
+      >
         {visible.map((item) => (
-          <Link
-            className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 font-medium text-[#364039] hover:bg-[#f0f6f2] hover:text-[#173f30]"
+          <AdminNavLink
             href={item.href}
             key={item.href}
-          >
-            <span
-              aria-hidden="true"
-              className="grid size-7 place-items-center rounded-md bg-[#e3efe8] text-xs font-bold text-[#1e513d]"
-            >
-              {item.symbol}
-            </span>
-            {item.label}
-          </Link>
+            label={item.label}
+            mobile
+            symbol={item.symbol}
+          />
         ))}
       </nav>
     );
@@ -122,18 +121,11 @@ function Navigation({
             <ul className="grid gap-1">
               {items.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    className="group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#d8e5dc] transition hover:bg-white/8 hover:text-white"
+                  <AdminNavLink
                     href={item.href}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="grid size-6 place-items-center rounded-md bg-white/7 text-[0.68rem] font-bold text-[#b9cec1] group-hover:bg-[#d3a33f] group-hover:text-[#102f24]"
-                    >
-                      {item.symbol}
-                    </span>
-                    {item.label}
-                  </Link>
+                    label={item.label}
+                    symbol={item.symbol}
+                  />
                 </li>
               ))}
             </ul>
