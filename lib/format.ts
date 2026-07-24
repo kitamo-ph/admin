@@ -1,24 +1,26 @@
-const dateTimeFormatter = new Intl.DateTimeFormat("en-PH", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "Asia/Manila",
-});
-
-const dateFormatter = new Intl.DateTimeFormat("en-PH", {
-  dateStyle: "medium",
-  timeZone: "Asia/Manila",
-});
-
 const numberFormatter = new Intl.NumberFormat("en-PH");
 
-export function formatDateTime(value: string | null | undefined): string {
+export function formatDateTime(
+  value: string | null | undefined,
+  timeZone = "Asia/Manila",
+): string {
   if (!value) return "Not recorded";
-  return dateTimeFormatter.format(new Date(value));
+  return new Intl.DateTimeFormat("en-PH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone,
+  }).format(new Date(value));
 }
 
-export function formatDate(value: string | null | undefined): string {
+export function formatDate(
+  value: string | null | undefined,
+  timeZone = "Asia/Manila",
+): string {
   if (!value) return "Not recorded";
-  return dateFormatter.format(new Date(value));
+  return new Intl.DateTimeFormat("en-PH", {
+    dateStyle: "medium",
+    timeZone,
+  }).format(new Date(value));
 }
 
 export function formatNumber(value: number): string {
