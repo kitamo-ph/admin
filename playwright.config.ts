@@ -23,7 +23,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `MOCK_ADMIN_ENABLED=true npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+    command: `MOCK_ADMIN_SCENARIO=normal MOCK_ADMIN_LATENCY_MS=0 npm run dev -- --hostname 127.0.0.1 --port ${port}`,
     url: `http://127.0.0.1:${port}/sign-in`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

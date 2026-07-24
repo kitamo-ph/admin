@@ -6,7 +6,7 @@ export const appConfig = {
   environment: process.env.NODE_ENV,
   mock: {
     enabled: process.env.NODE_ENV !== "production",
-    scenario: process.env.MOCK_ADMIN_FAILURE_MODE ?? "normal",
+    scenario: process.env.MOCK_ADMIN_SCENARIO ?? "normal",
     latencyMs: z.coerce
       .number()
       .int()

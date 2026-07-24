@@ -1,10 +1,14 @@
 import type { NextConfig } from "next";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   turbopack: {
-    root: process.cwd(),
+    root: projectRoot,
   },
   async headers() {
     return [
@@ -34,9 +38,7 @@ const nextConfig: NextConfig = {
               "font-src 'self'",
               "style-src 'self' 'unsafe-inline'",
               `script-src 'self' 'unsafe-inline'${
-                process.env.NODE_ENV === "development"
-                  ? " 'unsafe-eval'"
-                  : ""
+                process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""
               }`,
               "connect-src 'self'",
             ].join("; "),

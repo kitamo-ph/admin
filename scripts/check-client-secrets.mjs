@@ -14,9 +14,13 @@ const secretValuePatterns = [
   /eyJ[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{12,}\.[A-Za-z0-9_-]{12,}/,
 ];
 
-const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
-  encoding: "utf8",
-})
+const files = execFileSync(
+  "git",
+  ["ls-files", "--cached", "--others", "--exclude-standard"],
+  {
+    encoding: "utf8",
+  },
+)
   .split("\n")
   .filter(Boolean)
   .filter(

@@ -29,8 +29,8 @@ export default function ErrorBoundary({
           This view could not be loaded
         </h1>
         <p className="mt-3 text-[#69736d]">
-          No changes were made. Try the request again, or return to the
-          overview if the issue continues.
+          No changes were made. Try the request again, or return to the overview
+          if the issue continues.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button
