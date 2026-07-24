@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  turbopack: {
+    root: process.cwd(),
+  },
   async headers() {
     return [
       {
@@ -30,7 +33,11 @@ const nextConfig: NextConfig = {
               "img-src 'self' data:",
               "font-src 'self'",
               "style-src 'self' 'unsafe-inline'",
-              "script-src 'self' 'unsafe-inline'",
+              `script-src 'self' 'unsafe-inline'${
+                process.env.NODE_ENV === "development"
+                  ? " 'unsafe-eval'"
+                  : ""
+              }`,
               "connect-src 'self'",
             ].join("; "),
           },

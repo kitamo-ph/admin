@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --forest-950: #102f24;
+  --forest-900: #173f30;
+  --forest-800: #1e513d;
+  --forest-700: #2a684f;
+  --forest-100: #e3efe8;
+  --forest-50: #f0f6f2;
+  --gold-600: #b98621;
+  --gold-500: #d3a33f;
+  --gold-100: #f5e9c9;
+  --cream: #f7f5ef;
+  --paper: #fffefa;
+  --charcoal: #202622;
+  --muted: #69736d;
+  --line: #dfe4df;
+  --line-strong: #cbd3cc;
+  --danger: #a53b31;
+  --danger-soft: #f9e7e4;
+  --warning: #8a6115;
+  --warning-soft: #fbf0d5;
+  --info: #315f81;
+  --info-soft: #e7f0f7;
+  --success: #28734f;
+  --success-soft: #e2f1e8;
+  --shadow-card: 0 1px 2px rgb(16 47 36 / 5%),
+    0 8px 28px rgb(16 47 36 / 4%);
+}
+
+@theme inline {
+  --color-background: var(--cream);
+  --color-foreground: var(--charcoal);
+  --font-sans: var(--font-admin);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--cream);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(
+      circle at 92% 0%,
+      rgb(211 163 63 / 8%),
+      transparent 26rem
+    ),
+    var(--cream);
+  color: var(--charcoal);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--gold-100);
+  color: var(--forest-950);
+}
+
+:focus-visible {
+  border-radius: 0.25rem;
+  outline: 3px solid rgb(211 163 63 / 70%);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-180%);
+  border-radius: 0.5rem;
+  background: var(--paper);
+  padding: 0.65rem 1rem;
+  color: var(--forest-900);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.admin-page {
+  width: min(100%, 96rem);
+  margin-inline: auto;
+  padding: 1.75rem 2rem 3rem;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th {
+  border-bottom: 1px solid var(--line);
+  padding: 0.7rem 1rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.data-table td {
+  border-bottom: 1px solid #edf0ed;
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+.data-table tbody tr:hover {
+  background: #fafbf8;
+}
+
+.control {
+  min-height: 2.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 0.55rem;
+  background: var(--paper);
+  padding: 0.55rem 0.75rem;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.control:hover {
+  border-color: #aeb9b0;
+}
+
+.control:focus {
+  border-color: var(--forest-700);
+  box-shadow: 0 0 0 3px rgb(42 104 79 / 12%);
+  outline: none;
+}
+
+.control::placeholder {
+  color: #929a94;
+}
+
+.skeleton {
+  animation: shimmer 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, #edf0ec 25%, #f8f9f6 50%, #edf0ec 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-page {
+    padding: 1.25rem 1rem 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
