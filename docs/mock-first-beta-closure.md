@@ -6,7 +6,7 @@
 | -------------------------- | ---------------------------------------------------------------------------- |
 | Repository                 | `kitamo-ph/admin`                                                            |
 | Secure foundation baseline | `b9460858bf91cd5bf50536d469ff7106ce92b483`                                   |
-| Closure commit             | `CLOSURE_COMMIT_PLACEHOLDER`                                                 |
+| Closure commit             | `653791e15e8ead6d8b2214b140f34d3511ae9e14`                                   |
 | Canonical local path       | `~/Documents/KitaMo-ph/admin`                                                |
 | Compatibility path         | `~/Documents/KitaMo_admin` may exist only as a symlink to the canonical path |
 | Closure date               | 2026-08-10 (Asia/Manila)                                                     |
