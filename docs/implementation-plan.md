@@ -2,14 +2,14 @@
 
 ## Purpose
 
-This document preserves the six required pre-build artifacts that govern the mock-first KitaMo Admin Platform implementation. It is a planning baseline, not evidence that build, lint, tests, accessibility checks, or deployment gates have passed.
+This document preserves the six pre-build artifacts that governed the mock-first KitaMo Admin Platform implementation. The secure mock-first beta represented by baseline commit `b946085` is now complete; final quality, accessibility, responsive, and dependency evidence is recorded in [mock-first-beta-closure.md](./mock-first-beta-closure.md). Production integration and deployment remain separate future gates.
 
 ## 1. Proposed repository structure
 
 The existing Next.js scaffold may keep the App Router at the repository root. The intended production-structured boundary is:
 
 ```text
-kitamo_admin/
+admin/
 ├── app/
 │   ├── (auth)/
 │   │   └── sign-in/

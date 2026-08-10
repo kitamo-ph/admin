@@ -3,6 +3,12 @@
 Internal, mock-first support and platform-operations application for KitaMo.
 The intended production host is `admin.kitamo.online`.
 
+**Current phase:** the secure mock-first beta is complete and closed. The
+canonical local repository path is `~/Documents/KitaMo-ph/admin`, and the
+authoritative remote is `kitamo-ph/admin`. The application is ready to remain
+stable while Shared Contracts and production dependencies are established; it
+is not deployed and is not approved for production use.
+
 This application helps authorized administrators inspect users and businesses,
 monitor connected devices and synchronization health, triage problem reports,
 review app-version adoption, and follow an auditable operational trail. It is
@@ -228,19 +234,28 @@ npm run typecheck
 npm test
 npm run security:check
 npm run build
+npm run security:bundle
 npm run test:e2e
 ```
 
+`security:bundle` runs after a production build and verifies that browser
+chunks contain neither privileged key names nor development mock-auth/scenario
+controls. The combined `quality` command runs it in the correct order.
+
 `npm run test:e2e` starts an isolated development server at
 `http://127.0.0.1:3100` unless one is already running there. It runs desktop
-Chromium and a Pixel 7 profile. The tests set the development role cookie
-directly to verify authentication and authorization without coupling every
-case to the sign-in form.
+Chromium, a Pixel 7 profile, and a dedicated responsive Chromium project over
+320, 412, 768, 1440, and 1920 CSS-pixel widths. The tests set the development
+role cookie directly to verify authentication and authorization without
+coupling every case to the sign-in form. They include focused keyboard,
+semantic, form-label, heading, navigation, table-overflow, and page-overflow
+checks; these smokes complement rather than replace human assistive-technology
+review.
 
 Combined commands:
 
 ```bash
-npm run quality  # formatting, lint, types, unit tests, secret check, build
+npm run quality  # format, lint, types, unit, source/bundle security, build
 npm run verify   # quality plus Playwright
 ```
 
@@ -267,12 +282,15 @@ Operational health details remain behind administrator access.
 
 ## Future Clerk and Supabase integration
 
-Production integration is intentionally gated on inspecting the existing
-Android repository, Supabase migration history and RLS policies,
-Clerk-to-Supabase identity mapping, administrator-assignment source, sync and
-problem-report contracts, audit requirements, and the versioned,
-machine-readable artifacts governed by the approved KitaMo Shared Data
-Contract Baseline.
+The sibling Android repository at `kitamo-ph/owner-seller-mobile` has been
+inspected as evidence of the current local-first SQLite domain, migrations,
+repositories, protected workflows, local problem reports, and future
+identity/cloud planning. It does not provide the missing production cloud
+contracts. Production integration remains gated on the machine-readable
+`kitamo-ph/shared-contracts` workstream, approved Android compatibility
+mappings, Supabase migration history and RLS policies, Clerk-to-Supabase
+identity mapping, administrator-assignment source, production sync envelope,
+durable problem-report and audit contracts, and account lifecycle rules.
 
 When those dependencies are available:
 
@@ -329,3 +347,4 @@ readiness.
 - [Supabase migration plan](docs/supabase-migration-plan.md)
 - [Implementation plan](docs/implementation-plan.md)
 - [Decision log](docs/decision-log.md)
+- [Mock-first beta closure](docs/mock-first-beta-closure.md)

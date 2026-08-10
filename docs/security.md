@@ -144,4 +144,4 @@ The beta targets WCAG 2.2 AA practices. Accessible labels, announced errors, vis
 - Query/payload bounds and output escaping are tested.
 - No destructive, impersonation, remote-device, or full-transaction endpoint exists.
 
-This checklist records required evidence; it does not claim the checks have passed.
+The mock-first closure pass verified this checklist where the current mock-only scope permits. Exact command evidence, accessibility limitations, and protected production gates are recorded in [mock-first-beta-closure.md](./mock-first-beta-closure.md); that evidence is not production authorization.

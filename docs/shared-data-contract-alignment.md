@@ -130,8 +130,8 @@ physical or authorization contracts needed for production. Before integration,
 the team must still inspect:
 
 1. the shared-contract repository and machine-readable schemas/versioning;
-2. the Android models, SQLite migrations, sync payloads, and ID transition
-   behavior;
+2. the known Android models and SQLite migrations plus approved compatibility
+   mappings, production sync payloads, and ID transition behavior;
 3. the complete Supabase migrations, schema, functions, grants, and RLS
    policies;
 4. the Clerk-to-Supabase user mapping and revocation behavior;
@@ -145,9 +145,17 @@ waive that gate.
 
 ## Current dependency report
 
-The supplied materials establish the mock-first product roadmap and Shared
-Data Contract Baseline v0.1. The workspace does not contain the Android
-repository, Supabase migration history, production schema, Clerk mapping,
-administrator assignment source, or machine-readable shared-contract
-artifacts. Therefore this repository remains mock-only and must not be
+The Android repository is now known at the expected sibling path,
+`~/Documents/KitaMo-ph/owner-seller-mobile`, with GitHub authority
+`kitamo-ph/owner-seller-mobile`. Its inspected evidence confirms a local-first
+SQLite domain, ordered migrations, domain types, repositories/services,
+protected offline workflows, local problem reports, and future identity/cloud
+planning. It does not contain an active production Supabase client, cloud sync
+worker, or cloud authentication contract.
+
+Still missing are the machine-readable `kitamo-ph/shared-contracts` package and
+approved Android compatibility mappings; production sync envelope; Supabase
+schema, complete migrations, functions, grants, and RLS; Clerk mapping;
+administrator assignment source; durable production report/audit contracts;
+and account lifecycle rules. Therefore Admin remains mock-only and must not be
 connected to production or deployed to `admin.kitamo.online`.

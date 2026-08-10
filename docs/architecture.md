@@ -4,7 +4,7 @@
 
 This document describes the mock-first foundation for the KitaMo Admin Platform at `admin.kitamo.online`. The application is an internal support and platform-operations tool. It is not the KitaMo merchant Owner dashboard and does not implement checkout, inventory editing, recipes, production, sales or expense entry, subscriptions, detailed merchant financial reporting, impersonation, or destructive account operations.
 
-This iteration uses fictional, deterministic data. It does not connect to Clerk or Supabase, define a production database schema, or apply production migrations. Those integrations must preserve the boundaries below rather than requiring the UI to be rewritten.
+The secure mock-first beta is complete at baseline commit `b946085`. It uses fictional, deterministic data and does not connect to Clerk or Supabase, define a production database schema, or apply production migrations. Later closure commits document and harden the milestone without changing that boundary. Production integrations must preserve the layers below rather than requiring the UI to be rewritten.
 
 ## Architectural principles
 
@@ -164,4 +164,4 @@ Unit tests cover schemas, service contracts, filters, policy decisions, report u
 
 The interface targets WCAG 2.2 AA practices. Verification includes keyboard-only use, visible focus, semantic headings and tables, labels and announced state changes, non-color status cues, reduced motion, appropriate contrast/touch targets, 200% zoom, screen-reader spot checks, and mobile/tablet/desktop widths.
 
-This document defines the intended architecture; it does not assert that any quality gate has already passed.
+This architecture was reverified during mock-first beta closure. Current command results, test counts, accessibility/responsive scope, and remaining production gates are recorded in [mock-first-beta-closure.md](./mock-first-beta-closure.md).

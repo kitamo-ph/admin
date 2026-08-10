@@ -12,7 +12,7 @@ Before writing a production adapter or migration, obtain and inspect:
 
 1. The authoritative Supabase repository/project and complete migration history.
 2. Current schemas, tables, views, functions, triggers, indexes, grants, and RLS policies.
-3. The Android application's persisted models and cloud synchronization contracts.
+3. The known Android persisted models and migrations, plus approved Android-to-canonical compatibility mappings and the still-missing production synchronization contract.
 4. The Clerk-to-Supabase user mapping, including stable identifiers and lifecycle behavior.
 5. The authoritative administrator assignment source and revocation process.
 6. Existing problem-report, synchronization, app-version, and audit records/contracts.
