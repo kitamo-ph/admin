@@ -83,7 +83,7 @@ export function Panel({
 }) {
   return (
     <section
-      className={`rounded-xl border border-[#dfe4df] bg-[#fffefa] shadow-[var(--shadow-card)] ${className}`}
+      className={`min-w-0 rounded-xl border border-[#dfe4df] bg-[#fffefa] shadow-[var(--shadow-card)] ${className}`}
     >
       {title || description || action ? (
         <header className="flex flex-col justify-between gap-3 border-b border-[#e7ebe7] px-5 py-4 sm:flex-row sm:items-center">

@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import { AdminShell } from "@/components/layout/admin-shell";
 import { RoleSwitcher } from "@/components/layout/role-switcher";
 import {
@@ -26,9 +24,7 @@ export default async function ProtectedAdminLayout({
       allowedHrefs={allowedHrefs}
       roleControl={
         isDevelopmentRoleSwitchingEnabled() ? (
-          <Suspense fallback={null}>
-            <RoleSwitcher role={session.role} />
-          </Suspense>
+          <RoleSwitcher role={session.role} />
         ) : null
       }
       roleLabel={titleCase(session.role)}

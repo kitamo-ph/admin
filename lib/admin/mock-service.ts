@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { hasPermission } from "@/lib/auth/authorization";
+
 import { createMockAdminData, MOCK_CLOCK_ISO } from "./mock-seed";
 import {
   administratorListFiltersSchema,
@@ -634,10 +636,10 @@ export class MockAdminService implements AdminService {
       input,
       problemReportUpdateResultSchema,
       (update) => {
-        if (update.actor.role === "operations_viewer") {
+        if (!hasPermission(update.actor.role, "problem_reports:update")) {
           throw new MockServiceFault(
             "FORBIDDEN",
-            "The operations viewer role cannot update problem reports.",
+            "The current administrator cannot update problem reports.",
           );
         }
 
