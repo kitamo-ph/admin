@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { safeReturnTo } from "@/lib/auth/kitamo/resolve";
@@ -29,6 +30,8 @@ export async function closeAccessAction(formData: FormData): Promise<void> {
   if (!result.ok && result.error.code === "UNAUTHORIZED") {
     redirect("/sign-in?why=expired");
   }
+  // The banner is in the shared layout: refresh it along with the page.
+  revalidatePath("/", "layout");
   redirect(
     result.ok
       ? withNotice(returnTo, "closed")

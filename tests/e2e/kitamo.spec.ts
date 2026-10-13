@@ -247,8 +247,9 @@ test.describe("R16 pages through the Core adapter", () => {
       page.getByRole("heading", { name: "The last 14 days" }),
     ).toBeVisible();
     const banner = page.getByTestId("access-banner");
+    // The reason picked above (health check) is the one on the banner.
     await expect(banner).toContainText(
-      "Summary · reason: support request · 30 min left",
+      "Summary · reason: health check · 30 min left",
     );
 
     // Records are refused with only a summary access: the page asks for a new one.

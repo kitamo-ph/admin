@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { refusalMessage } from "@/lib/admin/r16-messages";
@@ -74,6 +75,9 @@ export async function openAccessAction(
     if (result.error.code === "UNAUTHORIZED") redirect("/sign-in?why=expired");
     return { message: refusalMessage(result.error) };
   }
+  // The banner lives in the shared layout, which a client-side redirect
+  // would otherwise keep as it was: invalidate it so the new access shows.
+  revalidatePath("/", "layout");
   redirect(sheet.value.level === "records" ? `${page}/records` : page);
 }
 

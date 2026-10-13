@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import {
   LEVEL_LABELS,
@@ -9,6 +9,18 @@ import {
   minutesLeft,
 } from "@/lib/admin/r16-rules";
 import type { LiveAccess } from "@/lib/admin/r16-schemas";
+
+const TICK_MS = 15_000;
+
+/** A local clock in 15-second steps: one interval, no request (no polling). */
+function subscribe(onTick: () => void): () => void {
+  const timer = window.setInterval(onTick, TICK_MS);
+  return () => window.clearInterval(timer);
+}
+// Rounded up, so the banner never shows more time than is left.
+const clockSnapshot = () => Math.ceil(Date.now() / TICK_MS) * TICK_MS;
+/** On the server (and while hydrating) the minutes are not shown yet. */
+const serverSnapshot = () => null;
 
 /**
  * The 30-minute banner (spec §5.3, D27 §4.2), from km_admin_session. The
@@ -26,18 +38,15 @@ export function AccessBanner({
   closeAction: (formData: FormData) => Promise<void>;
 }) {
   const pathname = usePathname();
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 15_000);
-    return () => window.clearInterval(timer);
-  }, []);
+  const now = useSyncExternalStore(subscribe, clockSnapshot, serverSnapshot);
 
   if (accesses.length === 0) return null;
 
   return (
     <section aria-label="Open accesses" className="km-banner-stack">
       {accesses.map((access) => {
-        const left = minutesLeft(access.expiresAt, now);
+        // Before the browser's clock is read, treat the access as open.
+        const left = now === null ? 1 : minutesLeft(access.expiresAt, now);
         const name = access.businessName ?? "A deleted business";
         return (
           <div
@@ -51,7 +60,7 @@ export function AccessBanner({
                 You&apos;re viewing <strong>{name}</strong> ·{" "}
                 {LEVEL_LABELS[access.level]} · reason:{" "}
                 {REASON_LABELS[access.reasonCode]} ·{" "}
-                <strong>{left} min left</strong>
+                <strong>{now === null ? "open" : `${left} min left`}</strong>
               </p>
             ) : (
               <p>
