@@ -62,7 +62,7 @@ async function openFirstBusiness(page: Page) {
 async function openSummary(page: Page) {
   await openFirstBusiness(page);
   await page
-    .getByLabel("Reason", { exact: true })
+    .getByRole("combobox", { name: "Reason", exact: true })
     .selectOption("support_request");
   await page.getByLabel(/Why you need to look/).fill(REASON);
   await page
@@ -216,7 +216,7 @@ test.describe("R16 pages through the Core adapter", () => {
     // Records with a reason but neither a flag nor a reference.
     await page.getByLabel(/Records \(break-glass\)/).check();
     await page
-      .getByLabel("Reason", { exact: true })
+      .getByRole("combobox", { name: "Reason", exact: true })
       .selectOption("health_check");
     await page.getByLabel(/Why you need to look/).fill(REASON);
     await page
@@ -267,7 +267,7 @@ test.describe("R16 pages through the Core adapter", () => {
     );
 
     await page
-      .getByLabel("Reason", { exact: true })
+      .getByRole("combobox", { name: "Reason", exact: true })
       .selectOption("support_request");
     await page.getByLabel(/Why you need to look/).fill(REASON);
     await page.getByLabel(/support or legal reference/).fill("SUP-2026-0142");
@@ -340,9 +340,11 @@ test.describe("R16 pages through the Core adapter", () => {
     await openSummary(page);
     const business = page.url();
     await page
-      .getByLabel("Kind", { exact: true })
+      .getByRole("combobox", { name: "Kind", exact: true })
       .selectOption("health_mismatch");
-    await page.getByLabel("Source", { exact: true }).selectOption("health");
+    await page
+      .getByRole("combobox", { name: "Source", exact: true })
+      .selectOption("health");
     await page.getByLabel(/Attach the health counts/).check();
     await page.getByRole("button", { name: "Raise the flag" }).click();
     await expect(page.getByText("Flag raised")).toBeVisible();
@@ -365,7 +367,10 @@ test.describe("R16 pages through the Core adapter", () => {
     }
 
     await page.goto("/flags");
-    await page.getByLabel("Change to").first().selectOption("dismissed");
+    await page
+      .getByRole("combobox", { name: "Change to" })
+      .first()
+      .selectOption("dismissed");
     await page
       .getByLabel(/Note/)
       .first()
