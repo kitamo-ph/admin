@@ -21,6 +21,10 @@ test("representative admin routes expose usable keyboard and semantic foundation
   page,
 }) => {
   await page.goto("/overview");
+  // The layout awaits the session (Core's km_admin_session in production), so
+  // the root loading state can stream first; React reveals the page shortly
+  // after the load event. Press Tab on the revealed page, not the skeleton.
+  await expect(page.locator("main#main-content")).toBeVisible();
 
   await page.keyboard.press("Tab");
   const skipLink = page.getByRole("link", { name: "Skip to main content" });
