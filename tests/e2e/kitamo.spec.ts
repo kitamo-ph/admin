@@ -126,7 +126,9 @@ test.describe("KitaMo sign-in", () => {
     ).toBeVisible();
     await page.getByLabel("6-digit code").fill("000000");
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("alert")).toContainText("didn't match");
+    await expect(page.getByRole("main").getByRole("alert")).toContainText(
+      "didn't match",
+    );
     // aal1 is not enough for the admin site.
     await page.goto("/overview");
     await expect(page).toHaveURL(/\/mfa\?returnTo=%2Foverview/);
@@ -143,7 +145,7 @@ test.describe("KitaMo sign-in", () => {
     await page.getByLabel("Email").fill(account("admin"));
     await page.getByLabel("Password").fill("not-the-password");
     await page.getByRole("button", { name: "Sign in with KitaMo" }).click();
-    await expect(page.getByRole("alert")).toContainText(
+    await expect(page.getByRole("main").getByRole("alert")).toContainText(
       "don't match a KitaMo account",
     );
     expect(

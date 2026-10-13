@@ -34,6 +34,12 @@ export async function signIn(
   }
   await page.getByLabel("6-digit code").fill(TOTP);
   await page.getByRole("button", { name: "Continue" }).click();
+  // The page moves on with location.replace once Auth answers: wait for it,
+  // so the caller's next navigation does not race it.
+  await page.waitForURL(
+    (url) =>
+      !url.pathname.startsWith("/mfa") && !url.pathname.startsWith("/sign-in"),
+  );
 }
 
 export type StubCalls = {
