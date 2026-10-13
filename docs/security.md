@@ -73,7 +73,17 @@ The development role switcher is not real authentication. It is allowed only in 
 
 Production code must ignore or reject a mock-role cookie and fail closed until the Clerk resolver is wired. A build-level check should verify that role, scenario, delay, seed-reset, and data-reset controls do not appear in the production bundle or rendered UI.
 
-### Future Clerk identity
+### R16 KitaMo identity (ADM-048)
+
+KitaMo's Auth by plain `fetch` (copied from Operations' console at dbe4ca6):
+Turnstile, the vendored ES256 check (sha256-pinned), `aal2` TOTP, host-only
+httpOnly cookies, a 30-minute idle on the server and the screen, and Core's
+`km_admin_session` on every request. No service-role key exists; the Core
+adapter uses the administrator's own token and fails closed on any reply key
+outside the spec's allowlist. Turnstile is the only third party in the CSP
+(`script-src` and `frame-src https://challenges.cloudflare.com`).
+
+### Future Clerk identity (superseded for R16 by ADM-048)
 
 The production integration must:
 

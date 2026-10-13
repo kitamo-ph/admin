@@ -6,6 +6,11 @@ const ACCESSIBILITY_ROUTES = [
   "/overview",
   "/users",
   "/problem-reports/report-001",
+  // R16 (ADM-048), through the mock adapter: the reason sheet and Flags.
+  "/businesses",
+  "/businesses/00000011-0000-4000-8000-000000a7d8e2",
+  "/flags",
+  "/audit-log",
 ] as const;
 
 test.beforeEach(async ({ baseURL, context }) => {

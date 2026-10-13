@@ -3,11 +3,14 @@
 Internal, mock-first support and platform-operations application for KitaMo.
 The intended production host is `admin.kitamo.online`.
 
-**Current phase:** the secure mock-first beta is complete and closed. The
-canonical local repository path is `~/Documents/KitaMo-ph/admin`, and the
-authoritative remote is `kitamo-ph/admin`. The application is ready to remain
-stable while Shared Contracts and production dependencies are established; it
-is not deployed and is not approved for production use.
+**Current phase: R16, the Core-backed super admin (ADM-048, signed off by
+the lead on 2026-10-14).** The secure mock-first beta is complete and closed.
+For R16 only, ADM-048 lifts ADM-041, ADM-044 (in part) and ADM-047: a
+read-only super-admin site that signs in with KitaMo's Auth at `aal2` and
+reads only through Core's `km_admin_*` RPCs with the administrator's own
+token. No service-role key, no Clerk, no module schema. The canonical local
+repository path is `~/Documents/KitaMo-ph/admin`, and the authoritative
+remote is `kitamo-ph/admin`.
 
 This application helps authorized administrators inspect users and businesses,
 monitor connected devices and synchronization health, triage problem reports,
@@ -17,8 +20,18 @@ sales or expense entry, subscriptions, detailed merchant financial reporting,
 account impersonation, and destructive account operations are intentionally
 outside its scope.
 
-The current iteration uses deterministic fictional data. It does not connect
-to production Clerk or Supabase, create database tables, or apply migrations.
+In R16 the site has two adapters behind one `AdminService`:
+
+- **Core** (production): every call is one `POST /rest/v1/rpc/<fn>` to
+  KitaMo's Supabase with the anon key and the signed-in administrator's own
+  `aal2` token. Core's `km_admin_can` is the gate and logs every read; the
+  site's own checks only route the browser. Replies are parsed with strict
+  zod schemas that fail closed on an unknown key.
+- **Mock** (development and tests only): deterministic fictional data with
+  Core's rules. A production runtime never serves it.
+
+This repository creates no tables and applies no migrations; Core's
+`0083_admin_expand` and `0084_admin` live in seller-web.
 
 ## Technology
 
@@ -142,7 +155,8 @@ are not compliance-grade audit storage.
 The role chooser and role switcher exist only when `NODE_ENV` is
 `development` or `test`. The server accepts the HttpOnly
 `kitamo_admin_mock_role` cookie only in those environments. A production
-runtime ignores it and fails closed until Clerk is connected.
+runtime ignores it; there, only a KitaMo `aal2` session that Core accepts is
+an administrator (R16 uses only `super_admin`, ADM-048).
 
 | Capability                                            | Super admin | Support admin | Operations viewer |
 | ----------------------------------------------------- | :---------: | :-----------: | :---------------: |
@@ -161,22 +175,25 @@ authoritative; [Authorization](docs/authorization.md) records its rationale.
 
 Public:
 
-- `/sign-in`
+- `/sign-in`, `/mfa` and `/mfa/enroll` (the last two need a KitaMo password
+  session)
 - `/access-denied`
-- `/api/health` — minimal mock liveness only; no dependency or secret details
+- `/api/session` (sign-in, sign-out, MFA; same-origin only)
+- `/api/health` — minimal liveness only; no dependency or secret details
 
-Protected:
+Protected, R16 (every link `prefetch={false}`):
 
-- `/overview`
-- `/users` and `/users/[userId]`
-- `/businesses` and `/businesses/[businessId]`
-- `/devices`
-- `/synchronization`
-- `/problem-reports` and `/problem-reports/[reportId]`
-- `/app-versions`
-- `/audit-log`
-- `/settings` — `super_admin` only
-- `/health` and `/maintenance`
+- `/overview` — the directory's totals, counts only
+- `/businesses` — the directory (no reason; every view logged by Core)
+- `/businesses/[businessId]` — the reason sheet, then the Summary
+- `/businesses/[businessId]/records` — Records, behind a records access
+- `/flags` — leads, not proof; review with a note
+- `/audit-log` — the access log (nav label "Access log")
+- `/associations` — a stub until the HOA level (the JR's 0086)
+
+Parked until R23 (development role cookie only; a KitaMo session gets 404):
+`/users`, `/devices`, `/synchronization`, `/problem-reports`,
+`/app-versions`, `/settings`, `/health`. `/maintenance` stays.
 
 Unauthenticated protected navigation redirects to `/sign-in` with a validated
 same-origin return path. Authenticated requests without a route capability go
@@ -186,29 +203,23 @@ check; the request proxy is defense in depth.
 ## Environment variables
 
 `.env.example` intentionally contains variable names with blank values only.
-Classify them before use:
+Values live in Vercel's environment settings, never in the repository:
 
-| Variable                            | Exposure    | Current purpose                                    |
-| ----------------------------------- | ----------- | -------------------------------------------------- |
-| `NEXT_PUBLIC_APP_URL`               | Browser     | Canonical application URL                          |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Browser     | Future Clerk publishable key                       |
-| `NEXT_PUBLIC_CLERK_SIGN_IN_URL`     | Browser     | Future Clerk sign-in route                         |
-| `CLERK_SECRET_KEY`                  | Server only | Future Clerk server authentication                 |
-| `CLERK_WEBHOOK_SIGNING_SECRET`      | Server only | Future Clerk webhook verification                  |
-| `SUPABASE_URL`                      | Server only | Future Supabase project URL                        |
-| `SUPABASE_ANON_KEY`                 | Server only | Future user-scoped/RLS client in this architecture |
-| `SUPABASE_SERVICE_ROLE_KEY`         | Server only | Future privileged adapter, if narrowly approved    |
-| `MOCK_ADMIN_ENABLED`                | Server only | Reserved marker; never grants administrator access |
-| `MOCK_ADMIN_SCENARIO`               | Server only | Controlled mock scenario                           |
-| `MOCK_ADMIN_LATENCY_MS`             | Server only | Controlled mock delay                              |
+| Variable                         | Exposure    | Purpose                                                                     |
+| -------------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_APP_URL`            | Browser     | Canonical application URL                                                   |
+| `KITAMO_SUPABASE_URL`            | Server only | KitaMo's Supabase project URL (Auth and PostgREST)                          |
+| `KITAMO_SUPABASE_ANON_KEY`       | Server only | KitaMo's anon key (public by design; the admin's token carries the rights)  |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Browser     | Turnstile on the sign-in (Cloudflare's test keys are refused in production) |
+| `KITAMO_AUTH_TEST_CAPTCHA_TOKEN` | Server only | Local tests only, with a loopback Auth; never set in Vercel                 |
+| `MOCK_ADMIN_ENABLED`             | Server only | Reserved marker; never grants administrator access                          |
+| `MOCK_ADMIN_SCENARIO`            | Server only | Controlled mock scenario (development and tests)                            |
+| `MOCK_ADMIN_LATENCY_MS`          | Server only | Controlled mock delay (development and tests)                               |
 
-Only variables deliberately prefixed `NEXT_PUBLIC_` may reach browser code.
-Never rename a secret with that prefix. In particular,
-`SUPABASE_SERVICE_ROLE_KEY`, `CLERK_SECRET_KEY`, and webhook signing material
-must stay in server-only modules and deployment secret storage.
-
-The repository security check rejects privileged variable names in browser
-modules:
+There is no service-role key (ADM-048). `npm run security:check` refuses any
+service-role name in application code and in `.env.example`, and
+`npm run security:bundle` refuses it, and the server-only env names, in the
+browser bundle:
 
 ```bash
 npm run security:check
@@ -216,6 +227,59 @@ npm run security:check
 
 See [Security and threat model](docs/security.md) for the complete controls and
 known production gaps.
+
+## Sign-in (R16)
+
+Copied from Operations' console (D19's module sign-in, operations `dbe4ca6`):
+
+1. `/sign-in`: email, password and Turnstile, posted to `/api/session`, which
+   calls KitaMo's Auth by plain `fetch` (no SDK) and checks the token with the
+   vendored ES256 check (`lib/auth/vendor/kitamo-login.ts`, sha256-pinned by
+   `tests/unit/kitamo-login.test.ts`). Staff (anonymous) sign-ins are refused.
+2. `/mfa/enroll` (first time) or `/mfa`: the authenticator-app (TOTP) code
+   through Auth's `/factors` endpoints; the session becomes `aal2`.
+3. Every request: the 30-minute idle, the ES256 check, `aal2`, then Core's
+   `km_admin_session`. Core's `KM005` is one "Not permitted" page: not the
+   admin account, an account that owns or manages a business, or the `admin`
+   switch off.
+
+Sessions live in host-only httpOnly cookies (`adm_at`, `adm_rt`, `adm_seen`).
+The development role chooser still exists in development and test only.
+
+## R16 operations runbook
+
+1. **The first `platform_admins` row** is an operator SQL step with a reason;
+   there is no client path (no grant, no function). In the SQL editor:
+
+   ```sql
+   insert into public.platform_admins (user_id, label, added_reason)
+   select id, 'Owner', 'R16 (OQ14): the owner''s separate admin account, added by <operator> on <date>'
+     from auth.users where email = '<the admin email>';
+   ```
+
+   Core's guard refuses an account that owns a business or has a live
+   manager row. Ending one is
+   `update … set ended_at = now(), ended_reason = '<why, 20+ characters>'`.
+
+2. **TOTP must be on** for KitaMo's hosted Auth project (Authentication →
+   Multi-Factor → "App Authenticator (TOTP)"). If it is off, `/mfa/enroll`
+   says so in plain words (Auth's `mfa_totp_enroll_not_enabled`).
+3. **The owner enrols TOTP** on the admin site's `/mfa/enroll`, on the admin
+   account only.
+4. **Never create a business on the admin account.** Opening the KitaMo app
+   with it lands on `/setup`; creating a business there makes Core refuse the
+   account here (fail-safe), and the account then needs a new
+   `platform_admins` row on a clean account.
+5. **The lead flips `admin`** after the smoke and the lawyer's OK (Q-L9):
+   `update public.km_switches set enabled = true, changed_at = now(), note = '<why>' where name = 'admin'`.
+   While it is off, every admin call answers `KM005` and the site shows "Not
+   permitted".
+6. **OQ22 (a rule, not a lock):** before reading or fixing one business's
+   records in the SQL editor, open an access on this site with the reason.
+   Release preflights stay counts only (D27 §4.4).
+7. **Vercel Hobby:** links do not prefetch and nothing polls (the access
+   banner's minutes tick on a local clock), so one administrator is a few
+   thousand invocations a month.
 
 ## Testing and quality gates
 
@@ -242,8 +306,13 @@ npm run test:e2e
 chunks contain neither privileged key names nor development mock-auth/scenario
 controls. The combined `quality` command runs it in the correct order.
 
-`npm run test:e2e` starts an isolated development server at
-`http://127.0.0.1:3100` unless one is already running there. It runs desktop
+`npm run test:e2e` starts a loopback stub of KitaMo's Auth and Core
+(`tests/e2e/stub/kitamo-stub.ts`, port 3199: GoTrue REST and PostgREST RPCs,
+ES256 tokens signed with a key made at start-up) and an isolated development
+server at `http://127.0.0.1:3100` pointed at it, unless they are already
+running. No test calls a hosted service. `kitamo.spec.ts` drives the real
+sign-in to `aal2` and the Core adapter; the other specs use the mock role
+cookie. It runs desktop
 Chromium, a Pixel 7 profile, and a dedicated responsive Chromium project over
 320, 412, 768, 1440, and 1920 CSS-pixel widths. The tests set the development
 role cookie directly to verify authentication and authorization without
@@ -282,6 +351,11 @@ Operational health details remain behind administrator access.
 
 ## Future Clerk and Supabase integration
 
+> **Superseded for R16 by ADM-048:** Clerk is dropped from the plan and the
+> identity source is KitaMo's Auth; the Core adapter above replaces the
+> service-role adapter described here. The rest of this section stays as the
+> record of the mock-first gate for scope beyond R16.
+
 The sibling Android repository at `kitamo-ph/owner-seller-mobile` has been
 inspected as evidence of the current local-first SQLite domain, migrations,
 repositories, protected workflows, local problem reports, and future
@@ -316,8 +390,12 @@ migrations merely to fit the mock UI. The full gate is documented in the
 
 ## Future Vercel deployment
 
-This iteration is deployment-compatible but must not be deployed to the
-production domain yet.
+> **R16 (ADM-048):** `admin.kitamo.online` may be deployed as its own Vercel
+> project, after the owner's DNS and Turnstile host steps (STEP5 §4), with
+> the `admin` switch still off until the lead flips it.
+
+Before R16 this iteration was deployment-compatible but not to be deployed to
+the production domain.
 
 Before a Vercel deployment:
 

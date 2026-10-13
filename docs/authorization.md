@@ -116,6 +116,21 @@ The switcher must satisfy all of the following:
 
 The mock development session is not a security boundary against a local developer. It exists to exercise policy behavior. Browser and role-access tests should verify that invalid roles fail closed and that the switcher is absent from a production build.
 
+## R16: Core is the gate (ADM-048)
+
+A KitaMo session is the `super_admin` role. The site's checks only route the
+browser; Core authorizes every read and write: each `km_admin_*` reader and
+the four admin-log writers call `km_admin_can` first (the `admin` switch,
+`aal2`, a live `platform_admins` row, no business owned, no live manager row)
+and answer one `KM005` for every refusal. Summary and Records need a live
+access of their own (30 minutes, a reason; Records also an open flag of the
+business or a reference) and are never inherited.
+
+The R16 permissions route the pages: `flags:read`, `flags:update`,
+`business_access:open` (open and close an access) and `associations:read`.
+`super_admin` holds all of them; the two mock roles read flags and
+associations only. Parked mock-first sections answer 404 to a KitaMo session.
+
 ## Future Clerk and Supabase authorization
 
 Production integration requires an approved mapping:

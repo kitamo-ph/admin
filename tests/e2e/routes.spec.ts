@@ -13,6 +13,8 @@ const MAIN_ADMIN_ROUTES = [
   "/audit-log",
   "/settings",
   "/health",
+  "/flags",
+  "/associations",
 ] as const;
 
 test.beforeEach(async ({ baseURL, context }) => {
@@ -40,7 +42,8 @@ test("stable detail routes resolve through the service boundary", async ({
 }) => {
   for (const path of [
     "/users/user-001",
-    "/businesses/business-001",
+    // A fictional R16 business id (lib/admin/mock-r16.ts).
+    "/businesses/00000011-0000-4000-8000-000000a7d8e2",
     "/problem-reports/report-001",
   ]) {
     await test.step(path, async () => {
