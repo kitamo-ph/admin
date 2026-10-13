@@ -9,8 +9,12 @@ import {
   assertPermission,
   authorize,
   hasPermission,
+  isMfaPath,
+  isParkedAdminPath,
   isProtectedAdminPath,
   isPublicAppPath,
+  PARKED_ADMIN_PATHS,
+  R16_ADMIN_PATHS,
   permissionForAdminPath,
   permissionsForRole,
   sessionFromDevelopmentRole,
@@ -201,3 +205,107 @@ function developmentRequest(url: string, role: string): NextRequest {
     },
   });
 }
+
+describe("R16 routes and permissions (ADM-048)", () => {
+  it("routes the R16 sections and keeps the MFA steps out of the permission map", () => {
+    expect(permissionForAdminPath("/flags")).toBe("flags:read");
+    expect(permissionForAdminPath("/associations")).toBe("associations:read");
+    expect(permissionForAdminPath("/businesses/0b0/records")).toBe(
+      "businesses:read",
+    );
+    expect(permissionForAdminPath("/mfa")).toBeNull();
+    expect(isMfaPath("/mfa/enroll")).toBe(true);
+    expect(isMfaPath("/mfa-old")).toBe(false);
+    expect(isPublicAppPath("/api/session/mfa")).toBe(true);
+  });
+
+  it("parks the mock-first sections, not the R16 ones", () => {
+    for (const path of PARKED_ADMIN_PATHS) {
+      expect(isParkedAdminPath(`${path}/x`)).toBe(true);
+    }
+    for (const path of R16_ADMIN_PATHS) {
+      expect(isParkedAdminPath(path)).toBe(false);
+    }
+  });
+
+  it("gives the R16 writes to super admins only", () => {
+    for (const permission of [
+      "flags:update",
+      "business_access:open",
+    ] as const) {
+      expect(hasPermission("super_admin", permission)).toBe(true);
+      expect(hasPermission("support_admin", permission)).toBe(false);
+      expect(hasPermission("operations_viewer", permission)).toBe(false);
+    }
+    expect(hasPermission("operations_viewer", "flags:read")).toBe(true);
+  });
+});
+
+describe("admin proxy with a KitaMo session", () => {
+  const now = Date.now();
+  const token = (exp: number) =>
+    `h.${Buffer.from(JSON.stringify({ exp })).toString("base64url")}.s`;
+  const kitamoRequest = (url: string, seen: number, exp: number) =>
+    new NextRequest(url, {
+      headers: {
+        cookie: `adm_at=${token(exp)}; adm_rt=refresh-1; adm_seen=${seen}`,
+      },
+    });
+
+  it("lets a fresh session through and marks the activity", async () => {
+    const response = await proxy(
+      kitamoRequest(
+        "https://admin.kitamo.online/flags",
+        now - 60_000,
+        Math.floor(now / 1000) + 600,
+      ),
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    const seen = response.cookies.get("adm_seen");
+    expect(seen?.httpOnly).toBe(true);
+    expect(Number(seen?.value)).toBeGreaterThanOrEqual(now);
+  });
+
+  it("signs out after 30 minutes idle and clears every session cookie", async () => {
+    const response = await proxy(
+      kitamoRequest(
+        "https://admin.kitamo.online/overview",
+        now - 31 * 60_000,
+        Math.floor(now / 1000) + 600,
+      ),
+    );
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      "https://admin.kitamo.online/sign-in?why=idle",
+    );
+    for (const name of ["adm_at", "adm_rt", "adm_seen"]) {
+      expect(response.cookies.get(name)?.value).toBe("");
+    }
+  });
+
+  it("sends a token it cannot refresh to the sign-in", async () => {
+    // No KITAMO_SUPABASE_URL in unit tests: the refresh fails closed.
+    const response = await proxy(
+      kitamoRequest(
+        "https://admin.kitamo.online/overview",
+        now - 60_000,
+        Math.floor(now / 1000) + 30,
+      ),
+    );
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      "https://admin.kitamo.online/sign-in?why=expired",
+    );
+  });
+
+  it("needs a session for the MFA steps", async () => {
+    const response = await proxy(
+      new NextRequest("https://admin.kitamo.online/mfa"),
+    );
+    expect(response.status).toBe(307);
+    expect(response.headers.get("location")).toBe(
+      "https://admin.kitamo.online/sign-in?returnTo=%2Fmfa",
+    );
+  });
+});
