@@ -73,9 +73,9 @@ App Router pages and components
               v
         AdminService
               |
-              +-- MockAdminService (current)
+              +-- MockAdminService (development and tests)
               |
-              +-- SupabaseAdminService (future)
+              +-- CoreAdminService (R16: Core RPCs with the admin's own aal2 token)
 ```
 
 Pages and components must not import seed arrays or a Supabase client. Domain

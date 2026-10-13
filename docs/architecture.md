@@ -31,7 +31,7 @@ Next.js App Router on Vercel
           |
           +-- current: MockAdminService
           |
-          +-- future: SupabaseAdminService
+          +-- CoreAdminService (R16, ADM-048: Core km_admin_* RPCs, the admin's own aal2 token)
                          |
                          +-- Supabase PostgreSQL + RLS
 
