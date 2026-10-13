@@ -1,460 +1,376 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
+import { RaiseFlagForm } from "@/components/admin/flag-forms";
+import { Notice } from "@/components/admin/notices";
+import { ReasonSheet, type SheetFlag } from "@/components/admin/reason-sheet";
 import { ServiceErrorState } from "@/components/feedback/service-state";
-import { CopyButton } from "@/components/ui/copy-button";
 import {
   Badge,
   Breadcrumbs,
   DataTable,
-  EmptyState,
   KeyValueGrid,
   PageHeader,
   Panel,
   StateBanner,
 } from "@/components/ui/primitives";
-import { getAdminService } from "@/lib/admin";
-import { requireAdminPermission } from "@/lib/auth/server";
-import { formatDate, formatDateTime, shortenId, titleCase } from "@/lib/format";
+import { LEVEL_LABELS, REASON_LABELS } from "@/lib/admin/r16-rules";
+import { coreIdSchema } from "@/lib/admin/r16-schemas";
+import { requireAdmin } from "@/lib/auth/server";
+import {
+  formatBusinessDay,
+  formatDateTime,
+  formatNumber,
+  formatPesos,
+  titleCase,
+} from "@/lib/format";
 
 export const metadata: Metadata = {
-  title: "Business details",
+  title: "Business",
 };
 
-const sections = [
-  ["overview", "Overview"],
-  ["memberships", "Owner & members"],
-  ["stalls", "Stalls"],
-  ["devices", "Devices"],
-  ["versions", "App versions"],
-  ["sync", "Sync health"],
-  ["reports", "Problem reports"],
-  ["audit", "Audit history"],
-] as const;
-
-export default async function BusinessDetailPage({
+/**
+ * One business (spec §5.3). With no live access: the reason sheet. With
+ * one: the Summary (counts and day totals, no customer or staff names),
+ * "Raise a flag", and "Open records", which is a new access with its own
+ * reason and evidence (never inherited, OQ16).
+ */
+export default async function BusinessPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ businessId: string }>;
+  searchParams: Promise<{ open?: string; level?: string; notice?: string }>;
 }) {
-  const { businessId } = await params;
-  await requireAdminPermission("businesses:read", `/businesses/${businessId}`);
+  const { businessId: rawId } = await params;
+  const id = coreIdSchema.safeParse(rawId);
+  if (!id.success) notFound();
+  const businessId = id.data;
+  const query = await searchParams;
+  const { service, state } = await requireAdmin(
+    "businesses:read",
+    `/businesses/${businessId}`,
+  );
+  const live = state.accesses.filter(
+    (access) => access.businessId === businessId,
+  );
+  const records = live.find((access) => access.level === "records");
+  const requestId = crypto.randomUUID();
 
-  const result = await getAdminService().getBusiness(businessId);
+  if (live.length === 0) {
+    // No access yet: the sheet. The flag picker needs this business's open
+    // flags (km_admin_flags, a directory-level read that Core logs).
+    const flags = await service.listFlags({ status: null });
+    const own = flags.ok
+      ? flags.data.filter((flag) => flag.businessId === businessId)
+      : [];
+    const name = own[0]?.businessName ?? null;
+    const label = name ?? `Business ${businessId.slice(0, 8)}`;
+    return (
+      <div className="admin-page">
+        <Breadcrumbs
+          items={[{ label: "Businesses", href: "/businesses" }, { label }]}
+        />
+        <PageHeader
+          description={`Business ID ${businessId}. Nothing about it is shown until you open an access with a reason.`}
+          eyebrow="Open an access"
+          title={label}
+        />
+        <Notice value={query.notice} />
+        <Panel
+          className="max-w-3xl"
+          description="Summary shows counts and day totals. Records are break-glass: they need an open flag of this business or a reference."
+          title="Reason sheet"
+        >
+          <div className="p-5">
+            <ReasonSheet
+              businessId={businessId}
+              businessLabel={label}
+              flags={toSheetFlags(own)}
+              initialLevel={query.level === "records" ? "records" : "summary"}
+              levels={["summary", "records"]}
+              requestId={requestId}
+            />
+          </div>
+        </Panel>
+      </div>
+    );
+  }
+
+  const result = await service.getBusinessSummary(businessId);
   if (!result.ok) {
     return (
       <div className="admin-page">
         <Breadcrumbs
           items={[
             { label: "Businesses", href: "/businesses" },
-            { label: "Business details" },
+            { label: "Business" },
           ]}
+        />
+        <PageHeader
+          description="The summary could not be shown."
+          eyebrow="Summary"
+          title="Business"
         />
         <ServiceErrorState error={result.error} />
       </div>
     );
   }
 
-  const detail = result.data;
-  const business = detail.business;
+  const summary = result.data;
+  const openFlags = summary.flags.filter(
+    (flag) => flag.status === "open" || flag.status === "reviewing",
+  );
+  const healthCounts = {
+    stock_use_issues_7d: summary.health.stockUseIssues7d,
+    ticket_issues_7d: summary.health.ticketIssues7d,
+    problem_reports_7d: summary.health.problemReports7d,
+    staff_code_failures_1d: summary.health.staffCodeFailures1d,
+    correction_requests_open: summary.health.correctionRequestsOpen,
+  };
+  const access = live[0];
 
   return (
     <div className="admin-page">
       <Breadcrumbs
         items={[
           { label: "Businesses", href: "/businesses" },
-          { label: business.name },
+          { label: summary.business.name },
         ]}
       />
       <PageHeader
         actions={
-          <>
-            <Badge value={business.status} />
-            <Badge value={business.syncHealth} />
-          </>
+          records ? (
+            <Link
+              className="km-button"
+              href={`/businesses/${businessId}/records`}
+              prefetch={false}
+            >
+              Records
+            </Link>
+          ) : (
+            <Link
+              className="km-button-secondary"
+              href={`/businesses/${businessId}?open=records`}
+              prefetch={false}
+            >
+              Open records
+            </Link>
+          )
         }
-        description={`${titleCase(business.type)} · Owned by ${business.ownerName}`}
-        eyebrow="Business details"
-        title={business.name}
+        description={
+          access
+            ? `${LEVEL_LABELS[access.level]} access · reason: ${REASON_LABELS[access.reasonCode]} · ends ${formatDateTime(access.expiresAt)}`
+            : "Summary"
+        }
+        eyebrow="Summary"
+        title={summary.business.name}
       />
+      <Notice value={query.notice} />
 
-      <StateBanner tone="info" title="Operational support view">
-        This record intentionally excludes sales, expenses, inventory, recipes,
-        production, profit calculations, and complete transaction detail.
-      </StateBanner>
-
-      <nav
-        aria-label="Business detail sections"
-        className="mb-5 flex gap-2 overflow-x-auto rounded-xl border border-[#dfe4df] bg-[#fffefa] p-2 shadow-[var(--shadow-card)]"
-      >
-        {sections.map(([id, label]) => (
-          <a
-            className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-[#4f5a53] hover:bg-[#f0f6f2] hover:text-[#173f30]"
-            href={`#${id}`}
-            key={id}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
-
-      <div className="grid gap-5">
-        <Panel className="scroll-mt-24" title="Business overview">
-          <div id="overview" className="scroll-mt-24">
-            <KeyValueGrid
-              items={[
-                { label: "Business type", value: titleCase(business.type) },
-                { label: "Owner", value: business.ownerName },
-                { label: "Timezone", value: business.timezone },
-                { label: "Status", value: <Badge value={business.status} /> },
-                {
-                  label: "Synchronization",
-                  value: <Badge value={business.syncHealth} />,
-                },
-                { label: "Active stalls", value: business.stallCount },
-                { label: "Seller members", value: business.sellerCount },
-                {
-                  label: "Connected devices",
-                  value: business.connectedDeviceCount,
-                },
-                {
-                  label: "Created",
-                  value: formatDate(business.createdAt, business.timezone),
-                },
-                {
-                  label: "Last activity",
-                  value: formatDateTime(
-                    business.lastActivityAt,
-                    business.timezone,
-                  ),
-                },
-              ]}
+      {query.open === "records" && !records ? (
+        <Panel
+          className="mb-6 max-w-3xl"
+          description="Records are a new access with their own reason and evidence; the summary's access is never stretched to cover them."
+          title="Open records (break-glass)"
+        >
+          <div className="p-5">
+            <ReasonSheet
+              businessId={businessId}
+              businessLabel={summary.business.name}
+              flags={toSheetFlags(openFlags)}
+              initialLevel="records"
+              levels={["records"]}
+              requestId={requestId}
             />
           </div>
         </Panel>
+      ) : null}
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Panel title="Business">
+          <KeyValueGrid
+            items={[
+              {
+                label: "Created",
+                value: formatBusinessDay(summary.business.createdOn),
+              },
+              { label: "Timezone", value: summary.business.timezone },
+              {
+                label: "State",
+                value: summary.business.hiddenSince
+                  ? `Hidden since ${formatDateTime(summary.business.hiddenSince)}`
+                  : "Live",
+              },
+              { label: "Stalls", value: formatNumber(summary.stalls.length) },
+              { label: "Staff", value: formatNumber(summary.staffCount) },
+              {
+                label: "Tickets",
+                value: titleCase(summary.settings.ticketMode),
+              },
+              {
+                label: "Owner PIN",
+                value: summary.settings.ownerPinSet ? "Set" : "Not set",
+              },
+              {
+                label: "Payment QR codes",
+                value: formatNumber(summary.settings.paymentQrCount),
+              },
+            ]}
+          />
+          {summary.stalls.length > 0 ? (
+            <p className="px-5 pb-5 text-sm text-[var(--km-color-text-secondary)]">
+              Stalls: {summary.stalls.map((stall) => stall.name).join(", ")}
+            </p>
+          ) : null}
+        </Panel>
 
         <Panel
-          className="scroll-mt-24"
-          description="Owner and fictional staff access"
-          title="Owner & memberships"
+          description="Counts from each record's own time; a lead for a flag, never proof."
+          title="Health"
         >
-          <div id="memberships" className="scroll-mt-24">
-            <div className="border-b border-[#e7ebe7] p-5">
-              <p className="text-xs font-semibold tracking-[0.05em] text-[#69736d] uppercase">
-                Owner
-              </p>
-              <Link
-                className="mt-1 inline-flex font-semibold text-[#173f30] hover:underline"
-                href={`/users/${detail.owner.id}`}
-              >
-                {detail.owner.displayName}
-              </Link>
-              <p className="mt-0.5 text-xs text-[#69736d]">
-                {detail.owner.emailMasked}
-              </p>
-            </div>
-            <DataTable label={`${business.name} memberships`}>
-              <thead>
-                <tr>
-                  <th scope="col">Member</th>
-                  <th scope="col">Role</th>
-                  <th scope="col">Stall</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detail.memberships.map((membership) => (
-                  <tr key={membership.id}>
-                    <td>
-                      <Link
-                        className="font-semibold text-[#173f30] hover:underline"
-                        href={`/users/${membership.userId}`}
-                      >
-                        {membership.userName}
-                      </Link>
-                    </td>
-                    <td>
-                      <Badge value={membership.role} />
-                    </td>
-                    <td>{membership.stallName ?? "All stalls"}</td>
-                    <td>
-                      <Badge value={membership.status} />
-                    </td>
-                    <td className="text-xs text-[#69736d]">
-                      {formatDate(membership.joinedAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </DataTable>
-          </div>
+          <KeyValueGrid
+            items={[
+              {
+                label: "Stock-use issues, 7 days",
+                value: formatNumber(summary.health.stockUseIssues7d),
+              },
+              {
+                label: "Ticket issues, 7 days",
+                value: formatNumber(summary.health.ticketIssues7d),
+              },
+              {
+                label: "Problem reports, 7 days",
+                value: formatNumber(summary.health.problemReports7d),
+              },
+              {
+                label: "Staff code failures, 1 day",
+                value: formatNumber(summary.health.staffCodeFailures1d),
+              },
+              {
+                label: "Open correction requests",
+                value: formatNumber(summary.health.correctionRequestsOpen),
+              },
+            ]}
+          />
         </Panel>
-
-        <Panel className="scroll-mt-24" title="Stalls">
-          <div
-            id="stalls"
-            className="grid scroll-mt-24 gap-3 p-5 md:grid-cols-2"
-          >
-            {detail.stalls.map((stall) => {
-              const stallDevices = detail.devices.filter(
-                (device) => device.stallId === stall.id,
-              );
-              return (
-                <article
-                  className="rounded-xl border border-[#e3e7e3] bg-[#fafbf8] p-4"
-                  key={stall.id}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-[#364039]">
-                        {stall.name}
-                      </p>
-                      <p className="mt-0.5 text-xs text-[#69736d]">
-                        {stall.locationLabel}
-                      </p>
-                    </div>
-                    <Badge value={stall.status} />
-                  </div>
-                  <p className="mt-4 text-sm text-[#4f5a53]">
-                    {stallDevices.length} connected{" "}
-                    {stallDevices.length === 1 ? "device" : "devices"} · Last
-                    activity {formatDateTime(stall.lastActivityAt)}
-                  </p>
-                  <Link
-                    className="mt-3 inline-flex text-sm font-semibold text-[#1e513d] hover:underline"
-                    href={`/synchronization?stall=${stall.id}`}
-                  >
-                    View synchronization
-                  </Link>
-                </article>
-              );
-            })}
-          </div>
-        </Panel>
-
-        <Panel className="scroll-mt-24" title="Connected devices">
-          <div id="devices" className="scroll-mt-24">
-            {detail.devices.length === 0 ? (
-              <EmptyState
-                description="No devices are registered to this fictional business."
-                title="No connected devices"
-              />
-            ) : (
-              <DataTable
-                label={`${business.name} connected devices`}
-                minWidth="64rem"
-              >
-                <thead>
-                  <tr>
-                    <th scope="col">Device</th>
-                    <th scope="col">Android</th>
-                    <th scope="col">App version</th>
-                    <th scope="col">Device tier</th>
-                    <th scope="col">Sync state</th>
-                    <th scope="col">Last seen</th>
-                    <th scope="col">Last successful sync</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.devices.map((device) => (
-                    <tr key={device.id}>
-                      <td>
-                        <p className="font-semibold text-[#364039]">
-                          {device.manufacturer} {device.model}
-                        </p>
-                        <p className="mt-0.5 font-mono text-xs text-[#69736d]">
-                          {device.deviceIdentifierMasked}
-                        </p>
-                      </td>
-                      <td>{device.androidVersion}</td>
-                      <td>{device.appVersionName}</td>
-                      <td>{titleCase(device.performanceTier)}</td>
-                      <td>
-                        <Badge value={device.syncState} />
-                      </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
-                        {formatDateTime(device.lastSeenAt)}
-                      </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
-                        {formatDateTime(device.lastSuccessfulSyncAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
-            )}
-          </div>
-        </Panel>
-
-        <Panel className="scroll-mt-24" title="App versions">
-          <div id="versions" className="scroll-mt-24">
-            <DataTable label={`${business.name} app versions`}>
-              <thead>
-                <tr>
-                  <th scope="col">Version</th>
-                  <th scope="col">Channel</th>
-                  <th scope="col">Active installs</th>
-                  <th scope="col">Outdated</th>
-                  <th scope="col">Support status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detail.appVersions.map((version) => (
-                  <tr key={version.id}>
-                    <td className="font-semibold">
-                      {version.versionName} ({version.versionCode})
-                    </td>
-                    <td>
-                      <Badge value={version.releaseChannel} />
-                    </td>
-                    <td>{version.activeInstalls}</td>
-                    <td>{version.outdatedDeviceCount}</td>
-                    <td>
-                      <Badge
-                        label={version.isSupported ? "Supported" : "Outdated"}
-                        tone={version.isSupported ? "success" : "warning"}
-                        value={version.isSupported ? "supported" : "outdated"}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </DataTable>
-          </div>
-        </Panel>
-
-        <Panel className="scroll-mt-24" title="Recent synchronization">
-          <div id="sync" className="scroll-mt-24">
-            {detail.recentSyncEvents.length === 0 ? (
-              <EmptyState
-                description="No synchronization events are available for this business."
-                title="No recent sync activity"
-              />
-            ) : (
-              <DataTable
-                label={`${business.name} recent synchronization events`}
-                minWidth="68rem"
-              >
-                <thead>
-                  <tr>
-                    <th scope="col">State</th>
-                    <th scope="col">Device / stall</th>
-                    <th scope="col">App version</th>
-                    <th scope="col">Retry</th>
-                    <th scope="col">Error</th>
-                    <th scope="col">Last attempt</th>
-                    <th scope="col">Correlation ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detail.recentSyncEvents.map((event) => (
-                    <tr key={event.id}>
-                      <td>
-                        <Badge value={event.state} />
-                      </td>
-                      <td>
-                        <p className="font-mono text-xs">
-                          {event.deviceIdentifierMasked}
-                        </p>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
-                          {event.stallName ?? "No stall"}
-                        </p>
-                      </td>
-                      <td>{event.appVersionName}</td>
-                      <td>{titleCase(event.retryState)}</td>
-                      <td>
-                        {event.errorType
-                          ? titleCase(event.errorType)
-                          : "No error"}
-                      </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
-                        {formatDateTime(event.occurredAt, business.timezone)}
-                      </td>
-                      <td>
-                        <div className="flex items-center gap-2">
-                          <code className="text-xs">
-                            {shortenId(event.correlationId)}
-                          </code>
-                          <CopyButton value={event.correlationId} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </DataTable>
-            )}
-          </div>
-        </Panel>
-
-        <div className="grid gap-5 xl:grid-cols-2">
-          <Panel className="scroll-mt-24" title="Related problem reports">
-            <div id="reports" className="scroll-mt-24">
-              {detail.problemReports.length === 0 ? (
-                <EmptyState
-                  description="No support reports are associated with this business."
-                  title="No related reports"
-                />
-              ) : (
-                <div className="divide-y divide-[#e7ebe7]">
-                  {detail.problemReports.slice(0, 8).map((report) => (
-                    <article className="p-5" key={report.id}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <Link
-                            className="font-semibold text-[#173f30] hover:underline"
-                            href={`/problem-reports/${report.id}`}
-                          >
-                            {report.title}
-                          </Link>
-                          <p className="mt-1 text-xs text-[#69736d]">
-                            {titleCase(report.category)} ·{" "}
-                            {formatDateTime(report.submittedAt)}
-                          </p>
-                        </div>
-                        <Badge value={report.status} />
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Panel>
-
-          <Panel className="scroll-mt-24" title="Audit history">
-            <div id="audit" className="scroll-mt-24">
-              {detail.auditEvents.length === 0 ? (
-                <EmptyState
-                  description="No mock audit events are associated with this business."
-                  title="No audit history"
-                />
-              ) : (
-                <div className="divide-y divide-[#e7ebe7]">
-                  {detail.auditEvents.slice(0, 8).map((event) => (
-                    <article className="p-5" key={event.id}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-[#364039]">
-                            {titleCase(event.action.replaceAll(".", "_"))}
-                          </p>
-                          <p className="mt-1 text-xs text-[#69736d]">
-                            {event.actorName} ·{" "}
-                            {formatDateTime(
-                              event.occurredAt,
-                              business.timezone,
-                            )}
-                          </p>
-                        </div>
-                        <Badge value={event.outcome} />
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </div>
-          </Panel>
-        </div>
       </div>
+
+      <Panel
+        className="mt-6"
+        description="Business days in the business's timezone. Voided sales are left out; returns count on the day they were made."
+        title="The last 14 days"
+      >
+        <DataTable label="Daily totals" minWidth="40rem">
+          <thead>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Sales</th>
+              <th scope="col">Sales total</th>
+              <th scope="col">Returns</th>
+              <th scope="col">Returns total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {summary.days.map((day) => (
+              <tr key={day.day}>
+                <td>{formatBusinessDay(day.day)}</td>
+                <td>{formatNumber(day.salesCount)}</td>
+                <td className="money">{formatPesos(day.salesCents)}</td>
+                <td>{formatNumber(day.returnsCount)}</td>
+                <td className="money">{formatPesos(day.returnsCents)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </DataTable>
+      </Panel>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <Panel title="Apps with access">
+          {summary.apps.length === 0 ? (
+            <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+              No app has access.
+            </p>
+          ) : (
+            <ul className="divide-y divide-[var(--km-color-border)]">
+              {summary.apps.map((app) => (
+                <li
+                  className="px-5 py-3 text-sm"
+                  key={`${app.grantee}-${app.scope}`}
+                >
+                  <strong>{app.grantee}</strong> · {app.scope} · since{" "}
+                  {formatDateTime(app.since)}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+
+        <Panel
+          description="A lead, not proof. Never shown to the business."
+          title="Flags"
+        >
+          {summary.flags.length === 0 ? (
+            <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+              No flags.
+            </p>
+          ) : (
+            <ul className="divide-y divide-[var(--km-color-border)]">
+              {summary.flags.map((flag) => (
+                <li
+                  className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm"
+                  key={flag.flagId}
+                >
+                  <Badge value={flag.status} />
+                  <span>
+                    {titleCase(flag.kind)} · from {flag.source} ·{" "}
+                    {formatDateTime(flag.createdAt)}
+                  </span>
+                  <span className="km-lead">A lead, not proof</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Panel>
+      </div>
+
+      <Panel className="mt-6 max-w-3xl" title="Raise a flag">
+        <div className="p-5">
+          <RaiseFlagForm
+            businessId={businessId}
+            healthCounts={healthCounts}
+            requestId={requestId}
+          />
+        </div>
+      </Panel>
+
+      <StateBanner tone="info" title="Read-only">
+        Nothing here changes the business. When you are done, close the access
+        from the banner above.
+      </StateBanner>
     </div>
+  );
+}
+
+function toSheetFlags(
+  flags: ReadonlyArray<{
+    flagId: string;
+    kind: SheetFlag["kind"];
+    status: string;
+    createdAt: string;
+  }>,
+): SheetFlag[] {
+  return flags.flatMap((flag) =>
+    flag.status === "open" || flag.status === "reviewing"
+      ? [
+          {
+            flagId: flag.flagId,
+            kind: flag.kind,
+            status: flag.status,
+            createdAt: flag.createdAt,
+          },
+        ]
+      : [],
   );
 }

@@ -7,6 +7,21 @@ const forbiddenNames = [
   "NEXT_PUBLIC_CLERK_WEBHOOK_SIGNING_SECRET",
 ];
 
+/**
+ * ADM-048: no service-role key exists in this repo. Application code and the
+ * env example may not even name one (the Core adapter uses the admin's own
+ * token with the anon key).
+ */
+const serviceRolePattern = /service_role/i;
+const serviceRoleScopes = ["app/", "lib/", "components/"];
+const serviceRoleFiles = new Set([
+  "proxy.ts",
+  "next.config.ts",
+  ".env.example",
+  "vitest.config.ts",
+  "playwright.config.ts",
+]);
+
 const secretValuePatterns = [
   /sk_(?:live|test)_[A-Za-z0-9]{16,}/,
   /sk_(?:proj|org)-[A-Za-z0-9_-]{20,}/,
@@ -43,6 +58,16 @@ for (const file of files) {
     if (content.includes(name)) {
       findings.push(`${file}: forbidden browser-exposed secret name ${name}`);
     }
+  }
+
+  if (
+    (serviceRoleFiles.has(file) ||
+      serviceRoleScopes.some((scope) => file.startsWith(scope))) &&
+    serviceRolePattern.test(content)
+  ) {
+    findings.push(
+      `${file}: names a service-role key; ADM-048 allows none in this repository`,
+    );
   }
 
   for (const pattern of secretValuePatterns) {

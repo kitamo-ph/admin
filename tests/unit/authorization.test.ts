@@ -156,8 +156,8 @@ describe("development role sessions", () => {
 });
 
 describe("admin proxy", () => {
-  it("redirects an unauthenticated protected request to sign-in safely", () => {
-    const response = proxy(
+  it("redirects an unauthenticated protected request to sign-in safely", async () => {
+    const response = await proxy(
       new NextRequest("https://admin.kitamo.online/users?status=active"),
     );
 
@@ -167,8 +167,8 @@ describe("admin proxy", () => {
     );
   });
 
-  it("redirects an authenticated but unauthorized role to access denied", () => {
-    const response = proxy(
+  it("redirects an authenticated but unauthorized role to access denied", async () => {
+    const response = await proxy(
       developmentRequest(
         "https://admin.kitamo.online/settings",
         "support_admin",
@@ -181,8 +181,8 @@ describe("admin proxy", () => {
     );
   });
 
-  it("allows an authenticated role with the route permission", () => {
-    const response = proxy(
+  it("allows an authenticated role with the route permission", async () => {
+    const response = await proxy(
       developmentRequest(
         "https://admin.kitamo.online/problem-reports/report_mock_001",
         "operations_viewer",

@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+/**
+ * KitaMo's tab look (Operations' align/kitamo-feel @ 2daaf50): the active
+ * item in the text colour with a rule beside it. prefetch is off: each
+ * prefetch would be a Vercel invocation on the shared Hobby limit.
+ */
 export function AdminNavLink({
   href,
   label,
@@ -17,48 +22,25 @@ export function AdminNavLink({
   const pathname = usePathname();
   const active = pathname === href || pathname.startsWith(`${href}/`);
 
-  if (mobile) {
-    return (
-      <Link
-        aria-current={active ? "page" : undefined}
-        className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 font-medium ${
-          active
-            ? "bg-[#e3efe8] text-[#173f30]"
-            : "text-[#364039] hover:bg-[#f0f6f2] hover:text-[#173f30]"
-        }`}
-        href={href}
-      >
-        <span
-          aria-hidden="true"
-          className={`grid size-7 place-items-center rounded-md text-xs font-bold ${
-            active
-              ? "bg-[#d3a33f] text-[#102f24]"
-              : "bg-[#e3efe8] text-[#1e513d]"
-          }`}
-        >
-          {symbol}
-        </span>
-        {label}
-      </Link>
-    );
-  }
-
   return (
     <Link
       aria-current={active ? "page" : undefined}
-      className={`group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+      className={`group flex min-h-11 items-center gap-3 rounded-[var(--km-radius-control)] border-l-2 px-3 py-2 ${
+        mobile ? "font-medium" : "text-sm font-semibold"
+      } ${
         active
-          ? "bg-white/10 text-white"
-          : "text-[#d8e5dc] hover:bg-white/8 hover:text-white"
+          ? "border-[var(--km-color-text)] bg-[var(--km-color-muted)] text-[var(--km-color-text)]"
+          : "border-transparent text-[var(--km-color-text-secondary)] hover:bg-[var(--km-color-muted)] hover:text-[var(--km-color-text)]"
       }`}
       href={href}
+      prefetch={false}
     >
       <span
         aria-hidden="true"
-        className={`grid size-6 place-items-center rounded-md text-[0.68rem] font-bold ${
+        className={`grid size-7 place-items-center rounded-md text-xs font-bold ${
           active
-            ? "bg-[#d3a33f] text-[#102f24]"
-            : "bg-white/7 text-[#b9cec1] group-hover:bg-[#d3a33f] group-hover:text-[#102f24]"
+            ? "bg-[var(--km-color-action)] text-[var(--km-color-action-foreground)]"
+            : "bg-[var(--km-color-select-soft)] text-[var(--km-color-select)]"
         }`}
       >
         {symbol}

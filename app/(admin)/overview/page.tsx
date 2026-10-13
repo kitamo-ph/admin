@@ -1,230 +1,109 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import {
-  DataFreshness,
-  ServiceErrorState,
-} from "@/components/feedback/service-state";
-import {
-  Badge,
-  DataTable,
-  MetricCard,
-  PageHeader,
-  Panel,
-  StateBanner,
-} from "@/components/ui/primitives";
-import { getAdminService } from "@/lib/admin";
-import { requireAdminPermission } from "@/lib/auth/server";
-import {
-  formatDateTime,
-  formatNumber,
-  formatPercent,
-  titleCase,
-} from "@/lib/format";
+import { ServiceErrorState } from "@/components/feedback/service-state";
+import { MetricCard, PageHeader, Panel } from "@/components/ui/primitives";
+import { LEVEL_LABELS, REASON_LABELS } from "@/lib/admin/r16-rules";
+import { requireAdmin } from "@/lib/auth/server";
+import { formatDateTime, formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Overview",
 };
 
+/** Overview (spec §5.3): km_admin_directory's totals, counts only. */
 export default async function OverviewPage() {
-  await requireAdminPermission("overview:read", "/overview");
-
-  const result = await getAdminService().getDashboardSummary();
-  if (!result.ok) {
-    return (
-      <div className="admin-page">
-        <PageHeader
-          description="A concise view of KitaMo platform activity, support workload, and synchronization health."
-          eyebrow="Operational workspace"
-          title="Overview"
-        />
-        <ServiceErrorState error={result.error} />
-      </div>
-    );
-  }
-
-  const summary = result.data;
+  const { service, state } = await requireAdmin("overview:read", "/overview");
+  const result = await service.getOverview();
 
   return (
     <div className="admin-page">
       <PageHeader
-        actions={
-          <DataFreshness
-            generatedAt={result.meta.generatedAt}
-            stale={result.meta.stale}
-          />
-        }
-        description="A concise view of KitaMo platform activity, support workload, and synchronization health."
-        eyebrow="Operational workspace"
+        description="Counts across every KitaMo business. No money, no names: open a business with a reason to see more."
+        eyebrow="KitaMo admin"
         title="Overview"
+        actions={
+          <Link className="km-button" href="/businesses" prefetch={false}>
+            Open the business directory
+          </Link>
+        }
       />
 
-      {result.meta.stale ? (
-        <StateBanner tone="warning" title="This snapshot may be out of date">
-          The mock stale-data scenario is active. Use timestamps and correlation
-          IDs when reviewing support issues.
-        </StateBanner>
-      ) : null}
+      {result.ok ? (
+        <section
+          aria-label="Business counts"
+          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
+        >
+          <MetricCard
+            context="Every business KitaMo holds"
+            icon="B"
+            label="Businesses"
+            value={formatNumber(result.data.totals.businesses)}
+          />
+          <MetricCard
+            context="Not hidden by their owner"
+            icon="L"
+            label="Live"
+            tone="success"
+            value={formatNumber(result.data.totals.live)}
+          />
+          <MetricCard
+            context="Hidden by their owner"
+            icon="H"
+            label="Hidden"
+            value={formatNumber(result.data.totals.hidden)}
+          />
+          <MetricCard
+            context="With a sale in the last 7 days"
+            icon="7"
+            label="Active this week"
+            value={formatNumber(result.data.totals.active7d)}
+          />
+          <MetricCard
+            context="Open or under review; a lead, not proof"
+            icon="F"
+            label="With open flags"
+            tone={result.data.totals.withOpenFlags > 0 ? "warning" : "default"}
+            value={formatNumber(result.data.totals.withOpenFlags)}
+          />
+        </section>
+      ) : (
+        <ServiceErrorState error={result.error} />
+      )}
 
-      <section
-        aria-label="Platform metrics"
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      <Panel
+        className="mt-6"
+        description="Each lasts 30 minutes from when it was opened. Close it when you are done."
+        title="Your open accesses"
       >
-        <MetricCard
-          context="Fictional owner and seller accounts"
-          icon="U"
-          label="Registered users"
-          value={formatNumber(summary.registeredUsers)}
-        />
-        <MetricCard
-          context={`${formatNumber(summary.activeStalls)} active stalls`}
-          icon="B"
-          label="Active businesses"
-          value={formatNumber(summary.activeBusinesses)}
-        />
-        <MetricCard
-          context="Seller devices seen in the active window"
-          icon="D"
-          label="Connected devices"
-          value={formatNumber(summary.connectedSellerDevices)}
-        />
-        <MetricCard
-          context={`${formatNumber(summary.syncRecordsProcessed)} records processed`}
-          icon="↻"
-          label="Sync success rate"
-          tone={summary.syncSuccessRate >= 95 ? "success" : "warning"}
-          value={formatPercent(summary.syncSuccessRate)}
-        />
-        <MetricCard
-          context="Attempts requiring investigation or retry"
-          icon="!"
-          label="Failed sync attempts"
-          tone={summary.failedSyncAttempts > 30 ? "danger" : "warning"}
-          value={formatNumber(summary.failedSyncAttempts)}
-        />
-        <MetricCard
-          context="Reports not yet resolved or closed"
-          icon="R"
-          label="Unresolved reports"
-          tone={summary.unresolvedProblemReports > 10 ? "warning" : "default"}
-          value={formatNumber(summary.unresolvedProblemReports)}
-        />
-        <MetricCard
-          context="Active operational locations"
-          icon="S"
-          label="Active stalls"
-          value={formatNumber(summary.activeStalls)}
-        />
-        <MetricCard
-          context="Support-safe count; transaction detail is excluded"
-          icon="✓"
-          label="Sync records processed"
-          value={formatNumber(summary.syncRecordsProcessed)}
-        />
-      </section>
-
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-        <Panel
-          action={
-            <Link
-              className="text-sm font-semibold text-[#1e513d] hover:underline"
-              href="/app-versions"
-            >
-              Review versions
-            </Link>
-          }
-          description="Share of connected mock devices"
-          title="Version distribution"
-        >
-          <div className="space-y-4 p-5">
-            {summary.versionDistribution.map((item) => (
-              <div key={item.appVersionId}>
-                <div className="mb-1.5 flex items-center justify-between gap-4 text-sm">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="truncate font-semibold text-[#364039]">
-                      v{item.versionName}
-                    </span>
-                    {item.outdated ? (
-                      <Badge label="Outdated" tone="warning" value="outdated" />
-                    ) : null}
-                  </div>
-                  <span className="shrink-0 text-xs font-semibold text-[#69736d]">
-                    {formatNumber(item.deviceCount)} ·{" "}
-                    {formatPercent(item.percentage)}
-                  </span>
-                </div>
-                <div
-                  aria-label={`${item.versionName}: ${formatPercent(item.percentage)} of devices`}
-                  aria-valuemax={100}
-                  aria-valuemin={0}
-                  aria-valuenow={item.percentage}
-                  className="h-2 overflow-hidden rounded-full bg-[#e7ebe7]"
-                  role="progressbar"
+        {state.accesses.length === 0 ? (
+          <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+            None open. Every look at a business starts with a reason.
+          </p>
+        ) : (
+          <ul className="divide-y divide-[var(--km-color-border)]">
+            {state.accesses.map((access) => (
+              <li
+                className="flex flex-wrap items-center justify-between gap-3 px-5 py-3"
+                key={access.accessId}
+              >
+                <Link
+                  className="font-semibold underline underline-offset-4"
+                  href={`/businesses/${access.businessId}`}
+                  prefetch={false}
                 >
-                  <div
-                    className={
-                      item.outdated
-                        ? "h-full bg-[#d3a33f]"
-                        : "h-full bg-[#2a684f]"
-                    }
-                    style={{ width: `${Math.max(item.percentage, 1)}%` }}
-                  />
-                </div>
-              </div>
+                  {access.businessName ?? "A deleted business"}
+                </Link>
+                <span className="text-sm text-[var(--km-color-text-secondary)]">
+                  {LEVEL_LABELS[access.level]} ·{" "}
+                  {REASON_LABELS[access.reasonCode]} · ends{" "}
+                  {formatDateTime(access.expiresAt)}
+                </span>
+              </li>
             ))}
-          </div>
-        </Panel>
-
-        <Panel
-          action={
-            <Link
-              className="text-sm font-semibold text-[#1e513d] hover:underline"
-              href="/audit-log"
-            >
-              Open audit log
-            </Link>
-          }
-          description="Latest support-safe administrator and system events"
-          title="Recent activity"
-        >
-          <DataTable label="Recent platform activity" minWidth="38rem">
-            <thead>
-              <tr>
-                <th scope="col">Activity</th>
-                <th scope="col">Actor</th>
-                <th scope="col">Outcome</th>
-                <th scope="col">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {summary.recentActivity.map((event) => (
-                <tr key={event.id}>
-                  <td>
-                    <p className="font-semibold text-[#364039]">
-                      {titleCase(event.action.replaceAll(".", "_"))}
-                    </p>
-                    <p className="mt-0.5 text-xs text-[#69736d]">
-                      {event.targetLabel}
-                    </p>
-                  </td>
-                  <td>
-                    <p className="text-sm">{event.actorName}</p>
-                    <p className="text-xs text-[#69736d]">
-                      {titleCase(event.actorRole)}
-                    </p>
-                  </td>
-                  <td>
-                    <Badge value={event.outcome} />
-                  </td>
-                  <td className="text-xs whitespace-nowrap text-[#69736d]">
-                    {formatDateTime(event.occurredAt)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </DataTable>
-        </Panel>
-      </div>
+          </ul>
+        )}
+      </Panel>
     </div>
   );
 }

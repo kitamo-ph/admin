@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored verbatim (ED-008); its sha256 is pinned by a unit test.
+    "lib/auth/vendor/**",
   ]),
 ]);
 

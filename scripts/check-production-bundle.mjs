@@ -5,6 +5,11 @@ const staticRoot = join(process.cwd(), ".next", "static");
 
 const forbiddenBrowserStrings = [
   "SUPABASE_SERVICE_ROLE_KEY",
+  // ADM-048: no service-role key, in any spelling, and no server-only env names.
+  "SERVICE_ROLE",
+  "service_role",
+  "KITAMO_SUPABASE_ANON_KEY",
+  "KITAMO_AUTH_TEST_CAPTCHA_TOKEN",
   "CLERK_SECRET_KEY",
   "CLERK_WEBHOOK_SIGNING_SECRET",
   "kitamo_admin_mock_role",

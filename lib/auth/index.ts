@@ -22,6 +22,11 @@ export {
 } from "./model";
 export {
   ADMIN_ROUTE_RULES,
+  MFA_PATH,
+  PARKED_ADMIN_PATHS,
+  R16_ADMIN_PATHS,
+  isMfaPath,
+  isParkedAdminPath,
   isProtectedAdminPath,
   isPublicAppPath,
   permissionForAdminPath,

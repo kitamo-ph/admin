@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
 
+import { KitamoSignInForm } from "@/components/auth/kitamo-sign-in-form";
 import { PublicShell } from "@/components/layout/public-shell";
 import {
   ADMIN_ROLES,
   isDevelopmentRoleSwitchingEnabled,
   type AdminRole,
 } from "@/lib/auth";
+import { captchaConfiguration } from "@/lib/auth/kitamo/captcha";
+import { safeReturnTo } from "@/lib/auth/kitamo/resolve";
+import { authBase } from "@/lib/auth/kitamo/session";
 import { titleCase } from "@/lib/format";
 
 import { signInWithDevelopmentRole } from "./actions";
 
 export const metadata: Metadata = {
   title: "Sign in",
+};
+
+export const dynamic = "force-dynamic";
+
+const WHY: Record<string, string> = {
+  idle: "The admin site signed you out after 30 minutes without use. Sign in again.",
+  expired: "Your sign-in ended. Sign in again.",
+  signed_out: "You signed out.",
 };
 
 const roleDescriptions: Record<AdminRole, string> = {
@@ -23,21 +35,42 @@ const roleDescriptions: Record<AdminRole, string> = {
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ returnTo?: string }>;
+  searchParams: Promise<{ returnTo?: string; why?: string }>;
 }) {
-  const { returnTo = "/overview" } = await searchParams;
+  const { returnTo = "/overview", why } = await searchParams;
   const switchingEnabled = isDevelopmentRoleSwitchingEnabled();
+  // KitaMo's Auth (R16, ADM-048): always in production; in development only
+  // when KITAMO_SUPABASE_URL and KITAMO_SUPABASE_ANON_KEY are set.
+  const kitamoEnabled = !switchingEnabled || authBase() !== null;
+  const notice = why === undefined ? undefined : WHY[why];
 
   return (
     <PublicShell
       eyebrow={switchingEnabled ? "Development access" : "Administrator access"}
       title="Sign in to KitaMo Admin"
       description={
-        switchingEnabled
-          ? "Choose a fictional administrator role to review the mock-first platform. This authentication shell is available only during local development."
-          : "Production authentication is not connected in this mock-first iteration. Clerk will be integrated at this server-side boundary."
+        kitamoEnabled
+          ? "For KitaMo's admin account only: its KitaMo email and password, then the code from its authenticator app."
+          : "Choose a fictional administrator role to review the mock-first platform. This authentication shell is available only during local development."
       }
     >
+      {notice !== undefined ? (
+        <p className="km-notice mb-5" role="status">
+          {notice}
+        </p>
+      ) : null}
+      {kitamoEnabled ? (
+        <div className="mb-8">
+          <KitamoSignInForm
+            captcha={captchaConfiguration()}
+            returnTo={safeReturnTo(returnTo)}
+          />
+          <p className="km-hint mt-4">
+            Every look at a business needs a written reason, lasts at most 30
+            minutes, and is shown to that business.
+          </p>
+        </div>
+      ) : null}
       {switchingEnabled ? (
         <>
           <div className="mb-5 rounded-xl border border-[#eedcae] bg-[#fff7e5] px-4 py-3 text-sm text-[#79530d]">
@@ -71,28 +104,13 @@ export default async function SignInPage({
             ))}
           </div>
         </>
-      ) : (
-        <div className="rounded-xl border border-[#dfe4df] bg-[#fffefa] p-5 shadow-[var(--shadow-card)]">
-          <p className="font-semibold text-[#173f30]">
-            Clerk connection pending
-          </p>
-          <p className="mt-2 text-sm leading-6 text-[#69736d]">
-            This build fails closed. No mock role can be selected or accepted in
-            a production runtime.
-          </p>
-          <button
-            className="mt-5 w-full cursor-not-allowed rounded-lg bg-[#dfe4df] px-4 py-2.5 font-semibold text-[#69736d]"
-            disabled
-            type="button"
-          >
-            Sign in unavailable
-          </button>
-        </div>
-      )}
-      <p className="mt-6 text-center text-xs leading-5 text-[#69736d]">
-        Every protected route and mock mutation independently validates the
-        active administrator permission.
-      </p>
+      ) : null}
+      {switchingEnabled ? (
+        <p className="mt-6 text-center text-xs leading-5 text-[#69736d]">
+          Every protected route and mock mutation independently validates the
+          active administrator permission.
+        </p>
+      ) : null}
     </PublicShell>
   );
 }

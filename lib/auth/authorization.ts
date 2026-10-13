@@ -19,6 +19,8 @@ export const ROLE_PERMISSIONS = {
     "app_versions:read",
     "audit_log:read",
     "health:read",
+    "flags:read",
+    "associations:read",
   ],
   operations_viewer: [
     "overview:read",
@@ -30,6 +32,8 @@ export const ROLE_PERMISSIONS = {
     "app_versions:read",
     "audit_log:read",
     "health:read",
+    "flags:read",
+    "associations:read",
   ],
 } as const satisfies Record<AdminRole, readonly AdminPermission[]>;
 

@@ -1,36 +1,117 @@
 @import "tailwindcss";
 
+/*
+ * KitaMo's look (R16, Q-L12): the tokens and fonts copied from Operations'
+ * align/kitamo-feel @ 2daaf50 (web/kitamo-tokens.css, itself a copy of
+ * seller-web's app/globals.css :root and public/fonts: Schibsted Grotesk and
+ * the peso glyph from Hanken Grotesk, SIL OFL, see public/fonts/OFL.txt).
+ * A copy, not an import; a shared UI package is parked for after Nov 1.
+ * They replace the mock beta's forest and gold tokens.
+ */
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/schibsted-grotesk-latin-ext.woff2") format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20B0, U+20B2-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/hanken-grotesk-peso.woff2") format("woff2");
+  unicode-range: U+20B1;
+}
+@font-face {
+  font-family: "Schibsted Grotesk";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/schibsted-grotesk-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
-  --forest-950: #102f24;
-  --forest-900: #173f30;
-  --forest-800: #1e513d;
-  --forest-700: #2a684f;
-  --forest-100: #e3efe8;
-  --forest-50: #f0f6f2;
-  --gold-600: #b98621;
-  --gold-500: #d3a33f;
-  --gold-100: #f5e9c9;
-  --cream: #f7f5ef;
-  --paper: #fffefa;
-  --charcoal: #202622;
-  --muted: #69736d;
-  --line: #dfe4df;
-  --line-strong: #cbd3cc;
-  --danger: #a53b31;
-  --danger-soft: #f9e7e4;
-  --warning: #8a6115;
-  --warning-soft: #fbf0d5;
-  --info: #315f81;
-  --info-soft: #e7f0f7;
-  --success: #28734f;
-  --success-soft: #e2f1e8;
-  --shadow-card: 0 1px 2px rgb(16 47 36 / 5%), 0 8px 28px rgb(16 47 36 / 4%);
+  color-scheme: light;
+  --km-color-page: #f7f6f2;
+  --km-color-surface: #ffffff;
+  --km-color-muted: #f1f0ea;
+  --km-color-text: #161a17;
+  --km-color-text-secondary: #545b55;
+  --km-color-border: #dcdbd3;
+  --km-color-border-strong: #c9c8bf;
+  --km-color-control-edge: #858379;
+  --km-color-action: #006b3c;
+  --km-color-action-hover: #005a32;
+  --km-color-action-pressed: #004e2c;
+  --km-color-action-foreground: #ffffff;
+  --km-color-select: #0d4f33;
+  --km-color-select-soft: #e1efe6;
+  --km-color-accent: #e3a008;
+  --km-color-accent-foreground: #2c2100;
+  --km-color-focus: #1d4ed8;
+  --km-color-success: #17643e;
+  --km-color-warning: #8a5a00;
+  --km-color-warning-ink: #6d4100;
+  --km-color-info: #185b84;
+  --km-color-destructive: #a5322a;
+  --km-color-disabled: #e4e3dc;
+  --km-color-disabled-foreground: #5f5c55;
+  --km-color-info-soft: #e7f1f6;
+  --km-color-warning-soft: #fde8c8;
+  --km-color-success-soft: #e5f2e9;
+  --km-color-destructive-soft: #fbe9e7;
+
+  --km-font-body:
+    "Schibsted Grotesk", "Segoe UI", Roboto, ui-sans-serif, system-ui,
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  --km-radius-control: 0.625rem;
+  --km-radius-surface: 0.875rem;
+  --km-radius-status: 999px;
+  --km-control-height: 2.75rem;
+  --km-control-height-primary: 3.5rem;
+}
+
+/* The mock beta's token names, re-pointed at KitaMo's (older pages use them). */
+:root {
+  --forest-950: var(--km-color-text);
+  --forest-900: var(--km-color-text);
+  --forest-800: var(--km-color-select);
+  --forest-700: var(--km-color-action);
+  --forest-100: var(--km-color-select-soft);
+  --forest-50: var(--km-color-muted);
+  --gold-600: var(--km-color-warning);
+  --gold-500: var(--km-color-accent);
+  --gold-100: var(--km-color-warning-soft);
+  --cream: var(--km-color-page);
+  --paper: var(--km-color-surface);
+  --charcoal: var(--km-color-text);
+  --muted: var(--km-color-text-secondary);
+  --line: var(--km-color-border);
+  --line-strong: var(--km-color-border-strong);
+  --danger: var(--km-color-destructive);
+  --danger-soft: var(--km-color-destructive-soft);
+  --warning: var(--km-color-warning);
+  --warning-soft: var(--km-color-warning-soft);
+  --info: var(--km-color-info);
+  --info-soft: var(--km-color-info-soft);
+  --success: var(--km-color-success);
+  --success-soft: var(--km-color-success-soft);
+  --shadow-card: 0 1px 2px rgb(22 26 23 / 5%);
 }
 
 @theme inline {
   --color-background: var(--cream);
   --color-foreground: var(--charcoal);
-  --font-sans: var(--font-admin);
+  --font-sans: var(--km-font-body);
 }
 
 * {
@@ -46,18 +127,10 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
-  background:
-    radial-gradient(circle at 92% 0%, rgb(211 163 63 / 8%), transparent 26rem),
-    var(--cream);
-  color: var(--charcoal);
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  background: var(--km-color-page);
+  color: var(--km-color-text);
+  font-family: var(--km-font-body);
+  font-synthesis: none;
   font-size: 0.9375rem;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
@@ -82,13 +155,13 @@ a {
 }
 
 ::selection {
-  background: var(--gold-100);
-  color: var(--forest-950);
+  background: var(--km-color-select-soft);
+  color: var(--km-color-text);
 }
 
 :focus-visible {
   border-radius: 0.25rem;
-  outline: 3px solid rgb(211 163 63 / 70%);
+  outline: 3px solid var(--km-color-focus);
   outline-offset: 2px;
 }
 
@@ -113,7 +186,7 @@ a {
   border-radius: 0.5rem;
   background: var(--paper);
   padding: 0.65rem 1rem;
-  color: var(--forest-900);
+  color: var(--km-color-text);
   font-weight: 700;
   box-shadow: var(--shadow-card);
 }
@@ -154,7 +227,7 @@ a {
 }
 
 .data-table td {
-  border-bottom: 1px solid #edf0ed;
+  border-bottom: 1px solid var(--km-color-border);
   padding: 0.85rem 1rem;
   vertical-align: middle;
 }
@@ -168,14 +241,14 @@ a {
 }
 
 .data-table tbody tr:hover {
-  background: #fafbf8;
+  background: var(--km-color-muted);
 }
 
 .control {
-  min-height: 2.5rem;
-  border: 1px solid var(--line-strong);
-  border-radius: 0.55rem;
-  background: var(--paper);
+  min-height: var(--km-control-height);
+  border: 1px solid var(--km-color-control-edge);
+  border-radius: var(--km-radius-control);
+  background: var(--km-color-surface);
   padding: 0.55rem 0.75rem;
   transition:
     border-color 120ms ease,
@@ -183,22 +256,27 @@ a {
 }
 
 .control:hover {
-  border-color: #aeb9b0;
+  border-color: var(--km-color-text-secondary);
 }
 
 .control:focus {
-  border-color: var(--forest-700);
-  box-shadow: 0 0 0 3px rgb(42 104 79 / 12%);
+  border-color: var(--km-color-focus);
+  box-shadow: 0 0 0 3px rgb(29 78 216 / 18%);
   outline: none;
 }
 
 .control::placeholder {
-  color: #929a94;
+  color: var(--km-color-text-secondary);
 }
 
 .skeleton {
   animation: shimmer 1.5s ease-in-out infinite;
-  background: linear-gradient(90deg, #edf0ec 25%, #f8f9f6 50%, #edf0ec 75%);
+  background: linear-gradient(
+    90deg,
+    var(--km-color-muted) 25%,
+    var(--km-color-surface) 50%,
+    var(--km-color-muted) 75%
+  );
   background-size: 200% 100%;
 }
 
@@ -208,7 +286,227 @@ a {
   }
 }
 
+/* -- KitaMo header (Operations' .top, align/kitamo-feel @ 2daaf50) -------- */
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+  min-height: 4rem;
+  padding: 10px 2rem;
+  border-bottom: 1px solid var(--km-color-border);
+  background: var(--km-color-page);
+}
+
+.top p {
+  margin: 0;
+  color: var(--km-color-text-secondary);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--km-color-text);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.brand img {
+  width: 30px;
+  height: 30px;
+}
+
+/* -- R16 controls: 44 px targets, KitaMo's action colour ------------------ */
+
+.km-button,
+.km-button-secondary,
+.km-button-danger {
+  display: inline-flex;
+  min-height: var(--km-control-height);
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--km-radius-control);
+  padding: 0.55rem 1rem;
+  font-weight: 650;
+  text-align: center;
+  cursor: pointer;
+}
+
+.km-button {
+  background: var(--km-color-action);
+  color: var(--km-color-action-foreground);
+}
+
+.km-button:hover {
+  background: var(--km-color-action-hover);
+}
+
+.km-button:active {
+  background: var(--km-color-action-pressed);
+}
+
+.km-button-secondary {
+  border-color: var(--km-color-control-edge);
+  background: var(--km-color-surface);
+  color: var(--km-color-text);
+}
+
+.km-button-secondary:hover {
+  background: var(--km-color-muted);
+}
+
+.km-button-danger {
+  border-color: var(--km-color-destructive);
+  background: var(--km-color-surface);
+  color: var(--km-color-destructive);
+}
+
+.km-button-danger:hover {
+  background: var(--km-color-destructive-soft);
+}
+
+.km-button-small {
+  min-height: var(--km-control-height);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.km-button:disabled,
+.km-button-secondary:disabled,
+.km-button-danger:disabled {
+  border-color: transparent;
+  background: var(--km-color-disabled);
+  color: var(--km-color-disabled-foreground);
+  cursor: not-allowed;
+}
+
+.km-label {
+  display: grid;
+  gap: 0.375rem;
+  color: var(--km-color-text);
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.km-input {
+  width: 100%;
+  font-weight: 400;
+}
+
+textarea.km-input {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.km-hint {
+  margin: 0;
+  color: var(--km-color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.km-error {
+  margin: 0;
+  color: var(--km-color-destructive);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.km-alert,
+.km-notice {
+  margin: 0;
+  border: 1px solid var(--km-color-border);
+  border-radius: var(--km-radius-surface);
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+}
+
+.km-alert {
+  border-color: var(--km-color-destructive);
+  background: var(--km-color-destructive-soft);
+  color: var(--km-color-destructive);
+  font-weight: 600;
+}
+
+.km-notice {
+  background: var(--km-color-info-soft);
+  color: var(--km-color-text);
+}
+
+.km-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.km-qr {
+  width: 12rem;
+  height: 12rem;
+  border: 1px solid var(--km-color-border);
+  border-radius: var(--km-radius-surface);
+  background: #ffffff;
+  padding: 0.5rem;
+}
+
+/* -- The 30-minute access banner ------------------------------------------- */
+
+.km-banner-stack {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem 0;
+}
+
+.km-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  border: 1px solid var(--km-color-accent);
+  border-radius: var(--km-radius-surface);
+  background: var(--km-color-warning-soft);
+  padding: 0.5rem 0.875rem;
+  color: var(--km-color-warning-ink);
+}
+
+.km-banner p {
+  margin: 0;
+}
+
+.km-banner-ended {
+  border-color: var(--km-color-destructive);
+  background: var(--km-color-destructive-soft);
+  color: var(--km-color-destructive);
+}
+
+.km-lead {
+  display: inline-flex;
+  border-radius: var(--km-radius-status);
+  background: var(--km-color-muted);
+  padding: 0.125rem 0.5rem;
+  color: var(--km-color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.money {
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1;
+}
+
 @media (max-width: 767px) {
+  .top,
+  .km-banner-stack {
+    padding-inline: 1rem;
+  }
+
   .admin-page {
     padding: 1.25rem 1rem 2.5rem;
   }
