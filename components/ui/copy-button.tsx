@@ -20,7 +20,7 @@ export function CopyButton({
   return (
     <button
       aria-label={`${label}: ${value}`}
-      className="rounded-md border border-[#dfe4df] bg-white px-2 py-1 text-[0.7rem] font-semibold text-[#1e513d] hover:bg-[#f0f6f2]"
+      className="rounded-md border border-[var(--km-color-border)] bg-white px-2 py-1 text-[0.7rem] font-semibold text-[var(--km-color-select)] hover:bg-[var(--km-color-muted)]"
       onClick={copy}
       type="button"
     >

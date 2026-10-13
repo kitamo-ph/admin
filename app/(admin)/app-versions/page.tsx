@@ -162,7 +162,7 @@ export default async function AppVersionsPage({
           <EmptyState
             action={
               <Link
-                className="font-semibold text-[#1e513d] hover:underline"
+                className="font-semibold text-[var(--km-color-select)] hover:underline"
                 href="/app-versions"
               >
                 Clear all filters
@@ -192,17 +192,17 @@ export default async function AppVersionsPage({
                   {versions.items.map((version) => (
                     <tr key={version.id}>
                       <td>
-                        <p className="font-semibold text-[#364039]">
+                        <p className="font-semibold text-[var(--km-color-text)]">
                           {version.versionName}
                         </p>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
+                        <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                           Code {version.versionCode}
                         </p>
                       </td>
                       <td>
                         <Badge value={version.releaseChannel} />
                       </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
+                      <td className="text-xs whitespace-nowrap text-[var(--km-color-text-secondary)]">
                         {formatDate(version.releasedAt)}
                       </td>
                       <td>{formatNumber(version.activeInstalls)}</td>
@@ -237,15 +237,15 @@ export default async function AppVersionsPage({
               </DataTable>
             </div>
 
-            <div className="divide-y divide-[#e7ebe7] md:hidden">
+            <div className="divide-y divide-[var(--km-color-border)] md:hidden">
               {versions.items.map((version) => (
                 <article className="p-4" key={version.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-[#364039]">
+                      <p className="font-semibold text-[var(--km-color-text)]">
                         {version.versionName}
                       </p>
-                      <p className="mt-0.5 text-xs text-[#69736d]">
+                      <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                         Code {version.versionCode} ·{" "}
                         {titleCase(version.releaseChannel)}
                       </p>
@@ -258,23 +258,31 @@ export default async function AppVersionsPage({
                   </div>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <dt className="text-[#69736d]">Active devices</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Active devices
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {formatNumber(version.activeDeviceCount)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Outdated</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Outdated
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {formatNumber(version.outdatedDeviceCount)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Issues</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Issues
+                      </dt>
                       <dd className="mt-1 font-medium">{version.issueCount}</dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Crash indicator</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Crash indicator
+                      </dt>
                       <dd className="mt-1">
                         <Badge value={version.crashIndicator} />
                       </dd>

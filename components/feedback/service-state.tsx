@@ -22,30 +22,32 @@ export function ServiceErrorState({ error }: { error: ServiceErrorShape }) {
           >
             {state.symbol}
           </span>
-          <p className="text-xs font-bold tracking-[0.12em] text-[#69736d] uppercase">
+          <p className="text-xs font-bold tracking-[0.12em] text-[var(--km-color-text-secondary)] uppercase">
             {state.eyebrow}
           </p>
-          <h2 className="mt-2 text-xl font-semibold text-[#173f30]">
+          <h2 className="mt-2 text-xl font-semibold text-[var(--km-color-text)]">
             {state.title}
           </h2>
-          <p className="mt-3 leading-6 text-[#69736d]">{error.message}</p>
+          <p className="mt-3 leading-6 text-[var(--km-color-text-secondary)]">
+            {error.message}
+          </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {error.retryable ? (
               <Link
-                className="rounded-lg bg-[#173f30] px-4 py-2.5 font-semibold text-white hover:bg-[#1e513d]"
+                className="rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
                 href=""
               >
                 Try again
               </Link>
             ) : null}
             <Link
-              className="rounded-lg border border-[#cbd3cc] bg-white px-4 py-2.5 font-semibold text-[#173f30] hover:bg-[#f0f6f2]"
+              className="rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
               href="/health"
             >
               View system health
             </Link>
           </div>
-          <p className="mt-6 text-xs text-[#8a928d]">
+          <p className="mt-6 text-xs text-[var(--km-color-text-secondary)]">
             Correlation ID:{" "}
             <code className="break-all">{error.correlationId}</code>
           </p>
@@ -65,13 +67,17 @@ export function DataFreshness({
   return (
     <p
       className={`inline-flex items-center gap-2 text-xs ${
-        stale ? "font-semibold text-[#79530d]" : "text-[#69736d]"
+        stale
+          ? "font-semibold text-[var(--km-color-warning-ink)]"
+          : "text-[var(--km-color-text-secondary)]"
       }`}
     >
       <span
         aria-hidden="true"
         className={`size-1.5 rounded-full ${
-          stale ? "bg-[#b98621]" : "bg-[#28734f]"
+          stale
+            ? "bg-[var(--km-color-warning)]"
+            : "bg-[var(--km-color-success)]"
         }`}
       />
       {stale ? "Stale snapshot" : "Current snapshot"} ·{" "}
@@ -91,7 +97,8 @@ function errorState(code: string) {
         eyebrow: "Maintenance",
         title: "This operational view is temporarily paused",
         symbol: "⌁",
-        iconClass: "bg-[#fbf0d5] text-[#8a6115]",
+        iconClass:
+          "bg-[var(--km-color-warning-soft)] text-[var(--km-color-warning)]",
       };
     case "SERVICE_UNAVAILABLE":
     case "TIMEOUT":
@@ -99,7 +106,8 @@ function errorState(code: string) {
         eyebrow: "Service unavailable",
         title: "Operational data could not be reached",
         symbol: "!",
-        iconClass: "bg-[#f9e7e4] text-[#a53b31]",
+        iconClass:
+          "bg-[var(--km-color-destructive-soft)] text-[var(--km-color-destructive)]",
       };
     case "FORBIDDEN":
     case "UNAUTHORIZED":
@@ -107,21 +115,24 @@ function errorState(code: string) {
         eyebrow: "Access denied",
         title: "This request is not permitted",
         symbol: "×",
-        iconClass: "bg-[#f9e7e4] text-[#a53b31]",
+        iconClass:
+          "bg-[var(--km-color-destructive-soft)] text-[var(--km-color-destructive)]",
       };
     case "NOT_FOUND":
       return {
         eyebrow: "Not found",
         title: "The requested record is unavailable",
         symbol: "?",
-        iconClass: "bg-[#f4f5f2] text-[#59625c]",
+        iconClass:
+          "bg-[var(--km-color-muted)] text-[var(--km-color-text-secondary)]",
       };
     default:
       return {
         eyebrow: "Unable to load",
         title: "This view could not be completed",
         symbol: "!",
-        iconClass: "bg-[#f9e7e4] text-[#a53b31]",
+        iconClass:
+          "bg-[var(--km-color-destructive-soft)] text-[var(--km-color-destructive)]",
       };
   }
 }

@@ -160,7 +160,7 @@ export default async function UsersPage({
           <EmptyState
             action={
               <Link
-                className="font-semibold text-[#1e513d] hover:underline"
+                className="font-semibold text-[var(--km-color-select)] hover:underline"
                 href="/users"
               >
                 Clear all filters
@@ -190,12 +190,12 @@ export default async function UsersPage({
                     <tr key={user.id}>
                       <td>
                         <Link
-                          className="font-semibold text-[#173f30] hover:underline"
+                          className="font-semibold text-[var(--km-color-text)] hover:underline"
                           href={`/users/${user.id}`}
                         >
                           {user.displayName}
                         </Link>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
+                        <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                           {user.emailMasked}
                         </p>
                       </td>
@@ -214,12 +214,12 @@ export default async function UsersPage({
                           {user.businessNames[0] ?? "No business"}
                         </p>
                         {user.businessMembershipCount > 1 ? (
-                          <p className="text-xs text-[#69736d]">
+                          <p className="text-xs text-[var(--km-color-text-secondary)]">
                             +{user.businessMembershipCount - 1} more
                           </p>
                         ) : null}
                       </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
+                      <td className="text-xs whitespace-nowrap text-[var(--km-color-text-secondary)]">
                         {formatDateTime(user.lastActiveAt)}
                       </td>
                       <td className="text-sm whitespace-nowrap">
@@ -233,18 +233,18 @@ export default async function UsersPage({
               </DataTable>
             </div>
 
-            <div className="divide-y divide-[#e7ebe7] md:hidden">
+            <div className="divide-y divide-[var(--km-color-border)] md:hidden">
               {users.items.map((user) => (
                 <article className="p-4" key={user.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Link
-                        className="font-semibold text-[#173f30] hover:underline"
+                        className="font-semibold text-[var(--km-color-text)] hover:underline"
                         href={`/users/${user.id}`}
                       >
                         {user.displayName}
                       </Link>
-                      <p className="mt-0.5 truncate text-xs text-[#69736d]">
+                      <p className="mt-0.5 truncate text-xs text-[var(--km-color-text-secondary)]">
                         {user.emailMasked}
                       </p>
                     </div>
@@ -252,23 +252,31 @@ export default async function UsersPage({
                   </div>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <dt className="text-[#69736d]">Business</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Business
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {user.businessNames[0] ?? "None"}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">App version</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        App version
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {user.currentAppVersionName ?? "Not recorded"}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Devices</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Devices
+                      </dt>
                       <dd className="mt-1 font-medium">{user.deviceCount}</dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Last active</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Last active
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {formatDateTime(user.lastActiveAt)}
                       </dd>

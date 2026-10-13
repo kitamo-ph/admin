@@ -205,7 +205,7 @@ export default async function SynchronizationPage({
           <EmptyState
             action={
               <Link
-                className="font-semibold text-[#1e513d] hover:underline"
+                className="font-semibold text-[var(--km-color-select)] hover:underline"
                 href="/synchronization"
               >
                 Clear all filters
@@ -246,12 +246,12 @@ export default async function SynchronizationPage({
                       </td>
                       <td>
                         <Link
-                          className="font-semibold text-[#173f30] hover:underline"
+                          className="font-semibold text-[var(--km-color-text)] hover:underline"
                           href={`/businesses/${event.businessId}#sync`}
                         >
                           {event.businessName}
                         </Link>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
+                        <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                           {event.stallName ?? "No stall"}
                         </p>
                       </td>
@@ -260,17 +260,17 @@ export default async function SynchronizationPage({
                       <td className="font-medium">
                         {titleCase(event.eventName.replaceAll(".", "_"))}
                       </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
+                      <td className="text-xs whitespace-nowrap text-[var(--km-color-text-secondary)]">
                         {formatDateTime(event.occurredAt)}
                       </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
+                      <td className="text-xs whitespace-nowrap text-[var(--km-color-text-secondary)]">
                         {formatDateTime(event.syncedAt)}
                       </td>
                       <td>
                         {event.errorType ? (
                           <Badge value={event.errorType} />
                         ) : (
-                          <span className="text-xs text-[#69736d]">
+                          <span className="text-xs text-[var(--km-color-text-secondary)]">
                             No error
                           </span>
                         )}
@@ -292,15 +292,15 @@ export default async function SynchronizationPage({
               </DataTable>
             </div>
 
-            <div className="divide-y divide-[#e7ebe7] lg:hidden">
+            <div className="divide-y divide-[var(--km-color-border)] lg:hidden">
               {events.items.map((event) => (
                 <article className="p-4" key={event.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-[#364039]">
+                      <p className="font-semibold text-[var(--km-color-text)]">
                         {event.businessName}
                       </p>
-                      <p className="mt-0.5 text-xs text-[#69736d]">
+                      <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                         {event.stallName ?? "No stall"} ·{" "}
                         {event.deviceIdentifierMasked}
                       </p>
@@ -309,19 +309,25 @@ export default async function SynchronizationPage({
                   </div>
                   <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <dt className="text-[#69736d]">Occurred</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Occurred
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {formatDateTime(event.occurredAt)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Retry</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Retry
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {titleCase(event.retryState)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Error</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Error
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {event.errorType
                           ? titleCase(event.errorType)
@@ -329,14 +335,16 @@ export default async function SynchronizationPage({
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-[#69736d]">Event</dt>
+                      <dt className="text-[var(--km-color-text-secondary)]">
+                        Event
+                      </dt>
                       <dd className="mt-1 font-medium">
                         {titleCase(event.eventName.replaceAll(".", "_"))}
                       </dd>
                     </div>
                   </dl>
                   <div className="mt-4 flex items-center gap-2">
-                    <code className="min-w-0 truncate text-xs text-[#69736d]">
+                    <code className="min-w-0 truncate text-xs text-[var(--km-color-text-secondary)]">
                       {event.correlationId}
                     </code>
                     <CopyButton value={event.correlationId} />

@@ -9,20 +9,20 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <main className="grid min-h-screen place-items-center bg-[#f7f5ef] p-6 text-[#202622]">
-          <section className="max-w-lg rounded-2xl border border-[#dfe4df] bg-[#fffefa] p-8">
-            <p className="text-sm font-bold text-[#b98621] uppercase">
+        <main className="grid min-h-screen place-items-center bg-[var(--km-color-page)] p-6 text-[var(--km-color-text)]">
+          <section className="max-w-lg rounded-2xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-8">
+            <p className="text-sm font-bold text-[var(--km-color-warning)] uppercase">
               KitaMo Admin
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-[#173f30]">
+            <h1 className="mt-2 text-2xl font-semibold text-[var(--km-color-text)]">
               The application needs to reload
             </h1>
-            <p className="mt-3 text-[#69736d]">
+            <p className="mt-3 text-[var(--km-color-text-secondary)]">
               An unexpected application error occurred. No operational changes
               were made.
             </p>
             <button
-              className="mt-6 rounded-lg bg-[#173f30] px-4 py-2.5 font-semibold text-white"
+              className="mt-6 rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white"
               onClick={reset}
               type="button"
             >

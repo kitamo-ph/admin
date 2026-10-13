@@ -111,7 +111,9 @@ export default async function ProblemReportDetailPage({
         <div className="grid content-start gap-5">
           <Panel title="Report summary">
             <div className="p-5">
-              <p className="leading-7 text-[#364039]">{report.description}</p>
+              <p className="leading-7 text-[var(--km-color-text)]">
+                {report.description}
+              </p>
             </div>
             <KeyValueGrid
               items={[
@@ -147,7 +149,7 @@ export default async function ProblemReportDetailPage({
                   label: "Reporting user",
                   value: (
                     <Link
-                      className="text-[#173f30] hover:underline"
+                      className="text-[var(--km-color-text)] hover:underline"
                       href={`/users/${detail.user.id}`}
                     >
                       {detail.user.displayName}
@@ -158,7 +160,7 @@ export default async function ProblemReportDetailPage({
                   label: "Business",
                   value: (
                     <Link
-                      className="text-[#173f30] hover:underline"
+                      className="text-[var(--km-color-text)] hover:underline"
                       href={`/businesses/${detail.business.id}`}
                     >
                       {detail.business.name}
@@ -204,15 +206,17 @@ export default async function ProblemReportDetailPage({
             title="Internal notes"
           >
             {report.internalNotes.length === 0 ? (
-              <div className="p-5 text-sm text-[#69736d]">
+              <div className="p-5 text-sm text-[var(--km-color-text-secondary)]">
                 No internal notes have been added.
               </div>
             ) : (
-              <ol className="divide-y divide-[#e7ebe7]">
+              <ol className="divide-y divide-[var(--km-color-border)]">
                 {report.internalNotes.map((note) => (
                   <li className="p-5" key={note.id}>
-                    <p className="leading-6 text-[#364039]">{note.body}</p>
-                    <p className="mt-2 text-xs text-[#69736d]">
+                    <p className="leading-6 text-[var(--km-color-text)]">
+                      {note.body}
+                    </p>
+                    <p className="mt-2 text-xs text-[var(--km-color-text-secondary)]">
                       {note.authorName} · {formatDateTime(note.createdAt)}
                     </p>
                   </li>
@@ -222,7 +226,7 @@ export default async function ProblemReportDetailPage({
           </Panel>
 
           <Panel title="Resolution summary">
-            <p className="p-5 leading-6 text-[#4f5a53]">
+            <p className="p-5 leading-6 text-[var(--km-color-text-secondary)]">
               {report.resolution ?? "No resolution summary has been recorded."}
             </p>
           </Panel>
@@ -239,7 +243,7 @@ export default async function ProblemReportDetailPage({
                 className="grid gap-4 p-5"
               >
                 <input name="reportId" type="hidden" value={report.id} />
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Status
                   <select
                     className="control w-full"
@@ -260,7 +264,7 @@ export default async function ProblemReportDetailPage({
                     ))}
                   </select>
                 </label>
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Severity
                   <select
                     className="control w-full"
@@ -274,7 +278,7 @@ export default async function ProblemReportDetailPage({
                     ))}
                   </select>
                 </label>
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Assigned administrator
                   <select
                     className="control w-full"
@@ -289,7 +293,7 @@ export default async function ProblemReportDetailPage({
                     ))}
                   </select>
                 </label>
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Internal note
                   <textarea
                     className="control min-h-24 w-full resize-y"
@@ -298,7 +302,7 @@ export default async function ProblemReportDetailPage({
                     placeholder="Optional administrator-only note"
                   />
                 </label>
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Resolution summary
                   <textarea
                     className="control min-h-20 w-full resize-y"
@@ -308,7 +312,7 @@ export default async function ProblemReportDetailPage({
                     placeholder="Optional resolution context"
                   />
                 </label>
-                <label className="grid gap-1.5 text-sm font-semibold text-[#364039]">
+                <label className="grid gap-1.5 text-sm font-semibold text-[var(--km-color-text)]">
                   Reason
                   <textarea
                     className="control min-h-20 w-full resize-y"
@@ -320,12 +324,12 @@ export default async function ProblemReportDetailPage({
                   />
                 </label>
                 <button
-                  className="min-h-11 rounded-lg bg-[#173f30] px-4 py-2.5 font-semibold text-white hover:bg-[#1e513d]"
+                  className="min-h-11 rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
                   type="submit"
                 >
                   Update report
                 </button>
-                <p className="text-xs leading-5 text-[#69736d]">
+                <p className="text-xs leading-5 text-[var(--km-color-text-secondary)]">
                   This mock action creates an audit event. It does not notify
                   the user or alter merchant records.
                 </p>
@@ -335,7 +339,7 @@ export default async function ProblemReportDetailPage({
             <Panel title="Read-only access">
               <div className="p-5">
                 <Badge label="No mutation permission" value="read_only" />
-                <p className="mt-3 text-sm leading-6 text-[#69736d]">
+                <p className="mt-3 text-sm leading-6 text-[var(--km-color-text-secondary)]">
                   Your role can investigate this report but cannot change its
                   workflow state, assignment, notes, or resolution.
                 </p>

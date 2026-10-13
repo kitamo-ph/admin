@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s · KitaMo Admin",
   },
   description:
-    "Internal administration, support, and platform health for KitaMo.",
+    "KitaMo's internal super-admin site: reason-logged, time-limited, read-only access to businesses.",
   applicationName: "KitaMo Admin Platform",
   robots: {
     index: false,
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
     nocache: true,
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/kitamo-mark.png",
+    shortcut: "/kitamo-mark.png",
   },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#173f30",
+  themeColor: "#f7f6f2",
 };
 
 export default function RootLayout({

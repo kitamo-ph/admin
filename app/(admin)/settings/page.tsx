@@ -73,11 +73,13 @@ export default async function SettingsPage() {
               ["Minimum app version", "Placeholder only"],
             ].map(([label, value]) => (
               <div
-                className="flex items-center justify-between gap-4 border-b border-[#edf0ed] px-3 py-3 last:border-0"
+                className="flex items-center justify-between gap-4 border-b border-[var(--km-color-border)] px-3 py-3 last:border-0"
                 key={label}
               >
-                <span className="text-sm text-[#4f5a53]">{label}</span>
-                <span className="text-right text-xs font-semibold text-[#69736d]">
+                <span className="text-sm text-[var(--km-color-text-secondary)]">
+                  {label}
+                </span>
+                <span className="text-right text-xs font-semibold text-[var(--km-color-text-secondary)]">
                   {value}
                 </span>
               </div>
@@ -100,7 +102,7 @@ export default async function SettingsPage() {
               "Monitoring integration",
             ].map((label) => (
               <label
-                className="flex min-h-12 cursor-not-allowed items-center gap-3 rounded-lg border border-[#e3e7e3] bg-[#f8f8f5] px-3 text-sm text-[#69736d]"
+                className="flex min-h-12 cursor-not-allowed items-center gap-3 rounded-lg border border-[var(--km-color-border)] bg-[var(--km-color-muted)] px-3 text-sm text-[var(--km-color-text-secondary)]"
                 key={label}
               >
                 <input disabled type="checkbox" />

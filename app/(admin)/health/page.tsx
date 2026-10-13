@@ -78,21 +78,21 @@ export default async function HealthPage() {
             <article className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold text-[#173f30]">
+                  <h2 className="font-semibold text-[var(--km-color-text)]">
                     {indicator.name}
                   </h2>
-                  <p className="mt-1 text-xs text-[#69736d]">
+                  <p className="mt-1 text-xs text-[var(--km-color-text-secondary)]">
                     Checked {formatDateTime(indicator.checkedAt)}
                   </p>
                 </div>
                 <Badge value={indicator.status} />
               </div>
-              <p className="mt-4 min-h-12 text-sm leading-6 text-[#4f5a53]">
+              <p className="mt-4 min-h-12 text-sm leading-6 text-[var(--km-color-text-secondary)]">
                 {indicator.message}
               </p>
-              <p className="mt-4 border-t border-[#edf0ed] pt-3 text-xs text-[#69736d]">
+              <p className="mt-4 border-t border-[var(--km-color-border)] pt-3 text-xs text-[var(--km-color-text-secondary)]">
                 Observed latency:{" "}
-                <strong className="text-[#364039]">
+                <strong className="text-[var(--km-color-text)]">
                   {indicator.latencyMs === null
                     ? "Not available"
                     : `${indicator.latencyMs} ms`}
@@ -105,12 +105,12 @@ export default async function HealthPage() {
 
       <Panel className="mt-5" title="Basic health endpoint">
         <div className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
-          <p className="max-w-2xl text-sm leading-6 text-[#69736d]">
+          <p className="max-w-2xl text-sm leading-6 text-[var(--km-color-text-secondary)]">
             The public liveness route returns only application status, mock
             mode, and a timestamp. It does not disclose dependency details.
           </p>
           <Link
-            className="shrink-0 rounded-lg border border-[#cbd3cc] bg-white px-4 py-2.5 font-semibold text-[#173f30] hover:bg-[#f0f6f2]"
+            className="shrink-0 rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
             href="/api/health"
           >
             Open JSON endpoint

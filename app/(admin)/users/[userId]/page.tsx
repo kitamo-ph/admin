@@ -128,7 +128,7 @@ export default async function UserDetailPage({
                   <tr key={membership.id}>
                     <td>
                       <Link
-                        className="font-semibold text-[#173f30] hover:underline"
+                        className="font-semibold text-[var(--km-color-text)] hover:underline"
                         href={`/businesses/${membership.businessId}`}
                       >
                         {membership.businessName}
@@ -141,7 +141,7 @@ export default async function UserDetailPage({
                     <td>
                       <Badge value={membership.status} />
                     </td>
-                    <td className="text-xs text-[#69736d]">
+                    <td className="text-xs text-[var(--km-color-text-secondary)]">
                       {formatDate(membership.joinedAt)}
                     </td>
                   </tr>
@@ -159,15 +159,15 @@ export default async function UserDetailPage({
                 title="No devices"
               />
             ) : (
-              <div className="divide-y divide-[#e7ebe7]">
+              <div className="divide-y divide-[var(--km-color-border)]">
                 {detail.devices.map((device) => (
                   <article className="p-5" key={device.id}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-[#364039]">
+                        <p className="font-semibold text-[var(--km-color-text)]">
                           {device.manufacturer} {device.model}
                         </p>
-                        <p className="mt-0.5 font-mono text-xs text-[#69736d]">
+                        <p className="mt-0.5 font-mono text-xs text-[var(--km-color-text-secondary)]">
                           {device.deviceIdentifierMasked}
                         </p>
                       </div>
@@ -175,25 +175,33 @@ export default async function UserDetailPage({
                     </div>
                     <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
                       <div>
-                        <dt className="text-[#69736d]">Android</dt>
+                        <dt className="text-[var(--km-color-text-secondary)]">
+                          Android
+                        </dt>
                         <dd className="mt-1 font-medium">
                           {device.androidVersion}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-[#69736d]">App version</dt>
+                        <dt className="text-[var(--km-color-text-secondary)]">
+                          App version
+                        </dt>
                         <dd className="mt-1 font-medium">
                           {device.appVersionName}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-[#69736d]">Device tier</dt>
+                        <dt className="text-[var(--km-color-text-secondary)]">
+                          Device tier
+                        </dt>
                         <dd className="mt-1 font-medium">
                           {titleCase(device.performanceTier)}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-[#69736d]">Last seen</dt>
+                        <dt className="text-[var(--km-color-text-secondary)]">
+                          Last seen
+                        </dt>
                         <dd className="mt-1 font-medium">
                           {formatDateTime(device.lastSeenAt)}
                         </dd>
@@ -212,18 +220,18 @@ export default async function UserDetailPage({
                 title="No related reports"
               />
             ) : (
-              <div className="divide-y divide-[#e7ebe7]">
+              <div className="divide-y divide-[var(--km-color-border)]">
                 {detail.problemReports.slice(0, 6).map((report) => (
                   <article className="p-5" key={report.id}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <Link
-                          className="font-semibold text-[#173f30] hover:underline"
+                          className="font-semibold text-[var(--km-color-text)] hover:underline"
                           href={`/problem-reports/${report.id}`}
                         >
                           {report.title}
                         </Link>
-                        <p className="mt-1 text-xs text-[#69736d]">
+                        <p className="mt-1 text-xs text-[var(--km-color-text-secondary)]">
                           {titleCase(report.category)} ·{" "}
                           {formatDateTime(report.submittedAt)}
                         </p>

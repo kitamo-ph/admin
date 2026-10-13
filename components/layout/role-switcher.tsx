@@ -18,7 +18,7 @@ export function RoleSwitcher({ role }: { role: AdminRole }) {
       </label>
       <input name="returnTo" type="hidden" value="/overview" />
       <select
-        className="control max-w-48 text-sm font-semibold text-[#173f30]"
+        className="control max-w-48 text-sm font-semibold text-[var(--km-color-text)]"
         defaultValue={role}
         id="development-role"
         name="role"
@@ -31,7 +31,7 @@ export function RoleSwitcher({ role }: { role: AdminRole }) {
         ))}
       </select>
       <button
-        className="min-h-10 rounded-lg border border-[#cbd3cc] bg-white px-3 text-sm font-semibold text-[#173f30] hover:bg-[#f0f6f2]"
+        className="min-h-10 rounded-lg border border-[var(--km-color-border-strong)] bg-white px-3 text-sm font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
         type="submit"
       >
         Switch

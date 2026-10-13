@@ -181,7 +181,7 @@ export default async function ProblemReportsPage({
           <EmptyState
             action={
               <Link
-                className="font-semibold text-[#1e513d] hover:underline"
+                className="font-semibold text-[var(--km-color-select)] hover:underline"
                 href="/problem-reports"
               >
                 Clear all filters
@@ -212,12 +212,12 @@ export default async function ProblemReportsPage({
                     <tr key={report.id}>
                       <td>
                         <Link
-                          className="font-semibold text-[#173f30] hover:underline"
+                          className="font-semibold text-[var(--km-color-text)] hover:underline"
                           href={`/problem-reports/${report.id}`}
                         >
                           {report.title}
                         </Link>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
+                        <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                           {report.internalNotes.length} internal notes
                         </p>
                       </td>
@@ -248,16 +248,18 @@ export default async function ProblemReportsPage({
                         <p className="font-mono text-xs">
                           {report.deviceIdentifierMasked ?? "No device"}
                         </p>
-                        <p className="mt-0.5 text-xs text-[#69736d]">
+                        <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                           v{report.appVersionName}
                         </p>
                       </td>
-                      <td className="text-xs whitespace-nowrap text-[#69736d]">
+                      <td className="text-xs whitespace-nowrap text-[var(--km-color-text-secondary)]">
                         {formatDateTime(report.submittedAt)}
                       </td>
                       <td>
                         {report.assignedAdminName ?? (
-                          <span className="text-[#69736d]">Unassigned</span>
+                          <span className="text-[var(--km-color-text-secondary)]">
+                            Unassigned
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -266,18 +268,18 @@ export default async function ProblemReportsPage({
               </DataTable>
             </div>
 
-            <div className="divide-y divide-[#e7ebe7] lg:hidden">
+            <div className="divide-y divide-[var(--km-color-border)] lg:hidden">
               {reports.items.map((report) => (
                 <article className="p-4" key={report.id}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <Link
-                        className="font-semibold text-[#173f30] hover:underline"
+                        className="font-semibold text-[var(--km-color-text)] hover:underline"
                         href={`/problem-reports/${report.id}`}
                       >
                         {report.title}
                       </Link>
-                      <p className="mt-0.5 text-xs text-[#69736d]">
+                      <p className="mt-0.5 text-xs text-[var(--km-color-text-secondary)]">
                         {report.businessName} ·{" "}
                         {formatDateTime(report.submittedAt)}
                       </p>
@@ -288,7 +290,7 @@ export default async function ProblemReportsPage({
                     <Badge value={report.status} />
                     <Badge value={report.category} />
                   </div>
-                  <p className="mt-3 text-xs text-[#69736d]">
+                  <p className="mt-3 text-xs text-[var(--km-color-text-secondary)]">
                     Reported by {report.userName} · Assigned to{" "}
                     {report.assignedAdminName ?? "no administrator"}
                   </p>

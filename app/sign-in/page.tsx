@@ -73,7 +73,7 @@ export default async function SignInPage({
       ) : null}
       {switchingEnabled ? (
         <>
-          <div className="mb-5 rounded-xl border border-[#eedcae] bg-[#fff7e5] px-4 py-3 text-sm text-[#79530d]">
+          <div className="mb-5 rounded-xl border border-[var(--km-color-accent)] bg-[var(--km-color-warning-soft)] px-4 py-3 text-sm text-[var(--km-color-warning-ink)]">
             Development-only access · No real account or merchant data
           </div>
           <div className="grid gap-3">
@@ -82,20 +82,20 @@ export default async function SignInPage({
                 <input name="returnTo" type="hidden" value={returnTo} />
                 <input name="role" type="hidden" value={role} />
                 <button
-                  className="group flex w-full items-center justify-between gap-4 rounded-xl border border-[#dfe4df] bg-[#fffefa] p-4 text-left shadow-[var(--shadow-card)] transition hover:border-[#aeb9b0] hover:bg-white"
+                  className="group flex w-full items-center justify-between gap-4 rounded-xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-4 text-left shadow-[var(--shadow-card)] transition hover:border-[var(--km-color-control-edge)] hover:bg-white"
                   type="submit"
                 >
                   <span>
-                    <span className="block font-semibold text-[#173f30]">
+                    <span className="block font-semibold text-[var(--km-color-text)]">
                       {titleCase(role)}
                     </span>
-                    <span className="mt-1 block text-sm leading-5 text-[#69736d]">
+                    <span className="mt-1 block text-sm leading-5 text-[var(--km-color-text-secondary)]">
                       {roleDescriptions[role]}
                     </span>
                   </span>
                   <span
                     aria-hidden="true"
-                    className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#e3efe8] font-bold text-[#1e513d] transition group-hover:bg-[#d3a33f] group-hover:text-[#102f24]"
+                    className="grid size-8 shrink-0 place-items-center rounded-lg bg-[var(--km-color-select-soft)] font-bold text-[var(--km-color-select)] transition group-hover:bg-[var(--km-color-accent)] group-hover:text-[var(--km-color-accent-foreground)]"
                   >
                     →
                   </span>
@@ -106,7 +106,7 @@ export default async function SignInPage({
         </>
       ) : null}
       {switchingEnabled ? (
-        <p className="mt-6 text-center text-xs leading-5 text-[#69736d]">
+        <p className="mt-6 text-center text-xs leading-5 text-[var(--km-color-text-secondary)]">
           Every protected route and mock mutation independently validates the
           active administrator permission.
         </p>
