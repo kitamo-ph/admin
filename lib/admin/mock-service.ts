@@ -2,7 +2,52 @@ import { z } from "zod";
 
 import { hasPermission } from "@/lib/auth/authorization";
 
+import { MockR16Store, R16Refusal } from "./mock-r16";
 import { createMockAdminData, MOCK_CLOCK_ISO } from "./mock-seed";
+import { FLAG_TRANSITIONS } from "./r16-rules";
+import {
+  accessLogQuerySchema,
+  accessLogSchema,
+  adminSessionStateSchema,
+  associationListSchema,
+  businessSummarySchema,
+  closeAccessInputSchema,
+  closedAccessSchema,
+  coreIdSchema,
+  directoryPageSchema,
+  directoryQuerySchema,
+  flagListSchema,
+  flagsQuerySchema,
+  openAccessInputSchema,
+  openedAccessSchema,
+  overviewSchema,
+  raiseFlagInputSchema,
+  raisedFlagSchema,
+  recordsPageSchema,
+  recordsQuerySchema,
+  reviewFlagInputSchema,
+  reviewedFlagSchema,
+  type AccessLog,
+  type AccessLogQuery,
+  type AdminSessionState,
+  type Association,
+  type BusinessSummary,
+  type CloseAccessInput,
+  type ClosedAccess,
+  type DirectoryPage,
+  type DirectoryQuery,
+  type Flag,
+  type FlagsQuery,
+  type OpenAccessInput,
+  type OpenedAccess,
+  type Overview,
+  type RaiseFlagInput,
+  type RaisedFlag,
+  type RecordsPage,
+  type RecordsQuery,
+  type ReviewFlagInput,
+  type ReviewedFlag,
+} from "./r16-schemas";
 import {
   administratorListFiltersSchema,
   administratorSchema,
@@ -148,6 +193,7 @@ export class MockAdminService implements AdminService {
   private readonly scenario: MockScenario;
   private readonly latencyMs: number;
   private readonly data;
+  private readonly r16: MockR16Store;
   private requestCounter = 0;
   private mutationCounter = 0;
 
@@ -168,6 +214,146 @@ export class MockAdminService implements AdminService {
 
     this.latencyMs = configuredLatency;
     this.data = createMockAdminData(this.scenario);
+    this.r16 = new MockR16Store(
+      options.now ?? Date.now,
+      this.scenario === "empty",
+    );
+  }
+
+  // -- R16 super admin (ADM-048): fictional data, Core's rules ---------------
+
+  getSession(): Promise<ServiceResult<AdminSessionState>> {
+    return this.execute(
+      "getSession",
+      z.undefined(),
+      undefined,
+      adminSessionStateSchema,
+      () => this.r16.session(),
+    );
+  }
+
+  getOverview(): Promise<ServiceResult<Overview>> {
+    return this.execute(
+      "getOverview",
+      z.undefined(),
+      undefined,
+      overviewSchema,
+      () => ({ totals: this.r16.directory({ limit: 1 }).totals }),
+    );
+  }
+
+  listDirectory(
+    query: DirectoryQuery = {},
+  ): Promise<ServiceResult<DirectoryPage>> {
+    return this.execute(
+      "listDirectory",
+      directoryQuerySchema,
+      query,
+      directoryPageSchema,
+      (value) => this.r16.directory(value),
+    );
+  }
+
+  openAccess(input: OpenAccessInput): Promise<ServiceResult<OpenedAccess>> {
+    return this.execute(
+      "openAccess",
+      openAccessInputSchema,
+      input,
+      openedAccessSchema,
+      (value) => this.r16.open(value),
+    );
+  }
+
+  closeAccess(input: CloseAccessInput): Promise<ServiceResult<ClosedAccess>> {
+    return this.execute(
+      "closeAccess",
+      closeAccessInputSchema,
+      input,
+      closedAccessSchema,
+      (value) => this.r16.close(value),
+    );
+  }
+
+  getBusinessSummary(
+    businessId: string,
+  ): Promise<ServiceResult<BusinessSummary>> {
+    return this.execute(
+      "getBusinessSummary",
+      coreIdSchema,
+      businessId,
+      businessSummarySchema,
+      (id) => this.r16.summary(id),
+    );
+  }
+
+  getBusinessRecords(query: RecordsQuery): Promise<ServiceResult<RecordsPage>> {
+    return this.execute(
+      "getBusinessRecords",
+      recordsQuerySchema,
+      query,
+      recordsPageSchema,
+      (value) => this.r16.records(value),
+    );
+  }
+
+  listFlags(
+    query: FlagsQuery = { status: null },
+  ): Promise<ServiceResult<Flag[]>> {
+    return this.execute(
+      "listFlags",
+      flagsQuerySchema,
+      query,
+      flagListSchema,
+      (value) => this.r16.flagList(value),
+    );
+  }
+
+  raiseFlag(input: RaiseFlagInput): Promise<ServiceResult<RaisedFlag>> {
+    return this.execute(
+      "raiseFlag",
+      raiseFlagInputSchema,
+      input,
+      raisedFlagSchema,
+      (value) => this.r16.raise(value),
+    );
+  }
+
+  reviewFlag(input: ReviewFlagInput): Promise<ServiceResult<ReviewedFlag>> {
+    return this.execute(
+      "reviewFlag",
+      reviewFlagInputSchema,
+      input,
+      reviewedFlagSchema,
+      (value) => this.r16.review(value, FLAG_TRANSITIONS),
+    );
+  }
+
+  listAccessLog(
+    query: AccessLogQuery = { before: null },
+  ): Promise<ServiceResult<AccessLog>> {
+    return this.execute(
+      "listAccessLog",
+      accessLogQuerySchema,
+      query,
+      accessLogSchema,
+      (value) => this.r16.accessLog(value.before),
+    );
+  }
+
+  listAssociations(): Promise<ServiceResult<Association[]>> {
+    return this.execute(
+      "listAssociations",
+      z.undefined(),
+      undefined,
+      associationListSchema,
+      () => {
+        throw new MockServiceFault(
+          "NOT_AVAILABLE",
+          "This part of KitaMo is not available yet.",
+          false,
+        );
+      },
+    );
   }
 
   getDashboardSummary(): Promise<ServiceResult<DashboardSummary>> {
@@ -1071,6 +1257,22 @@ export class MockAdminService implements AdminService {
     } catch (error: unknown) {
       if (error instanceof MockServiceFault) {
         return this.failureResult(outputSchema, meta, error);
+      }
+      if (error instanceof R16Refusal) {
+        return this.failureResult(outputSchema, meta, {
+          code:
+            error.kind === "forbidden"
+              ? "FORBIDDEN"
+              : error.kind === "conflict"
+                ? "CONFLICT"
+                : "VALIDATION_ERROR",
+          message: error.message,
+          retryable: false,
+          details:
+            error.kind === "invalid"
+              ? { reason: error.reason ?? "input" }
+              : undefined,
+        });
       }
 
       return this.failureResult(outputSchema, meta, {

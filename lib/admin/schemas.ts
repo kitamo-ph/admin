@@ -658,6 +658,7 @@ export const serviceErrorCodeSchema = z.enum([
   "TIMEOUT",
   "SERVICE_UNAVAILABLE",
   "MAINTENANCE",
+  "NOT_AVAILABLE",
   "UNKNOWN",
 ]);
 
@@ -674,9 +675,11 @@ export const serviceErrorSchema = z
 export const serviceMetaSchema = z
   .object({
     requestId: idSchema,
-    source: z.literal("mock"),
+    /** `core` is the R16 Core adapter (ADM-048); `mock` is fictional data. */
+    source: z.enum(["mock", "core"]),
     generatedAt: utcDateTimeSchema,
-    scenario: mockScenarioSchema,
+    /** The mock scenario; null for the Core adapter. */
+    scenario: mockScenarioSchema.nullable(),
     stale: z.boolean(),
     latencyMs: z.number().int().nonnegative(),
     warnings: z.array(z.string().trim().min(1).max(300)),
