@@ -16,6 +16,9 @@ export default defineConfig({
     ? { workers: Number(process.env.E2E_WORKERS) }
     : {}),
   reporter: process.env.CI ? "github" : "list",
+  // The dev server compiles each route on first use; on the shared 8 GB
+  // laptop that can pass Playwright's 5 s default.
+  expect: { timeout: 15_000 },
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     trace: "retain-on-failure",

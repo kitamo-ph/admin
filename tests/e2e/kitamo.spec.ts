@@ -14,6 +14,9 @@ import {
  * against the loopback stub (GoTrue REST + PostgREST); no hosted call.
  */
 
+// Multi-page flows against a dev server that compiles routes on first use.
+test.describe.configure({ timeout: 120_000 });
+
 const READERS = [
   "km_admin_session",
   "km_admin_directory",
