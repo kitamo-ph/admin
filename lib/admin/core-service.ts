@@ -193,9 +193,10 @@ export class CoreAdminService implements AdminService {
   }
 
   async getOverview(): Promise<ServiceResult<Overview>> {
+    // §12.2: a limit of 0 answers the totals and no rows (logged with 0 rows).
     const page = await this.#rpc(
       "km_admin_directory",
-      { p_search: null, p_after: null, p_limit: 1 },
+      { p_search: null, p_after: null, p_limit: 0 },
       parseDirectoryReply,
       directoryPageSchema,
     );

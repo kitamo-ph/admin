@@ -331,9 +331,16 @@ describe("the Core adapter: strict replies (fail closed)", () => {
     });
     expect(directory.data.rows[0]?.sales7d).toBe(41);
 
-    const overview = await core(ok(DIRECTORY)).service.getOverview();
+    const overviewCore = core(ok(DIRECTORY));
+    const overview = await overviewCore.service.getOverview();
     expectOk(overview);
     expect(overview.data.totals.withOpenFlags).toBe(1);
+    // §12.2: the Overview asks for the totals only (a limit of 0, no rows).
+    expect(overviewCore.calls[0]?.body).toEqual({
+      p_search: null,
+      p_after: null,
+      p_limit: 0,
+    });
 
     const summary = await core(ok(SUMMARY)).service.getBusinessSummary(BIZ);
     expectOk(summary);
