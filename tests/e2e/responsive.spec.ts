@@ -10,6 +10,7 @@ const RESPONSIVE_ROUTES = [
   "/businesses/00000011-0000-4000-8000-000000a7d8e2/records",
   "/flags",
   "/associations",
+  "/associations/00000018-0000-4000-8000-00000112a8b7",
   "/devices",
   "/synchronization",
   "/problem-reports",

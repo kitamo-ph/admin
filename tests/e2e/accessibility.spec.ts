@@ -11,6 +11,10 @@ const ACCESSIBILITY_ROUTES = [
   "/businesses/00000011-0000-4000-8000-000000a7d8e2",
   "/flags",
   "/audit-log",
+  // The HOA level (0086), through the mock adapter: the list with its create
+  // form, and one association with its officer, code and close forms.
+  "/associations",
+  "/associations/00000018-0000-4000-8000-00000112a8b7",
 ] as const;
 
 test.beforeEach(async ({ baseURL, context }) => {

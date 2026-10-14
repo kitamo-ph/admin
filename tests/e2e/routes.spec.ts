@@ -44,6 +44,8 @@ test("stable detail routes resolve through the service boundary", async ({
     "/users/user-001",
     // A fictional R16 business id (lib/admin/mock-r16.ts).
     "/businesses/00000011-0000-4000-8000-000000a7d8e2",
+    // A fictional association (lib/admin/mock-r16.ts: Villa Rosa Homeowners).
+    "/associations/00000018-0000-4000-8000-00000112a8b7",
     "/problem-reports/report-001",
   ]) {
     await test.step(path, async () => {
