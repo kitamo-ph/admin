@@ -467,6 +467,23 @@ for (const [name, make] of [
       expect(!late.ok && late.error.details?.reason).toBe("closed");
     });
 
+    it("refuses a letter reference 0086 would refuse (a comma, 3 characters) before Core is asked", async () => {
+      const { service } = make();
+      for (const letterReference of ["Brgy. Res. No. 14, s. 2026", "L-1"]) {
+        expect(
+          code(
+            await service.createAssociation({
+              name: "Sampaguita Homes HOA",
+              kind: "hoa",
+              area: null,
+              letterReference,
+              clientRequestId: crypto.randomUUID(),
+            }),
+          ),
+        ).toBe("VALIDATION_ERROR");
+      }
+    });
+
     it("refuses an unknown association or officer with the one KM005", async () => {
       const { service } = make();
       const nobody = crypto.randomUUID();

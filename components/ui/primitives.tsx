@@ -55,6 +55,7 @@ export function Breadcrumbs({
               <Link
                 className="rounded hover:text-[var(--km-color-text)] hover:underline"
                 href={item.href}
+                prefetch={false}
               >
                 {item.label}
               </Link>
@@ -363,6 +364,7 @@ export function PaginationControls({
           <Link
             className="rounded-md border border-[var(--km-color-border-strong)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
             href={pageHref(Math.max(0, offset - limit))}
+            prefetch={false}
           >
             Previous
           </Link>
@@ -378,6 +380,7 @@ export function PaginationControls({
           <Link
             className="rounded-md border border-[var(--km-color-border-strong)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
             href={pageHref(offset + limit)}
+            prefetch={false}
           >
             Next
           </Link>

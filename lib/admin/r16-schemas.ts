@@ -463,7 +463,11 @@ export const associationSchema = z.strictObject({
   codeRotatedAt: utcDateTimeSchema.nullable(),
 });
 
-export const associationListSchema = z.array(associationSchema).max(500);
+/** Core caps km_admin_associations at 500 rows in a fixed order; the page says when it got all 500. */
+export const ASSOCIATION_LIST_MAX = 500;
+export const associationListSchema = z
+  .array(associationSchema)
+  .max(ASSOCIATION_LIST_MAX);
 
 /** An officer as km_admin_association names them (§12.15): never their email. */
 export const associationOfficerSchema = z.strictObject({
@@ -490,7 +494,11 @@ export const createAssociationInputSchema = z.strictObject({
   name: z.string().trim().min(1).max(80),
   kind: associationKindSchema,
   area: z.string().trim().min(1).max(120).nullable(),
-  letterReference: z.string().trim().min(1).max(120),
+  // 0086's rule: 4 to 60 of A-Z a-z 0-9 space # : / . _ -.
+  letterReference: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z0-9#:/._ -]{4,60}$/),
   clientRequestId: coreIdSchema,
 });
 

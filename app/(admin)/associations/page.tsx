@@ -11,6 +11,7 @@ import {
   Panel,
 } from "@/components/ui/primitives";
 import { ASSOCIATION_KIND_LABELS } from "@/lib/admin/r16-rules";
+import { ASSOCIATION_LIST_MAX } from "@/lib/admin/r16-schemas";
 import { hasPermission } from "@/lib/auth";
 import { requireAdmin } from "@/lib/auth/server";
 import { formatDateTime, formatNumber, titleCase } from "@/lib/format";
@@ -38,6 +39,14 @@ export default async function AssociationsPage({
   const query = await searchParams;
   const result = await service.listAssociations();
   const canUpdate = hasPermission(session.role, "associations:update");
+  const createPanel = (
+    <Panel
+      description="After checking a letter from the association."
+      title="Create an association"
+    >
+      <CreateAssociationForm requestId={crypto.randomUUID()} />
+    </Panel>
+  );
 
   return (
     <div className="admin-page">
@@ -49,7 +58,14 @@ export default async function AssociationsPage({
       <Notice value={query.notice} />
       {result.ok ? (
         <div className="grid gap-6">
-          <Panel title="Associations">
+          <Panel
+            description={
+              result.data.length >= ASSOCIATION_LIST_MAX
+                ? `Showing the first ${ASSOCIATION_LIST_MAX}.`
+                : undefined
+            }
+            title="Associations"
+          >
             {result.data.length === 0 ? (
               <EmptyState
                 description="No association has been created."
@@ -94,14 +110,7 @@ export default async function AssociationsPage({
               </DataTable>
             )}
           </Panel>
-          {canUpdate ? (
-            <Panel
-              description="After checking a letter from the association."
-              title="Create an association"
-            >
-              <CreateAssociationForm requestId={crypto.randomUUID()} />
-            </Panel>
-          ) : null}
+          {canUpdate ? createPanel : null}
         </div>
       ) : result.error.code === "NOT_AVAILABLE" ? (
         <Panel title="Associations arrive with the HOA level.">
@@ -127,7 +136,11 @@ export default async function AssociationsPage({
           </div>
         </Panel>
       ) : (
-        <ServiceErrorState error={result.error} />
+        // The list failed (not the HOA level missing): creating still works.
+        <div className="grid gap-6">
+          <ServiceErrorState error={result.error} />
+          {canUpdate ? createPanel : null}
+        </div>
       )}
     </div>
   );

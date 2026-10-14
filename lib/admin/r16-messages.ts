@@ -1,6 +1,15 @@
 import type { ServiceError } from "./schemas";
 
 /**
+ * A write whose result is unknown: the request reached Core (or may have),
+ * and the answer was lost. Never "nothing was changed" (the lead's review,
+ * LOW 7): a close or an open may have gone through; every write replays by
+ * its request id, so trying again never does it twice.
+ */
+export const UNCONFIRMED =
+  "We couldn't confirm this. Check the list before trying again.";
+
+/**
  * What the administrator reads when Core refuses (spec §3.2). KM005 is one
  * "Not permitted" for every case: Core never says why, so neither does this.
  */
@@ -19,8 +28,15 @@ export function refusalMessage(
         reasons,
       );
     case "TIMEOUT":
+      return UNCONFIRMED;
     case "SERVICE_UNAVAILABLE":
-      return "KitaMo could not answer right now. Nothing was opened or changed. Try again.";
+      // Core answered with an error (5xx): its transaction rolled back. A
+      // reply in a shape this site does not accept, or a connection lost after
+      // the request went out, may follow a write that went through.
+      return error.details?.contract !== undefined ||
+        error.details?.stage === "transport"
+        ? UNCONFIRMED
+        : "KitaMo could not answer right now. Nothing was opened or changed. Try again.";
     case "NOT_AVAILABLE":
       return "This part of KitaMo is not available yet.";
     default:
@@ -67,6 +83,7 @@ export const ASSOCIATION_REASONS: Record<string, string> = {
   closed: "This association is closed. Nothing was changed.",
   name: "Write the association's name in 1 to 80 characters.",
   area: "Write the place in at most 120 characters.",
-  letter_reference: "Write the reference of the letter you checked.",
+  letter_reference:
+    "Write the reference of the letter you checked: 4 to 60 letters, digits, spaces or # : / . _ - (no commas).",
   label: "Write the officer's name and role in 1 to 60 characters.",
 };

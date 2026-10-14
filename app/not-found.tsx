@@ -19,6 +19,7 @@ export default function NotFound() {
         <Link
           className="mt-6 inline-flex rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
           href="/overview"
+          prefetch={false}
         >
           Go to overview
         </Link>

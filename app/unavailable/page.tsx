@@ -22,14 +22,9 @@ export default function UnavailablePage() {
         <Link
           className="rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
           href="/overview"
+          prefetch={false}
         >
           Try overview again
-        </Link>
-        <Link
-          className="rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
-          href="/health"
-        >
-          View health status
         </Link>
       </div>
     </PublicShell>

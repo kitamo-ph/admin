@@ -30,9 +30,11 @@ test("the controlled maintenance state is safe and actionable", async ({
       name: "Administrative tools are temporarily paused",
     }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "Check system health" }),
-  ).toBeVisible();
+  // /health is parked for a KitaMo session: the next step is the overview.
+  await expect(page.getByRole("link", { name: "Try again" })).toHaveAttribute(
+    "href",
+    "/overview",
+  );
 });
 
 test("the controlled unavailable state does not claim a mutation occurred", async ({

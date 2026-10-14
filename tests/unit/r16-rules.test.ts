@@ -272,6 +272,30 @@ describe("association rules (0086, D18)", () => {
     });
   });
 
+  it("takes 0086's letter reference only: 4 to 60 of letters, digits, spaces or # : / . _ -", () => {
+    const create = (letterReference: string) =>
+      checkCreateAssociation({
+        name: "Villa Rosa Homeowners",
+        kind: "hoa",
+        area: "",
+        letterReference,
+      });
+    expect(create("Brgy. Resolution No. 14 s. 2026").ok).toBe(true);
+    expect(create("VR-HOA 2026/014#2:a_b").ok).toBe(true);
+    for (const bad of [
+      "Brgy. Resolution No. 14, s. 2026",
+      "L-1",
+      "x".repeat(61),
+      "Ref (2026)",
+    ]) {
+      const result = create(bad);
+      expect(result.ok, bad).toBe(false);
+      if (!result.ok) {
+        expect(result.errors.letterReference).toContain("4 to 60 letters");
+      }
+    }
+  });
+
   it("adds an officer by email with the name and role members see", () => {
     expect(
       checkAddOfficer({

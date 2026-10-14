@@ -18,11 +18,13 @@ export default function MaintenancePage() {
         Read and update actions remain unavailable until the maintenance window
         ends. This page intentionally exposes no infrastructure details.
       </div>
+      {/* /health is parked (a KitaMo session gets 404). */}
       <Link
         className="mt-6 inline-flex rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
-        href="/health"
+        href="/overview"
+        prefetch={false}
       >
-        Check system health
+        Try again
       </Link>
     </PublicShell>
   );

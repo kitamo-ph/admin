@@ -603,6 +603,8 @@ export class CoreAdminService implements AdminService {
           ? "KitaMo did not answer in time. Try again."
           : "KitaMo could not be reached. Try again.",
         retryable: true,
+        // The request may have gone out: a write's result is unknown.
+        ...(timedOut ? {} : { details: { stage: "transport" } }),
       });
     }
     const latency = Date.now() - started;

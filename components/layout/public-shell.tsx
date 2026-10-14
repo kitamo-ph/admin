@@ -25,6 +25,7 @@ export function PublicShell({
         <Link
           className="relative flex items-center gap-3 rounded-lg"
           href="/sign-in"
+          prefetch={false}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- KitaMo's static mark */}
           <img

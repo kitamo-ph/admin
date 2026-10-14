@@ -281,7 +281,11 @@ export const ASSOCIATION_KIND_LABELS: Record<AssociationKind, string> = {
 
 export const ASSOCIATION_NAME_MAX = 80;
 export const ASSOCIATION_AREA_MAX = 120;
-export const LETTER_REFERENCE_MAX = 120;
+export const LETTER_REFERENCE_MAX = 60;
+/** 0086's own rule for a letter's reference (its CHECK and admin_create_association). */
+export const LETTER_REFERENCE_PATTERN = /^[A-Za-z0-9#:/._ -]{4,60}$/;
+export const LETTER_REFERENCE_RULE =
+  "4 to 60 letters, digits, spaces or # : / . _ -";
 export const OFFICER_LABEL_MAX = 60;
 
 /** A join code as officers read it out: `K7Q4-X9RM`. */
@@ -322,11 +326,8 @@ export function checkCreateAssociation(input: {
     errors.area = `Write the place in at most ${ASSOCIATION_AREA_MAX} characters.`;
   }
   const letterReference = input.letterReference.trim();
-  if (
-    letterReference.length < 1 ||
-    letterReference.length > LETTER_REFERENCE_MAX
-  ) {
-    errors.letterReference = `Write the reference of the letter you checked (1 to ${LETTER_REFERENCE_MAX} characters).`;
+  if (!LETTER_REFERENCE_PATTERN.test(letterReference)) {
+    errors.letterReference = `Write the reference of the letter you checked: ${LETTER_REFERENCE_RULE} (no commas).`;
   }
   if (Object.keys(errors).length > 0 || !kind.success) {
     return { ok: false, errors };

@@ -768,6 +768,18 @@ describe("the Core adapter: associations (0086, §12.12, §12.15)", () => {
     }
   });
 
+  it("takes Core's 500-row list whole, and fails closed past it", async () => {
+    const rows = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({
+        ...ASSOCIATIONS[0],
+        association_id: `0d000000-0000-4000-8000-${String(i).padStart(12, "0")}`,
+      }));
+    const full = await core(ok(rows(500))).service.listAssociations();
+    expect(full.ok && full.data.length).toBe(500);
+    const over = await core(ok(rows(501))).service.listAssociations();
+    expect(over.ok).toBe(false);
+  });
+
   it("answers NOT_AVAILABLE for every association method until 0086 exists", async () => {
     const missing = () =>
       core(fail(404, { code: "PGRST202", message: "Could not find" })).service;

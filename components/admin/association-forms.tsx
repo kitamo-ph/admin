@@ -17,6 +17,7 @@ import {
   ASSOCIATION_KIND_LABELS,
   ASSOCIATION_NAME_MAX,
   LETTER_REFERENCE_MAX,
+  LETTER_REFERENCE_RULE,
   OFFICER_LABEL_MAX,
 } from "@/lib/admin/r16-rules";
 import { associationKindSchema } from "@/lib/admin/r16-schemas";
@@ -88,13 +89,17 @@ export function CreateAssociationForm({ requestId }: { requestId: string }) {
       <label className="km-label">
         Letter reference
         <input
+          aria-describedby="letter-reference-rule"
           autoComplete="off"
           className="control km-input"
           maxLength={LETTER_REFERENCE_MAX}
           name="letterReference"
-          placeholder="The reference of the letter you checked"
+          placeholder="e.g. VR-HOA 2026/014"
         />
       </label>
+      <p className="km-hint" id="letter-reference-rule">
+        The reference of the letter you checked: {LETTER_REFERENCE_RULE}.
+      </p>
       <FieldError message={state.errors?.letterReference} />
       <Alert message={state.message} />
       <div>

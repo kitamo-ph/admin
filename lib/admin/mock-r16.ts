@@ -1,4 +1,4 @@
-import { MAX_LIVE_ACCESSES } from "./r16-rules";
+import { LETTER_REFERENCE_PATTERN, MAX_LIVE_ACCESSES } from "./r16-rules";
 import type {
   AccessLevel,
   AccessLog,
@@ -854,6 +854,9 @@ export class MockR16Store {
   }
 
   createAssociation(input: CreateAssociationInput): CreatedAssociation {
+    if (!LETTER_REFERENCE_PATTERN.test(input.letterReference.trim())) {
+      throw new R16Refusal("invalid", "letter_reference");
+    }
     const replay = this.associationRows.find(
       (row) => row.clientRequestId === input.clientRequestId,
     );

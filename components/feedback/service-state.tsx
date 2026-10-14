@@ -36,15 +36,18 @@ export function ServiceErrorState({ error }: { error: ServiceErrorShape }) {
               <Link
                 className="rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
                 href=""
+                prefetch={false}
               >
                 Try again
               </Link>
             ) : null}
+            {/* /health is parked (a KitaMo session gets 404): the overview is the next step. */}
             <Link
               className="rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
-              href="/health"
+              href="/overview"
+              prefetch={false}
             >
-              View system health
+              Back to the overview
             </Link>
           </div>
           <p className="mt-6 text-xs text-[var(--km-color-text-secondary)]">
