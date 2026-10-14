@@ -127,9 +127,11 @@ access of their own (30 minutes, a reason; Records also an open flag of the
 business or a reference) and are never inherited.
 
 The R16 permissions route the pages: `flags:read`, `flags:update`,
-`business_access:open` (open and close an access) and `associations:read`.
-`super_admin` holds all of them; the two mock roles read flags and
-associations only. Parked mock-first sections answer 404 to a KitaMo session.
+`business_access:open` (open and close an access), `associations:read` and
+`associations:update` (create an association, add or end an officer, rotate
+the join code, close; 0086's `admin_*` functions, which also call
+`km_admin_can` first and write association records only). `super_admin`
+holds all of them; the two mock roles read flags and associations only. Parked mock-first sections answer 404 to a KitaMo session.
 
 ## Future Clerk and Supabase authorization
 

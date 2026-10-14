@@ -25,12 +25,18 @@ const READERS = [
   "km_admin_flags",
   "km_admin_access_log",
   "km_admin_associations",
+  "km_admin_association",
 ];
 const WRITERS = [
   "open_admin_access",
   "close_admin_access",
   "raise_admin_flag",
   "review_admin_flag",
+  "admin_create_association",
+  "admin_add_association_officer",
+  "admin_end_association_officer",
+  "admin_rotate_association_code",
+  "admin_close_association",
 ];
 const REASON = "The owner asked why yesterday's tally is off.";
 
@@ -392,9 +398,7 @@ test.describe("R16 pages through the Core adapter", () => {
     );
   });
 
-  test("the access log lists the access; Associations is the HOA stub", async ({
-    page,
-  }) => {
+  test("the access log lists the access and its reads", async ({ page }) => {
     await signIn(page, account("enrolled"), "/businesses");
     await openSummary(page);
     await page.goto("/audit-log");
@@ -407,12 +411,121 @@ test.describe("R16 pages through the Core adapter", () => {
     await expect(page.getByRole("table", { name: "Reads" })).toContainText(
       "km_admin_business_summary",
     );
-    await page.goto("/associations");
+  });
+
+  test("Associations (0086): one of each kind, the kind listed, officers added and ended, the code rotated, closed", async ({
+    page,
+    request,
+  }) => {
+    const email = account("enrolled");
+    await signIn(page, email, "/associations");
+    const list = page.getByRole("table", { name: "Associations" });
     await expect(
-      page.getByRole("heading", {
-        name: "Associations arrive with the HOA level.",
-      }),
+      list.getByRole("row", { name: /Villa Rosa Homeowners/ }),
+    ).toContainText("HOA");
+    await expect(
+      list.getByRole("row", { name: /Malanday Market Vendors/ }),
+    ).toContainText("Barangay");
+
+    for (const [kind, name] of [
+      ["Barangay", "Brgy. Dalig Vendors"],
+      ["HOA", "Sampaguita Homes HOA"],
+    ] as const) {
+      await page.goto("/associations");
+      const create = page.getByRole("form", { name: "Create an association" });
+      await create.getByLabel("Name", { exact: true }).fill(name);
+      await create.getByRole("radio", { name: kind, exact: true }).check();
+      await create.getByLabel("Letter reference").fill("LTR-2026-0001");
+      await create
+        .getByRole("button", { name: "Create the association" })
+        .click();
+      await expect(page.getByText("Association created")).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
+      await expect(page.getByTestId("join-code")).toHaveText(
+        /^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}$/,
+      );
+      await page.goto("/associations");
+      await expect(
+        page
+          .getByRole("table", { name: "Associations" })
+          .getByRole("row", { name: new RegExp(name) }),
+      ).toContainText(kind);
+    }
+
+    // The HOA just made: its detail, officers, the code, then closing it.
+    await page
+      .getByRole("table", { name: "Associations" })
+      .getByRole("link", { name: "Sampaguita Homes HOA" })
+      .click();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Sampaguita Homes HOA" }),
     ).toBeVisible();
+    const add = page.getByRole("form", { name: "Add an officer" });
+    await add.getByLabel("Officer's KitaMo email").fill("juan@example.test");
+    await add
+      .getByLabel("Name and role members see")
+      .fill("Juan D., President");
+    await add.getByRole("button", { name: "Add the officer" }).click();
+    await expect(page.getByText("Officer added")).toBeVisible();
+    const officers = page.getByRole("table", { name: "Officers" });
+    await expect(
+      officers.getByRole("row", { name: /Juan D., President/ }),
+    ).toContainText("Not yet");
+    // Never the officer's email on the page.
+    expect(await page.content()).not.toContain("juan@example.test");
+
+    const again = page.getByRole("form", { name: "Add an officer" });
+    await again
+      .getByLabel("Officer's KitaMo email")
+      .fill("unknown@example.test");
+    await again
+      .getByLabel("Name and role members see")
+      .fill("Maria S., Secretary");
+    await again.getByRole("button", { name: "Add the officer" }).click();
+    await expect(again.getByRole("alert")).toContainText(
+      "cannot be an officer here",
+    );
+
+    await page
+      .getByRole("form", { name: "End Juan D., President's role" })
+      .getByRole("button", { name: "End this officer's role" })
+      .click();
+    await expect(page.getByText("Officer's role ended")).toBeVisible();
+    await expect(
+      page
+        .getByRole("table", { name: "Officers" })
+        .getByRole("row", { name: /Juan D., President/ }),
+    ).not.toContainText("—");
+
+    const before = await page.getByTestId("join-code").innerText();
+    await page.getByRole("button", { name: "Rotate the join code" }).click();
+    await expect(page.getByText("Join code changed")).toBeVisible();
+    await expect(page.getByTestId("join-code")).not.toHaveText(before);
+
+    const close = page.getByRole("form", { name: "Close the association" });
+    await close.getByRole("button", { name: "Close the association" }).click();
+    await expect(close.getByText(/Tick the box to confirm/)).toBeVisible();
+    await close.getByRole("checkbox").check();
+    await close.getByRole("button", { name: "Close the association" }).click();
+    await expect(page.getByText("Association closed")).toBeVisible();
+    await expect(page.getByText("Closed", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("form", { name: "Add an officer" }),
+    ).toHaveCount(0);
+
+    const calls = await stubCalls(request, email);
+    for (const fn of calls.rpc) {
+      expect([...READERS, ...WRITERS], fn).toContain(fn);
+    }
+    expect(new Set(calls.rpc.filter((fn) => WRITERS.includes(fn)))).toEqual(
+      new Set([
+        "admin_create_association",
+        "admin_add_association_officer",
+        "admin_end_association_officer",
+        "admin_rotate_association_code",
+        "admin_close_association",
+      ]),
+    );
   });
 });
 

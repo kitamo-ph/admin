@@ -4,7 +4,10 @@ import type { ServiceError } from "./schemas";
  * What the administrator reads when Core refuses (spec §3.2). KM005 is one
  * "Not permitted" for every case: Core never says why, so neither does this.
  */
-export function refusalMessage(error: ServiceError): string {
+export function refusalMessage(
+  error: ServiceError,
+  reasons: Record<string, string> = {},
+): string {
   switch (error.code) {
     case "FORBIDDEN":
       return "Not permitted.";
@@ -13,6 +16,7 @@ export function refusalMessage(error: ServiceError): string {
     case "VALIDATION_ERROR":
       return invalidMessage(
         typeof error.details?.reason === "string" ? error.details.reason : null,
+        reasons,
       );
     case "TIMEOUT":
     case "SERVICE_UNAVAILABLE":
@@ -41,9 +45,28 @@ const INVALID: Record<string, string> = {
   note: "Write a note of 10 to 500 characters.",
 };
 
-export function invalidMessage(reason: string | null): string {
+export function invalidMessage(
+  reason: string | null,
+  reasons: Record<string, string> = {},
+): string {
   return (
-    (reason === null ? undefined : INVALID[reason]) ??
+    (reason === null ? undefined : (reasons[reason] ?? INVALID[reason])) ??
     "KitaMo refused the request as incomplete or invalid. Nothing was changed."
   );
 }
+
+/**
+ * KM003 reasons from the association functions (0086). `kind` there is the
+ * association's kind, not a kind of records; unknown reasons read as the
+ * general refusal.
+ */
+export const ASSOCIATION_REASONS: Record<string, string> = {
+  kind: "Choose HOA or Barangay.",
+  officer:
+    "That email cannot be an officer here: it has no KitaMo account, belongs to a staff sign-in or KitaMo's admin, or is already an officer of this association.",
+  closed: "This association is closed. Nothing was changed.",
+  name: "Write the association's name in 1 to 80 characters.",
+  area: "Write the place in at most 120 characters.",
+  letter_reference: "Write the reference of the letter you checked.",
+  label: "Write the officer's name and role in 1 to 60 characters.",
+};

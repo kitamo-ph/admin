@@ -2,6 +2,15 @@ import { MAX_LIVE_ACCESSES } from "./r16-rules";
 import type {
   AccessLevel,
   AccessLog,
+  AddOfficerInput,
+  Association,
+  AssociationChanged,
+  AssociationChangeInput,
+  AssociationDetail,
+  AssociationKind,
+  CreateAssociationInput,
+  CreatedAssociation,
+  EndOfficerInput,
   AccessLogEntry,
   AccessRead,
   AdminSessionState,
@@ -107,6 +116,43 @@ type MockFlag = {
   clientRequestId: string;
 };
 
+type MockOfficer = {
+  id: string;
+  email: string;
+  label: string;
+  addedAt: number;
+  acceptedAt: number | null;
+  endedAt: number | null;
+  clientRequestId: string;
+  endRequestId: string | null;
+};
+
+type MockAssociation = {
+  id: string;
+  name: string;
+  kind: AssociationKind;
+  area: string | null;
+  letterReference: string;
+  status: "live" | "closed";
+  joinCode: string;
+  codeRotatedAt: number | null;
+  createdAt: number;
+  memberStallCount: number;
+  officers: MockOfficer[];
+  clientRequestId: string;
+};
+
+/** D18 §3: 8 of A-Z without I, L and O, plus 2-9. */
+const JOIN_CODE_LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+function newJoinCode(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(
+    bytes,
+    (byte) => JOIN_CODE_LETTERS[byte % JOIN_CODE_LETTERS.length],
+  ).join("");
+}
+
 type MockRead = {
   fn: string;
   businessId: string | null;
@@ -157,6 +203,10 @@ function seeded(seed: number, n: number): number {
   return (x ^ (x >>> 15)) >>> 0;
 }
 
+function iso(ms: number | null): string | null {
+  return ms === null ? null : new Date(ms).toISOString();
+}
+
 function isoDay(ms: number, timeZone = "Asia/Manila"): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -171,6 +221,9 @@ export class MockR16Store {
   private readonly accesses: MockAccess[] = [];
   private readonly flags: MockFlag[];
   private readonly reads: MockRead[] = [];
+  private readonly associationRows: MockAssociation[];
+  /** Request ids of rotations and closes, with what each did (replays, KM015). */
+  private readonly associationChanges = new Map<string, string>();
   private readonly now: () => number;
 
   constructor(now: () => number, empty = false) {
@@ -234,6 +287,70 @@ export class MockR16Store {
               clientRequestId: mockId(14, 2),
             },
           ];
+    this.associationRows = empty
+      ? []
+      : [
+          {
+            id: mockId(18, 1),
+            name: "Villa Rosa Homeowners",
+            kind: "hoa",
+            area: "Villa Rosa, Brgy. San Roque, Antipolo",
+            letterReference: "VR-HOA-2026-014",
+            status: "live",
+            joinCode: "K7Q4X9RM",
+            codeRotatedAt: start - 3 * DAY,
+            createdAt: start - 20 * DAY,
+            memberStallCount: 4,
+            officers: [
+              {
+                id: mockId(19, 1),
+                email: "juan.president@example.test",
+                label: "Juan D., President",
+                addedAt: start - 20 * DAY,
+                acceptedAt: start - 19 * DAY,
+                endedAt: null,
+                clientRequestId: mockId(20, 1),
+                endRequestId: null,
+              },
+              {
+                id: mockId(19, 2),
+                email: "maria.secretary@example.test",
+                label: "Maria S., Secretary",
+                addedAt: start - 2 * DAY,
+                acceptedAt: null,
+                endedAt: null,
+                clientRequestId: mockId(20, 2),
+                endRequestId: null,
+              },
+            ],
+            clientRequestId: mockId(21, 1),
+          },
+          {
+            id: mockId(18, 2),
+            name: "Malanday Market Vendors",
+            kind: "barangay",
+            area: "Malanday public market",
+            letterReference: "BRGY-MAL-0031",
+            status: "live",
+            joinCode: "P3RT8HWZ",
+            codeRotatedAt: null,
+            createdAt: start - 6 * DAY,
+            memberStallCount: 2,
+            officers: [
+              {
+                id: mockId(19, 3),
+                email: "kap.ramon@example.test",
+                label: "Kap. Ramon A.",
+                addedAt: start - 6 * DAY,
+                acceptedAt: start - 5 * DAY,
+                endedAt: null,
+                clientRequestId: mockId(20, 3),
+                endRequestId: null,
+              },
+            ],
+            clientRequestId: mockId(21, 2),
+          },
+        ];
   }
 
   // -- Readers -----------------------------------------------------------------
@@ -688,6 +805,191 @@ export class MockR16Store {
         ? this.now()
         : null;
     return { flagId: flag.id, status: flag.status };
+  }
+
+  // -- Associations (the HOA level, 0086, D18) -----------------------------------
+  // The rules Core's 0086 is expected to enforce, as far as the site meets
+  // them: an unknown association or officer is the one KM005; a closed
+  // association takes no change (KM003 closed); an officer is a KitaMo
+  // account (here: any email not starting "unknown") added once (KM003
+  // officer); every write replays by its request id (KM015 on other details).
+
+  associationList(): Association[] {
+    const rows = [...this.associationRows]
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((association) => ({
+        associationId: association.id,
+        name: association.name,
+        kind: association.kind,
+        status: association.status,
+        memberStallCount: association.memberStallCount,
+        officerCount: association.officers.filter(
+          (officer) => officer.endedAt === null,
+        ).length,
+        codeRotatedAt: iso(association.codeRotatedAt),
+      }));
+    this.log("km_admin_associations", null, null, rows.length);
+    return rows;
+  }
+
+  association(associationId: string): AssociationDetail {
+    const association = this.mustAssociation(associationId);
+    this.log("km_admin_association", null, null, 1);
+    return {
+      associationId: association.id,
+      name: association.name,
+      kind: association.kind,
+      status: association.status,
+      area: association.area,
+      joinCode: association.joinCode,
+      codeRotatedAt: iso(association.codeRotatedAt),
+      officers: association.officers.map((officer) => ({
+        officerId: officer.id,
+        label: officer.label,
+        addedAt: new Date(officer.addedAt).toISOString(),
+        acceptedAt: iso(officer.acceptedAt),
+        endedAt: iso(officer.endedAt),
+      })),
+    };
+  }
+
+  createAssociation(input: CreateAssociationInput): CreatedAssociation {
+    const replay = this.associationRows.find(
+      (row) => row.clientRequestId === input.clientRequestId,
+    );
+    if (replay !== undefined) {
+      if (
+        replay.name !== input.name.trim() ||
+        replay.kind !== input.kind ||
+        replay.area !== input.area ||
+        replay.letterReference !== input.letterReference.trim()
+      ) {
+        throw new R16Refusal("conflict");
+      }
+      return { associationId: replay.id, joinCode: replay.joinCode };
+    }
+    const association: MockAssociation = {
+      id: crypto.randomUUID(),
+      name: input.name.trim(),
+      kind: input.kind,
+      area: input.area,
+      letterReference: input.letterReference.trim(),
+      status: "live",
+      joinCode: newJoinCode(),
+      codeRotatedAt: null,
+      createdAt: this.now(),
+      memberStallCount: 0,
+      officers: [],
+      clientRequestId: input.clientRequestId,
+    };
+    this.associationRows.push(association);
+    return { associationId: association.id, joinCode: association.joinCode };
+  }
+
+  addOfficer(input: AddOfficerInput): AssociationChanged {
+    const email = input.email.trim().toLowerCase();
+    const replay = this.associationRows
+      .flatMap((row) => row.officers.map((officer) => ({ row, officer })))
+      .find(({ officer }) => officer.clientRequestId === input.clientRequestId);
+    if (replay !== undefined) {
+      if (
+        replay.row.id !== input.associationId ||
+        replay.officer.email !== email ||
+        replay.officer.label !== input.label.trim()
+      ) {
+        throw new R16Refusal("conflict");
+      }
+      return { done: true };
+    }
+    const association = this.mustAssociation(input.associationId);
+    if (association.status !== "live") {
+      throw new R16Refusal("invalid", "closed");
+    }
+    if (
+      email.startsWith("unknown") ||
+      association.officers.some(
+        (officer) => officer.email === email && officer.endedAt === null,
+      )
+    ) {
+      throw new R16Refusal("invalid", "officer");
+    }
+    association.officers.push({
+      id: crypto.randomUUID(),
+      email,
+      label: input.label.trim(),
+      addedAt: this.now(),
+      acceptedAt: null,
+      endedAt: null,
+      clientRequestId: input.clientRequestId,
+      endRequestId: null,
+    });
+    return { done: true };
+  }
+
+  endOfficer(input: EndOfficerInput): AssociationChanged {
+    const officer = this.associationRows
+      .flatMap((row) => row.officers)
+      .find((candidate) => candidate.id === input.officerId);
+    if (officer === undefined) throw new R16Refusal("forbidden");
+    const used = this.associationRows
+      .flatMap((row) => row.officers)
+      .find((candidate) => candidate.endRequestId === input.clientRequestId);
+    if (used !== undefined && used.id !== officer.id) {
+      throw new R16Refusal("conflict");
+    }
+    if (officer.endedAt === null) {
+      officer.endedAt = this.now();
+      officer.endRequestId = input.clientRequestId;
+    }
+    return { done: true };
+  }
+
+  rotateCode(input: AssociationChangeInput): AssociationChanged {
+    const association = this.mustAssociation(input.associationId);
+    if (this.replayedChange(input, "rotate")) return { done: true };
+    if (association.status !== "live") {
+      throw new R16Refusal("invalid", "closed");
+    }
+    let code = newJoinCode();
+    while (code === association.joinCode) code = newJoinCode();
+    association.joinCode = code;
+    association.codeRotatedAt = this.now();
+    this.associationChanges.set(
+      input.clientRequestId,
+      `rotate:${association.id}`,
+    );
+    return { done: true };
+  }
+
+  closeAssociation(input: AssociationChangeInput): AssociationChanged {
+    const association = this.mustAssociation(input.associationId);
+    if (this.replayedChange(input, "close")) return { done: true };
+    association.status = "closed";
+    association.memberStallCount = 0;
+    this.associationChanges.set(
+      input.clientRequestId,
+      `close:${association.id}`,
+    );
+    return { done: true };
+  }
+
+  private mustAssociation(id: string): MockAssociation {
+    const association = this.associationRows.find((row) => row.id === id);
+    if (association === undefined) throw new R16Refusal("forbidden");
+    return association;
+  }
+
+  /** True when this request id already did exactly this; KM015 when it did something else. */
+  private replayedChange(
+    input: AssociationChangeInput,
+    action: "rotate" | "close",
+  ): boolean {
+    const done = this.associationChanges.get(input.clientRequestId);
+    if (done === undefined) return false;
+    if (done !== `${action}:${input.associationId}`) {
+      throw new R16Refusal("conflict");
+    }
+    return true;
   }
 
   // -- Internals ----------------------------------------------------------------

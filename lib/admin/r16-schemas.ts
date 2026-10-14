@@ -443,17 +443,88 @@ export const accessLogQuerySchema = z.strictObject({
   before: utcDateTimeSchema.nullable(),
 });
 
-/** The HOA level arrives with the JR's 0086; until then the method is not_available. */
+/**
+ * The HOA level (0086, D18; the owner's D18 answers of 2026-10-14: a kind of
+ * HOA or barangay). Until Core has it, every association method answers
+ * not_available (PGRST202) and the page says so.
+ */
+export const associationKindSchema = z.enum(["hoa", "barangay"]);
+/** The join code: 8 of A-Z without I, L and O, plus 2-9 (D18 §3), stored plain. */
+export const joinCodeSchema = z.string().regex(/^[A-HJKMNP-Z2-9]{8}$/);
+const associationStatusSchema = z.string().trim().min(1).max(40);
+
 export const associationSchema = z.strictObject({
   associationId: coreIdSchema,
   name: labelSchema,
-  status: z.string().trim().min(1).max(40),
+  kind: associationKindSchema,
+  status: associationStatusSchema,
   memberStallCount: countSchema,
   officerCount: countSchema,
   codeRotatedAt: utcDateTimeSchema.nullable(),
 });
 
 export const associationListSchema = z.array(associationSchema).max(500);
+
+/** An officer as km_admin_association names them (§12.15): never their email. */
+export const associationOfficerSchema = z.strictObject({
+  officerId: coreIdSchema,
+  label: z.string().trim().min(1).max(60),
+  addedAt: utcDateTimeSchema,
+  acceptedAt: utcDateTimeSchema.nullable(),
+  endedAt: utcDateTimeSchema.nullable(),
+});
+
+/** km_admin_association (§12.15): never an officer's email or a member stall's name. */
+export const associationDetailSchema = z.strictObject({
+  associationId: coreIdSchema,
+  name: labelSchema,
+  kind: associationKindSchema,
+  status: associationStatusSchema,
+  area: z.string().trim().max(120).nullable(),
+  joinCode: joinCodeSchema.nullable(),
+  codeRotatedAt: utcDateTimeSchema.nullable(),
+  officers: z.array(associationOfficerSchema).max(50),
+});
+
+export const createAssociationInputSchema = z.strictObject({
+  name: z.string().trim().min(1).max(80),
+  kind: associationKindSchema,
+  area: z.string().trim().min(1).max(120).nullable(),
+  letterReference: z.string().trim().min(1).max(120),
+  clientRequestId: coreIdSchema,
+});
+
+export const createdAssociationSchema = z.strictObject({
+  associationId: coreIdSchema,
+  joinCode: joinCodeSchema,
+});
+
+export const addOfficerInputSchema = z.strictObject({
+  associationId: coreIdSchema,
+  email: z.email().max(254),
+  label: z.string().trim().min(1).max(60),
+  clientRequestId: coreIdSchema,
+});
+
+export const endOfficerInputSchema = z.strictObject({
+  officerId: coreIdSchema,
+  clientRequestId: coreIdSchema,
+});
+
+/** Rotating the code and closing take the association and a request id. */
+export const associationChangeInputSchema = z.strictObject({
+  associationId: coreIdSchema,
+  clientRequestId: coreIdSchema,
+});
+
+/**
+ * The four association changes (add or end an officer, rotate the code,
+ * close) show nothing of Core's reply: the page reads km_admin_association
+ * again. So the site reads only that Core said yes.
+ */
+export const associationChangedSchema = z.strictObject({
+  done: z.literal(true),
+});
 
 export type AccessLevel = z.infer<typeof accessLevelSchema>;
 export type ReasonCode = z.infer<typeof reasonCodeSchema>;
@@ -492,3 +563,16 @@ export type AccessRead = z.infer<typeof accessReadSchema>;
 export type AccessLog = z.infer<typeof accessLogSchema>;
 export type AccessLogQuery = z.infer<typeof accessLogQuerySchema>;
 export type Association = z.infer<typeof associationSchema>;
+export type AssociationKind = z.infer<typeof associationKindSchema>;
+export type AssociationOfficer = z.infer<typeof associationOfficerSchema>;
+export type AssociationDetail = z.infer<typeof associationDetailSchema>;
+export type CreateAssociationInput = z.infer<
+  typeof createAssociationInputSchema
+>;
+export type CreatedAssociation = z.infer<typeof createdAssociationSchema>;
+export type AddOfficerInput = z.infer<typeof addOfficerInputSchema>;
+export type EndOfficerInput = z.infer<typeof endOfficerInputSchema>;
+export type AssociationChangeInput = z.infer<
+  typeof associationChangeInputSchema
+>;
+export type AssociationChanged = z.infer<typeof associationChangedSchema>;

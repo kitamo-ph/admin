@@ -114,12 +114,13 @@ const num = (params: Params, key: string): number | null =>
   typeof params[key] === "number" ? (params[key] as number) : null;
 
 export function createFakeCore(
-  options: { now?: () => number; switchOn?: boolean } = {},
+  options: { now?: () => number; switchOn?: boolean; hoa?: boolean } = {},
 ) {
   const stores = new Map<string, MockR16Store>();
   const offsets = new Map<string, number>();
   const calls: FakeCall[] = [];
   let switchOn = options.switchOn ?? true;
+  let hoa = options.hoa ?? true;
   const baseNow = options.now ?? Date.now;
 
   function storeFor(sub: string): MockR16Store {
@@ -148,6 +149,18 @@ export function createFakeCore(
       "km_admin_access_log",
       "raise_admin_flag",
       "review_admin_flag",
+      // The HOA level (0086): unless hoa is off, when PostgREST has none of them.
+      ...(hoa
+        ? [
+            "km_admin_associations",
+            "km_admin_association",
+            "admin_create_association",
+            "admin_add_association_officer",
+            "admin_end_association_officer",
+            "admin_rotate_association_code",
+            "admin_close_association",
+          ]
+        : []),
     ];
     if (!known.includes(fn)) return pgrst202(fn);
     // km_admin_can: the switch, aal2, a live platform admin (and no business).
@@ -239,6 +252,52 @@ export function createFakeCore(
             }),
           );
         }
+        case "km_admin_associations":
+          return ok(store.associationList());
+        case "km_admin_association":
+          return ok(store.association(str(params, "p_association_id") ?? ""));
+        case "admin_create_association": {
+          const kind = str(params, "p_kind");
+          if (kind !== "hoa" && kind !== "barangay") {
+            throw new R16Refusal("invalid", "kind");
+          }
+          return ok(
+            store.createAssociation({
+              name: str(params, "p_name") ?? "",
+              kind,
+              area: str(params, "p_area"),
+              letterReference: str(params, "p_letter_reference") ?? "",
+              clientRequestId: str(params, "p_client_request_id") ?? "",
+            }),
+          );
+        }
+        // The four changes: Core's reply is not read by the site, so any shape.
+        case "admin_add_association_officer":
+          store.addOfficer({
+            associationId: str(params, "p_association_id") ?? "",
+            email: str(params, "p_email") ?? "",
+            label: str(params, "p_label") ?? "",
+            clientRequestId: str(params, "p_client_request_id") ?? "",
+          });
+          return ok({ ok: true });
+        case "admin_end_association_officer":
+          store.endOfficer({
+            officerId: str(params, "p_officer_id") ?? "",
+            clientRequestId: str(params, "p_client_request_id") ?? "",
+          });
+          return ok({ ok: true });
+        case "admin_rotate_association_code":
+          store.rotateCode({
+            associationId: str(params, "p_association_id") ?? "",
+            clientRequestId: str(params, "p_client_request_id") ?? "",
+          });
+          return ok({ ok: true });
+        case "admin_close_association":
+          store.closeAssociation({
+            associationId: str(params, "p_association_id") ?? "",
+            clientRequestId: str(params, "p_client_request_id") ?? "",
+          });
+          return ok({ ok: true });
         case "review_admin_flag":
           return ok(
             store.review(
@@ -268,11 +327,16 @@ export function createFakeCore(
     setSwitch(on: boolean) {
       switchOn = on;
     },
+    /** Off: Core without 0086 (every association RPC answers PGRST202). */
+    setHoa(on: boolean) {
+      hoa = on;
+    },
     reset() {
       stores.clear();
       offsets.clear();
       calls.length = 0;
       switchOn = options.switchOn ?? true;
+      hoa = options.hoa ?? true;
     },
   };
 }

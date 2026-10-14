@@ -210,6 +210,11 @@ describe("R16 routes and permissions (ADM-048)", () => {
   it("routes the R16 sections and keeps the MFA steps out of the permission map", () => {
     expect(permissionForAdminPath("/flags")).toBe("flags:read");
     expect(permissionForAdminPath("/associations")).toBe("associations:read");
+    expect(
+      permissionForAdminPath(
+        "/associations/0a000000-0000-4000-8000-000000000001",
+      ),
+    ).toBe("associations:read");
     expect(permissionForAdminPath("/businesses/0b0/records")).toBe(
       "businesses:read",
     );
@@ -232,6 +237,7 @@ describe("R16 routes and permissions (ADM-048)", () => {
     for (const permission of [
       "flags:update",
       "business_access:open",
+      "associations:update",
     ] as const) {
       expect(hasPermission("super_admin", permission)).toBe(true);
       expect(hasPermission("support_admin", permission)).toBe(false);

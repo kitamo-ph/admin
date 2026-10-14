@@ -2,16 +2,20 @@ import { z } from "zod";
 
 import {
   accessLevelSchema,
+  associationKindSchema,
   auditSourceSchema,
   flagKindSchema,
   flagSourceSchema,
   flagStatusSchema,
+  joinCodeSchema,
   reasonCodeSchema,
   type AccessLog,
   type AdminSessionState,
   type Association,
+  type AssociationDetail,
   type BusinessSummary,
   type ClosedAccess,
+  type CreatedAssociation,
   type DirectoryPage,
   type Flag,
   type FlagEvidence,
@@ -537,12 +541,16 @@ export const parseAccessLogReply = (body: unknown): AccessLog => {
   };
 };
 
-/** 0086 (the JR's) defines this; until then PostgREST answers PGRST202. */
+/**
+ * 0086 defines these (§12.12, §12.15); until then PostgREST answers
+ * PGRST202. A bare array, kind included (the owner's D18 answers).
+ */
 const associationsReply = z
   .array(
     z.strictObject({
       association_id: id,
       name: text(200),
+      kind: associationKindSchema,
       status: text(40),
       member_stall_count: count,
       officer_count: count,
@@ -555,11 +563,67 @@ export const parseAssociationsReply = (body: unknown): Association[] =>
   associationsReply.parse(body).map((row) => ({
     associationId: row.association_id,
     name: row.name,
+    kind: row.kind,
     status: row.status,
     memberStallCount: row.member_stall_count,
     officerCount: row.officer_count,
     codeRotatedAt: row.code_rotated_at,
   }));
+
+/** km_admin_association (§12.15): never an officer's email, never a member stall. */
+const associationReply = z.strictObject({
+  association_id: id,
+  name: text(200),
+  kind: associationKindSchema,
+  status: text(40),
+  area: z.string().trim().max(120).nullable(),
+  join_code: joinCodeSchema.nullable(),
+  code_rotated_at: ts.nullable(),
+  officers: z
+    .array(
+      z.strictObject({
+        officer_id: id,
+        label: text(60),
+        added_at: ts,
+        accepted_at: ts.nullable(),
+        ended_at: ts.nullable(),
+      }),
+    )
+    .max(50),
+});
+
+export const parseAssociationReply = (body: unknown): AssociationDetail => {
+  const reply = associationReply.parse(body);
+  return {
+    associationId: reply.association_id,
+    name: reply.name,
+    kind: reply.kind,
+    status: reply.status,
+    area: reply.area === null || reply.area === "" ? null : reply.area,
+    joinCode: reply.join_code,
+    codeRotatedAt: reply.code_rotated_at,
+    officers: reply.officers.map((officer) => ({
+      officerId: officer.officer_id,
+      label: officer.label,
+      addedAt: officer.added_at,
+      acceptedAt: officer.accepted_at,
+      endedAt: officer.ended_at,
+    })),
+  };
+};
+
+/** admin_create_association (jr-parts §C.1): the new id and its first code. */
+const createdAssociationReply = z.strictObject({
+  association_id: id,
+  join_code: joinCodeSchema,
+});
+
+export const parseCreatedAssociationReply = (
+  body: unknown,
+): CreatedAssociation => {
+  const reply = createdAssociationReply.parse(body);
+  return { associationId: reply.association_id, joinCode: reply.join_code };
+};
 
 /** PostgREST's error body. Read loosely: it is never rendered. */
 export const postgrestErrorSchema = z.object({

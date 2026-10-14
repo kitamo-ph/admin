@@ -348,12 +348,179 @@ for (const [name, make] of [
       expect(fns).toContain("km_admin_business_summary");
     });
 
-    it("answers NOT_AVAILABLE for associations until the HOA level", async () => {
+    it("lists associations with their kind, and creates one of each kind", async () => {
       const { service } = make();
-      expect(code(await service.listAssociations())).toBe("NOT_AVAILABLE");
+      const before = data(await service.listAssociations());
+      expect(new Set(before.map((row) => row.kind))).toEqual(
+        new Set(["hoa", "barangay"]),
+      );
+      for (const kind of ["hoa", "barangay"] as const) {
+        const requestId = crypto.randomUUID();
+        const input = {
+          name: kind === "hoa" ? "Sampaguita Homes HOA" : "Brgy. Dalig Vendors",
+          kind,
+          area: kind === "hoa" ? "Sampaguita Homes, Cainta" : null,
+          letterReference: `LTR-${kind}-0001`,
+          clientRequestId: requestId,
+        };
+        const created = data(await service.createAssociation(input));
+        expect(created.joinCode).toMatch(/^[A-HJKMNP-Z2-9]{8}$/);
+        // A replay answers the same; other details with the same id are KM015.
+        expect(data(await service.createAssociation(input))).toEqual(created);
+        expect(
+          code(await service.createAssociation({ ...input, name: "Other" })),
+        ).toBe("CONFLICT");
+        const listed = data(await service.listAssociations()).find(
+          (row) => row.associationId === created.associationId,
+        );
+        expect(listed).toMatchObject({
+          kind,
+          memberStallCount: 0,
+          officerCount: 0,
+          codeRotatedAt: null,
+        });
+        const detail = data(
+          await service.getAssociation(created.associationId),
+        );
+        expect(detail).toMatchObject({
+          kind,
+          name: input.name,
+          area: input.area,
+          joinCode: created.joinCode,
+          officers: [],
+        });
+      }
+    });
+
+    it("adds and ends an officer, rotates the code and closes (each re-read)", async () => {
+      const { service } = make();
+      const { associationId, joinCode } = data(
+        await service.createAssociation({
+          name: "Sampaguita Homes HOA",
+          kind: "hoa",
+          area: null,
+          letterReference: "LTR-0002",
+          clientRequestId: crypto.randomUUID(),
+        }),
+      );
+      const add = (email: string, clientRequestId = crypto.randomUUID()) =>
+        service.addAssociationOfficer({
+          associationId,
+          email,
+          label: "Juan D., President",
+          clientRequestId,
+        });
+      data(await add("juan@example.test"));
+      expect(code(await add("juan@example.test"))).toBe("VALIDATION_ERROR");
+      const unknown = await add("unknown@example.test");
+      expect(!unknown.ok && unknown.error.details?.reason).toBe("officer");
+      let detail = data(await service.getAssociation(associationId));
+      expect(detail.officers).toHaveLength(1);
+      expect(JSON.stringify(detail)).not.toContain("juan@example.test");
+      const officer = detail.officers[0];
+      expect(officer).toMatchObject({
+        label: "Juan D., President",
+        acceptedAt: null,
+        endedAt: null,
+      });
+      data(
+        await service.endAssociationOfficer({
+          officerId: officer?.officerId ?? "",
+          clientRequestId: crypto.randomUUID(),
+        }),
+      );
+      detail = data(await service.getAssociation(associationId));
+      expect(detail.officers[0]?.endedAt).not.toBeNull();
+
+      const rotate = crypto.randomUUID();
+      data(
+        await service.rotateAssociationCode({
+          associationId,
+          clientRequestId: rotate,
+        }),
+      );
+      detail = data(await service.getAssociation(associationId));
+      expect(detail.joinCode).not.toBe(joinCode);
+      expect(detail.codeRotatedAt).not.toBeNull();
+      // The same request id again changes nothing more.
+      const rotated = detail.joinCode;
+      data(
+        await service.rotateAssociationCode({
+          associationId,
+          clientRequestId: rotate,
+        }),
+      );
+      expect(data(await service.getAssociation(associationId)).joinCode).toBe(
+        rotated,
+      );
+
+      data(
+        await service.closeAssociation({
+          associationId,
+          clientRequestId: crypto.randomUUID(),
+        }),
+      );
+      expect(data(await service.getAssociation(associationId)).status).toBe(
+        "closed",
+      );
+      const late = await add("maria@example.test");
+      expect(!late.ok && late.error.details?.reason).toBe("closed");
+    });
+
+    it("refuses an unknown association or officer with the one KM005", async () => {
+      const { service } = make();
+      const nobody = crypto.randomUUID();
+      expect(code(await service.getAssociation(nobody))).toBe("FORBIDDEN");
+      expect(
+        code(
+          await service.endAssociationOfficer({
+            officerId: nobody,
+            clientRequestId: crypto.randomUUID(),
+          }),
+        ),
+      ).toBe("FORBIDDEN");
+      expect(
+        code(
+          await service.closeAssociation({
+            associationId: nobody,
+            clientRequestId: crypto.randomUUID(),
+          }),
+        ),
+      ).toBe("FORBIDDEN");
     });
   });
 }
+
+describe("R16 contract: before the HOA level", () => {
+  it("answers NOT_AVAILABLE for every association method while Core has no 0086", async () => {
+    const core = createFakeCore({ hoa: false });
+    const service = new CoreAdminService({
+      url: "https://kitamo-test.supabase.co",
+      anonKey: "anon",
+      accessToken: "t",
+      fetchImpl: fakeCoreFetch(core, () => ({
+        sub: "0a000000-0000-4000-8000-00000000000c",
+        aal: "aal2",
+        admin: true,
+      })),
+    });
+    expect(code(await service.listAssociations())).toBe("NOT_AVAILABLE");
+    expect(code(await service.getAssociation(crypto.randomUUID()))).toBe(
+      "NOT_AVAILABLE",
+    );
+    expect(
+      code(
+        await service.createAssociation({
+          name: "Sampaguita Homes HOA",
+          kind: "hoa",
+          area: null,
+          letterReference: "LTR-0003",
+          clientRequestId: crypto.randomUUID(),
+        }),
+      ),
+    ).toBe("NOT_AVAILABLE");
+  });
+});
 
 describe("R16 contract: Core's gate", () => {
   it("refuses aal1, a non-admin and the switch off with the same KM005", async () => {

@@ -8,14 +8,21 @@ import { FLAG_TRANSITIONS } from "./r16-rules";
 import {
   accessLogQuerySchema,
   accessLogSchema,
+  addOfficerInputSchema,
   adminSessionStateSchema,
+  associationChangedSchema,
+  associationChangeInputSchema,
+  associationDetailSchema,
   associationListSchema,
   businessSummarySchema,
   closeAccessInputSchema,
   closedAccessSchema,
   coreIdSchema,
+  createAssociationInputSchema,
+  createdAssociationSchema,
   directoryPageSchema,
   directoryQuerySchema,
+  endOfficerInputSchema,
   flagListSchema,
   flagsQuerySchema,
   openAccessInputSchema,
@@ -29,13 +36,20 @@ import {
   reviewedFlagSchema,
   type AccessLog,
   type AccessLogQuery,
+  type AddOfficerInput,
   type AdminSessionState,
   type Association,
+  type AssociationChanged,
+  type AssociationChangeInput,
+  type AssociationDetail,
   type BusinessSummary,
   type CloseAccessInput,
   type ClosedAccess,
+  type CreateAssociationInput,
+  type CreatedAssociation,
   type DirectoryPage,
   type DirectoryQuery,
+  type EndOfficerInput,
   type Flag,
   type FlagsQuery,
   type OpenAccessInput,
@@ -346,13 +360,79 @@ export class MockAdminService implements AdminService {
       z.undefined(),
       undefined,
       associationListSchema,
-      () => {
-        throw new MockServiceFault(
-          "NOT_AVAILABLE",
-          "This part of KitaMo is not available yet.",
-          false,
-        );
-      },
+      () => this.r16.associationList(),
+    );
+  }
+
+  getAssociation(
+    associationId: string,
+  ): Promise<ServiceResult<AssociationDetail>> {
+    return this.execute(
+      "getAssociation",
+      coreIdSchema,
+      associationId,
+      associationDetailSchema,
+      (id) => this.r16.association(id),
+    );
+  }
+
+  createAssociation(
+    input: CreateAssociationInput,
+  ): Promise<ServiceResult<CreatedAssociation>> {
+    return this.execute(
+      "createAssociation",
+      createAssociationInputSchema,
+      input,
+      createdAssociationSchema,
+      (value) => this.r16.createAssociation(value),
+    );
+  }
+
+  addAssociationOfficer(
+    input: AddOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.execute(
+      "addAssociationOfficer",
+      addOfficerInputSchema,
+      input,
+      associationChangedSchema,
+      (value) => this.r16.addOfficer(value),
+    );
+  }
+
+  endAssociationOfficer(
+    input: EndOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.execute(
+      "endAssociationOfficer",
+      endOfficerInputSchema,
+      input,
+      associationChangedSchema,
+      (value) => this.r16.endOfficer(value),
+    );
+  }
+
+  rotateAssociationCode(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.execute(
+      "rotateAssociationCode",
+      associationChangeInputSchema,
+      input,
+      associationChangedSchema,
+      (value) => this.r16.rotateCode(value),
+    );
+  }
+
+  closeAssociation(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.execute(
+      "closeAssociation",
+      associationChangeInputSchema,
+      input,
+      associationChangedSchema,
+      (value) => this.r16.closeAssociation(value),
     );
   }
 

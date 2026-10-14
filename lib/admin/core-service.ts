@@ -3,8 +3,10 @@ import { z } from "zod";
 import {
   km003Reason,
   parseAccessLogReply,
+  parseAssociationReply,
   parseAssociationsReply,
   parseCloseReply,
+  parseCreatedAssociationReply,
   parseDirectoryReply,
   parseFlagsReply,
   parseOpenReply,
@@ -18,14 +20,21 @@ import {
 import {
   accessLogQuerySchema,
   accessLogSchema,
+  addOfficerInputSchema,
   adminSessionStateSchema,
+  associationChangedSchema,
+  associationChangeInputSchema,
+  associationDetailSchema,
   associationListSchema,
   businessSummarySchema,
   closeAccessInputSchema,
   closedAccessSchema,
   coreIdSchema,
+  createAssociationInputSchema,
+  createdAssociationSchema,
   directoryPageSchema,
   directoryQuerySchema,
+  endOfficerInputSchema,
   flagListSchema,
   flagsQuerySchema,
   openAccessInputSchema,
@@ -39,13 +48,20 @@ import {
   reviewedFlagSchema,
   type AccessLog,
   type AccessLogQuery,
+  type AddOfficerInput,
   type AdminSessionState,
   type Association,
+  type AssociationChanged,
+  type AssociationChangeInput,
+  type AssociationDetail,
   type BusinessSummary,
   type CloseAccessInput,
   type ClosedAccess,
+  type CreateAssociationInput,
+  type CreatedAssociation,
   type DirectoryPage,
   type DirectoryQuery,
+  type EndOfficerInput,
   type Flag,
   type FlagsQuery,
   type OpenAccessInput,
@@ -95,7 +111,8 @@ import {
  *
  * - every reply is parsed strictly (core-schemas.ts): an unknown key, a
  *   missing key or a wrong type answers SERVICE_UNAVAILABLE and nothing
- *   reaches a page;
+ *   reaches a page (the four association changes read only Core's yes:
+ *   nothing of their reply is shown);
  * - KM005 → FORBIDDEN (one "Not permitted" state for every refusal),
  *   KM003 → VALIDATION_ERROR with its reason, KM015 → CONFLICT,
  *   PGRST202 → NOT_AVAILABLE, a refused token → UNAUTHORIZED;
@@ -104,12 +121,20 @@ import {
 
 export const CORE_TIMEOUT_MS = 6_000;
 
-/** The only RPCs that write, and they write Core's admin log only (OQ21). */
+/**
+ * The only RPCs that write. They write Core's admin log, or association
+ * records (0086), never a business's records (OQ21).
+ */
 export const CORE_WRITE_RPCS = [
   "open_admin_access",
   "close_admin_access",
   "raise_admin_flag",
   "review_admin_flag",
+  "admin_create_association",
+  "admin_add_association_officer",
+  "admin_end_association_officer",
+  "admin_rotate_association_code",
+  "admin_close_association",
 ] as const;
 
 /** The readers (each logged by Core) and the unlogged session read. */
@@ -121,6 +146,7 @@ export const CORE_READ_RPCS = [
   "km_admin_flags",
   "km_admin_access_log",
   "km_admin_associations",
+  "km_admin_association",
 ] as const;
 
 export type CoreRpc =
@@ -368,6 +394,84 @@ export class CoreAdminService implements AdminService {
     );
   }
 
+  getAssociation(
+    associationId: string,
+  ): Promise<ServiceResult<AssociationDetail>> {
+    return this.#withInput(coreIdSchema, associationId, (id) =>
+      this.#rpc(
+        "km_admin_association",
+        { p_association_id: id },
+        parseAssociationReply,
+        associationDetailSchema,
+      ),
+    );
+  }
+
+  createAssociation(
+    input: CreateAssociationInput,
+  ): Promise<ServiceResult<CreatedAssociation>> {
+    return this.#withInput(createAssociationInputSchema, input, (value) =>
+      this.#rpc(
+        "admin_create_association",
+        {
+          p_name: value.name,
+          p_kind: value.kind,
+          p_area: value.area,
+          p_letter_reference: value.letterReference,
+          p_client_request_id: value.clientRequestId,
+        },
+        parseCreatedAssociationReply,
+        createdAssociationSchema,
+      ),
+    );
+  }
+
+  addAssociationOfficer(
+    input: AddOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.#withInput(addOfficerInputSchema, input, (value) =>
+      this.#change("admin_add_association_officer", {
+        p_association_id: value.associationId,
+        p_email: value.email,
+        p_label: value.label,
+        p_client_request_id: value.clientRequestId,
+      }),
+    );
+  }
+
+  endAssociationOfficer(
+    input: EndOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.#withInput(endOfficerInputSchema, input, (value) =>
+      this.#change("admin_end_association_officer", {
+        p_officer_id: value.officerId,
+        p_client_request_id: value.clientRequestId,
+      }),
+    );
+  }
+
+  rotateAssociationCode(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.#withInput(associationChangeInputSchema, input, (value) =>
+      this.#change("admin_rotate_association_code", {
+        p_association_id: value.associationId,
+        p_client_request_id: value.clientRequestId,
+      }),
+    );
+  }
+
+  closeAssociation(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.#withInput(associationChangeInputSchema, input, (value) =>
+      this.#change("admin_close_association", {
+        p_association_id: value.associationId,
+        p_client_request_id: value.clientRequestId,
+      }),
+    );
+  }
+
   // -- Parked mock-first methods (R23) ---------------------------------------
 
   getDashboardSummary(): Promise<ServiceResult<DashboardSummary>> {
@@ -450,6 +554,22 @@ export class CoreAdminService implements AdminService {
       });
     }
     return run(parsed.data);
+  }
+
+  /**
+   * An association change: nothing of Core's reply is shown (the page reads
+   * km_admin_association again), so only Core's yes is read, never its keys.
+   */
+  #change(
+    fn: CoreRpc,
+    params: Record<string, unknown>,
+  ): Promise<ServiceResult<AssociationChanged>> {
+    return this.#rpc(
+      fn,
+      params,
+      () => ({ done: true as const }),
+      associationChangedSchema,
+    );
   }
 
   async #rpc<T>(

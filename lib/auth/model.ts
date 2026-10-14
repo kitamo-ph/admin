@@ -27,6 +27,7 @@ export const ADMIN_PERMISSIONS = [
   "flags:update",
   "business_access:open",
   "associations:read",
+  "associations:update",
 ] as const;
 
 export const adminPermissionSchema = z.enum(ADMIN_PERMISSIONS);
@@ -37,6 +38,7 @@ export const ADMIN_MUTATION_PERMISSIONS = [
   "problem_reports:update",
   "flags:update",
   "business_access:open",
+  "associations:update",
 ] as const satisfies readonly AdminPermission[];
 
 export type AdminMutationPermission =

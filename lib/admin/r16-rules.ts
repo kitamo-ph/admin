@@ -1,11 +1,15 @@
+import { z } from "zod";
+
 import {
   FORBIDDEN_EVIDENCE_KEY,
   accessLevelSchema,
+  associationKindSchema,
   flagKindSchema,
   raisableFlagSourceSchema,
   reasonCodeSchema,
   withholdCodeSchema,
   type AccessLevel,
+  type AssociationKind,
   type FlagEvidence,
   type FlagKind,
   type FlagStatus,
@@ -265,4 +269,95 @@ export function checkRaiseFlag(input: {
     ok: true,
     value: { kind: kind.data, source: source.data, evidence },
   };
+}
+
+// -- Associations (the HOA level, 0086, D18) ------------------------------------
+
+/** The owner's D18 answers (2026-10-14): an association is an HOA or a barangay. */
+export const ASSOCIATION_KIND_LABELS: Record<AssociationKind, string> = {
+  hoa: "HOA",
+  barangay: "Barangay",
+};
+
+export const ASSOCIATION_NAME_MAX = 80;
+export const ASSOCIATION_AREA_MAX = 120;
+export const LETTER_REFERENCE_MAX = 120;
+export const OFFICER_LABEL_MAX = 60;
+
+/** A join code as officers read it out: `K7Q4-X9RM`. */
+export function formatJoinCode(code: string): string {
+  return code.length === 8 ? `${code.slice(0, 4)}-${code.slice(4)}` : code;
+}
+
+export type CreateAssociationField =
+  "name" | "kind" | "area" | "letterReference";
+
+/**
+ * Creating an association after checking its letter (D18 §2, spec §5.6): a
+ * name, a kind, the place it covers (optional) and the letter's reference.
+ */
+export function checkCreateAssociation(input: {
+  name: string;
+  kind: string;
+  area: string;
+  letterReference: string;
+}): RuleResult<
+  {
+    name: string;
+    kind: AssociationKind;
+    area: string | null;
+    letterReference: string;
+  },
+  CreateAssociationField
+> {
+  const errors: Partial<Record<CreateAssociationField, string>> = {};
+  const name = input.name.trim();
+  if (name.length < 1 || name.length > ASSOCIATION_NAME_MAX) {
+    errors.name = `Write the association's name in 1 to ${ASSOCIATION_NAME_MAX} characters.`;
+  }
+  const kind = associationKindSchema.safeParse(input.kind);
+  if (!kind.success) errors.kind = "Choose HOA or Barangay.";
+  const area = input.area.trim();
+  if (area.length > ASSOCIATION_AREA_MAX) {
+    errors.area = `Write the place in at most ${ASSOCIATION_AREA_MAX} characters.`;
+  }
+  const letterReference = input.letterReference.trim();
+  if (
+    letterReference.length < 1 ||
+    letterReference.length > LETTER_REFERENCE_MAX
+  ) {
+    errors.letterReference = `Write the reference of the letter you checked (1 to ${LETTER_REFERENCE_MAX} characters).`;
+  }
+  if (Object.keys(errors).length > 0 || !kind.success) {
+    return { ok: false, errors };
+  }
+  return {
+    ok: true,
+    value: {
+      name,
+      kind: kind.data,
+      area: area === "" ? null : area,
+      letterReference,
+    },
+  };
+}
+
+export type AddOfficerField = "email" | "label";
+
+/** Adding an officer: their KitaMo email and the name and role members see. */
+export function checkAddOfficer(input: {
+  email: string;
+  label: string;
+}): RuleResult<{ email: string; label: string }, AddOfficerField> {
+  const errors: Partial<Record<AddOfficerField, string>> = {};
+  const email = input.email.trim().toLowerCase();
+  if (!z.email().max(254).safeParse(email).success) {
+    errors.email = "Write the email of the officer's KitaMo account.";
+  }
+  const label = input.label.trim();
+  if (label.length < 1 || label.length > OFFICER_LABEL_MAX) {
+    errors.label = `Write the officer's name and role in 1 to ${OFFICER_LABEL_MAX} characters, e.g. "Juan D., President".`;
+  }
+  if (Object.keys(errors).length > 0) return { ok: false, errors };
+  return { ok: true, value: { email, label } };
 }

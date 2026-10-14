@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ASSOCIATION_KIND_LABELS,
   FLAG_TRANSITIONS,
+  checkAddOfficer,
+  checkCreateAssociation,
   checkFlagReview,
   checkRaiseFlag,
   checkReasonSheet,
+  formatJoinCode,
   minutesLeft,
   type ReasonSheetDraft,
 } from "@/lib/admin/r16-rules";
@@ -226,5 +230,66 @@ describe("raising a flag", () => {
         counts: null,
       }).ok,
     ).toBe(false);
+  });
+});
+
+describe("association rules (0086, D18)", () => {
+  it("creates with a name, a kind of HOA or barangay, an optional place and the letter's reference", () => {
+    expect(
+      checkCreateAssociation({
+        name: "  Villa Rosa Homeowners ",
+        kind: "barangay",
+        area: "  ",
+        letterReference: " VR-HOA-2026-014 ",
+      }),
+    ).toEqual({
+      ok: true,
+      value: {
+        name: "Villa Rosa Homeowners",
+        kind: "barangay",
+        area: null,
+        letterReference: "VR-HOA-2026-014",
+      },
+    });
+    const refused = checkCreateAssociation({
+      name: "",
+      kind: "village",
+      area: "x".repeat(121),
+      letterReference: "",
+    });
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(Object.keys(refused.errors).sort()).toEqual([
+        "area",
+        "kind",
+        "letterReference",
+        "name",
+      ]);
+    }
+    expect(ASSOCIATION_KIND_LABELS).toEqual({
+      hoa: "HOA",
+      barangay: "Barangay",
+    });
+  });
+
+  it("adds an officer by email with the name and role members see", () => {
+    expect(
+      checkAddOfficer({
+        email: " Juan@Example.TEST ",
+        label: " Juan D., President ",
+      }),
+    ).toEqual({
+      ok: true,
+      value: { email: "juan@example.test", label: "Juan D., President" },
+    });
+    const refused = checkAddOfficer({ email: "juan", label: "x".repeat(61) });
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(Object.keys(refused.errors).sort()).toEqual(["email", "label"]);
+    }
+  });
+
+  it("writes a join code as officers read it out", () => {
+    expect(formatJoinCode("K7Q4X9RM")).toBe("K7Q4-X9RM");
   });
 });

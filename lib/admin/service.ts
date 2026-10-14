@@ -32,13 +32,20 @@ import type {
 import type {
   AccessLog,
   AccessLogQuery,
+  AddOfficerInput,
   AdminSessionState,
   Association,
+  AssociationChanged,
+  AssociationChangeInput,
+  AssociationDetail,
   BusinessSummary,
   CloseAccessInput,
   ClosedAccess,
+  CreateAssociationInput,
+  CreatedAssociation,
   DirectoryPage,
   DirectoryQuery,
+  EndOfficerInput,
   Flag,
   FlagsQuery,
   OpenAccessInput,
@@ -80,6 +87,12 @@ export const adminServiceMethods = [
   "reviewFlag",
   "listAccessLog",
   "listAssociations",
+  "getAssociation",
+  "createAssociation",
+  "addAssociationOfficer",
+  "endAssociationOfficer",
+  "rotateAssociationCode",
+  "closeAssociation",
 ] as const;
 
 /**
@@ -173,8 +186,34 @@ export interface AdminService {
   reviewFlag(input: ReviewFlagInput): Promise<ServiceResult<ReviewedFlag>>;
   /** km_admin_access_log. */
   listAccessLog(query?: AccessLogQuery): Promise<ServiceResult<AccessLog>>;
-  /** The JR's 0086; NOT_AVAILABLE until it exists. */
+  // The HOA level (0086, D18). Each answers NOT_AVAILABLE until Core has it.
+  // The writes change association records only, never a business's (OQ21).
+  /** km_admin_associations: a bare array, kind included (§12.12). */
   listAssociations(): Promise<ServiceResult<Association[]>>;
+  /** km_admin_association: the detail behind the officer and code actions (§12.15). */
+  getAssociation(
+    associationId: string,
+  ): Promise<ServiceResult<AssociationDetail>>;
+  /** admin_create_association, after checking the association's letter. */
+  createAssociation(
+    input: CreateAssociationInput,
+  ): Promise<ServiceResult<CreatedAssociation>>;
+  /** admin_add_association_officer, by the officer's KitaMo email. */
+  addAssociationOfficer(
+    input: AddOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>>;
+  /** admin_end_association_officer. */
+  endAssociationOfficer(
+    input: EndOfficerInput,
+  ): Promise<ServiceResult<AssociationChanged>>;
+  /** admin_rotate_association_code: members stay; the old code stops joins. */
+  rotateAssociationCode(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>>;
+  /** admin_close_association. */
+  closeAssociation(
+    input: AssociationChangeInput,
+  ): Promise<ServiceResult<AssociationChanged>>;
 }
 
 export interface MockFailureConfig {

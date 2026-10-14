@@ -44,12 +44,12 @@ Signed off by the lead on 2026-10-14 (R15/R16 full spec, lead question 16). Sour
 - **ADM-041 (no scope growth).** The R16 pages may be added or re-pointed:
   - Overview, Businesses, a Business (Summary, then Records behind a reason sheet, with a 30-minute banner);
   - Flags, Access log;
-  - an Associations stub for the HOA level.
+  - Associations for the HOA level (0086, D18): the list with each one's kind (HOA or barangay, the owner's D18 answers), creating one after checking its letter, adding or ending an officer, rotating the join code, closing. Until Core has 0086 the page says what it will do.
 - **ADM-044**, in part:
   - **Supabase production adapters:** a Core adapter behind `AdminService` that POSTs PostgREST RPCs with the signed-in administrator's `aal2` token;
   - **production financial visibility:** behind a typed reason at Summary level, and at Records level only behind an open flag or a support or legal reference (break-glass), for 30 minutes at a time;
   - **production deployment** of this site;
-  - **durable production mutations, only for the administrator's own records:** opening and closing an access, and raising and reviewing a flag. These write Core's admin log, never a business's records.
+  - **durable production mutations, only for the administrator's own records:** opening and closing an access, and raising and reviewing a flag. These write Core's admin log, never a business's records. With 0086, also the association records (create, officers, join code, close; D18 §2), never a business's records (spec §11 Q8).
 - **ADM-047 (no deploy).** `admin.kitamo.online` may be deployed for R16 as its own Vercel project. The owner's DNS and Turnstile host steps come first (STEP5 §4).
 - **ADM-043, interpreted for this slice.** The Core RPCs' allowlisted reply keys, parsed with strict zod schemas that fail closed on an unknown key, are this slice's machine-readable contract. Wider shared contracts stay with the Shared Contracts workstream.
 

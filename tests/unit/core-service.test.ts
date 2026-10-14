@@ -45,6 +45,7 @@ function core(
 }
 
 const ok = (body: unknown) => () => ({ status: 200, body });
+const fail = (status: number, body: unknown) => () => ({ status, body });
 
 function expectOk<T>(
   result: ServiceResult<T>,
@@ -541,13 +542,245 @@ describe("the Core adapter: refusals", () => {
     expect(calls).toHaveLength(0);
   });
 
-  it("has exactly four write RPCs, all on Core's admin log", () => {
+  it("has exactly nine write RPCs: Core's admin log and the association records", () => {
     expect([...CORE_WRITE_RPCS].sort()).toEqual([
+      "admin_add_association_officer",
+      "admin_close_association",
+      "admin_create_association",
+      "admin_end_association_officer",
+      "admin_rotate_association_code",
       "close_admin_access",
       "open_admin_access",
       "raise_admin_flag",
       "review_admin_flag",
     ]);
+  });
+});
+
+const ASSOCIATION = "0d000000-0000-4000-8000-000000000001";
+const OFFICER = "0e000000-0000-4000-8000-000000000001";
+const ASSOCIATIONS = [
+  {
+    association_id: ASSOCIATION,
+    name: "Villa Rosa Homeowners",
+    kind: "hoa",
+    status: "live",
+    member_stall_count: 4,
+    officer_count: 1,
+    code_rotated_at: TS,
+  },
+];
+const ASSOCIATION_DETAIL = {
+  association_id: ASSOCIATION,
+  name: "Malanday Market Vendors",
+  kind: "barangay",
+  status: "live",
+  area: "Malanday public market",
+  join_code: "K7Q4X9RM",
+  code_rotated_at: null,
+  officers: [
+    {
+      officer_id: OFFICER,
+      label: "Kap. Ramon A.",
+      added_at: TS,
+      accepted_at: null,
+      ended_at: null,
+    },
+  ],
+};
+
+describe("the Core adapter: associations (0086, §12.12, §12.15)", () => {
+  it("names 0086's parameters exactly", async () => {
+    const { calls, service } = core(ok({ done: "whatever Core answers" }));
+    await service.addAssociationOfficer({
+      associationId: ASSOCIATION,
+      email: "juan@example.test",
+      label: "Juan D., President",
+      clientRequestId: REQ,
+    });
+    await service.endAssociationOfficer({
+      officerId: OFFICER,
+      clientRequestId: REQ,
+    });
+    await service.rotateAssociationCode({
+      associationId: ASSOCIATION,
+      clientRequestId: REQ,
+    });
+    await service.closeAssociation({
+      associationId: ASSOCIATION,
+      clientRequestId: REQ,
+    });
+    expect(
+      calls.map((call) => [call.url.split("/rpc/")[1], call.body]),
+    ).toEqual([
+      [
+        "admin_add_association_officer",
+        {
+          p_association_id: ASSOCIATION,
+          p_email: "juan@example.test",
+          p_label: "Juan D., President",
+          p_client_request_id: REQ,
+        },
+      ],
+      [
+        "admin_end_association_officer",
+        { p_officer_id: OFFICER, p_client_request_id: REQ },
+      ],
+      [
+        "admin_rotate_association_code",
+        { p_association_id: ASSOCIATION, p_client_request_id: REQ },
+      ],
+      [
+        "admin_close_association",
+        { p_association_id: ASSOCIATION, p_client_request_id: REQ },
+      ],
+    ]);
+    const created = core(
+      ok({ association_id: ASSOCIATION, join_code: "P3RT8HWZ" }),
+    );
+    const result = await created.service.createAssociation({
+      name: "Villa Rosa Homeowners",
+      kind: "hoa",
+      area: null,
+      letterReference: "VR-HOA-2026-014",
+      clientRequestId: REQ,
+    });
+    expect(created.calls[0]?.body).toEqual({
+      p_name: "Villa Rosa Homeowners",
+      p_kind: "hoa",
+      p_area: null,
+      p_letter_reference: "VR-HOA-2026-014",
+      p_client_request_id: REQ,
+    });
+    expect(result.ok && result.data).toEqual({
+      associationId: ASSOCIATION,
+      joinCode: "P3RT8HWZ",
+    });
+    const detail = core(ok(ASSOCIATION_DETAIL));
+    await detail.service.getAssociation(ASSOCIATION);
+    expect(detail.calls[0]?.body).toEqual({ p_association_id: ASSOCIATION });
+  });
+
+  it("maps the list with its kind, and the detail with its officers (no email)", async () => {
+    const list = await core(ok(ASSOCIATIONS)).service.listAssociations();
+    expect(list.ok && list.data).toEqual([
+      {
+        associationId: ASSOCIATION,
+        name: "Villa Rosa Homeowners",
+        kind: "hoa",
+        status: "live",
+        memberStallCount: 4,
+        officerCount: 1,
+        codeRotatedAt: "2026-10-14T05:20:00.123Z",
+      },
+    ]);
+    const detail = await core(ok(ASSOCIATION_DETAIL)).service.getAssociation(
+      ASSOCIATION,
+    );
+    expect(detail.ok && detail.data).toEqual({
+      associationId: ASSOCIATION,
+      name: "Malanday Market Vendors",
+      kind: "barangay",
+      status: "live",
+      area: "Malanday public market",
+      joinCode: "K7Q4X9RM",
+      codeRotatedAt: null,
+      officers: [
+        {
+          officerId: OFFICER,
+          label: "Kap. Ramon A.",
+          addedAt: "2026-10-14T05:20:00.123Z",
+          acceptedAt: null,
+          endedAt: null,
+        },
+      ],
+    });
+  });
+
+  it("fails closed on a row without its kind, an unknown kind, an officer's email or a bad code", async () => {
+    const { kind: _kind, ...noKind } = ASSOCIATIONS[0] ?? {};
+    void _kind;
+    for (const result of [
+      await core(ok([noKind])).service.listAssociations(),
+      await core(
+        ok([{ ...ASSOCIATIONS[0], kind: "village" }]),
+      ).service.listAssociations(),
+      await core(
+        ok({
+          ...ASSOCIATION_DETAIL,
+          officers: [{ ...ASSOCIATION_DETAIL.officers[0], email: "x@y.z" }],
+        }),
+      ).service.getAssociation(ASSOCIATION),
+      await core(
+        ok({ ...ASSOCIATION_DETAIL, member_stalls: ["Tindahan ni Rosa"] }),
+      ).service.getAssociation(ASSOCIATION),
+      await core(
+        ok({ ...ASSOCIATION_DETAIL, join_code: "K7Q4-X9RM" }),
+      ).service.getAssociation(ASSOCIATION),
+      await core(
+        ok({ association_id: ASSOCIATION, join_code: "K7Q4X9RM", extra: 1 }),
+      ).service.createAssociation({
+        name: "Villa Rosa Homeowners",
+        kind: "hoa",
+        area: null,
+        letterReference: "VR-HOA-2026-014",
+        clientRequestId: REQ,
+      }),
+    ]) {
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.code).toBe("SERVICE_UNAVAILABLE");
+        expect(JSON.stringify(result.error)).not.toMatch(/x@y\.z|Rosa/);
+      }
+    }
+  });
+
+  it("checks input first (an unknown kind never leaves), and maps KM003 kind and officer", async () => {
+    const { calls, service } = core(ok({}));
+    const bad = await service.createAssociation({
+      name: "Villa Rosa Homeowners",
+      kind: "village" as "hoa",
+      area: null,
+      letterReference: "VR-HOA-2026-014",
+      clientRequestId: REQ,
+    });
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) expect(bad.error.code).toBe("VALIDATION_ERROR");
+    expect(calls).toHaveLength(0);
+    const refused = await core(
+      fail(400, {
+        code: "KM003",
+        message: "Invalid request.",
+        details: JSON.stringify({ reason: "officer" }),
+      }),
+    ).service.addAssociationOfficer({
+      associationId: ASSOCIATION,
+      email: "unknown@example.test",
+      label: "Juan D., President",
+      clientRequestId: REQ,
+    });
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) {
+      expect(refused.error).toMatchObject({
+        code: "VALIDATION_ERROR",
+        details: { reason: "officer" },
+      });
+    }
+  });
+
+  it("answers NOT_AVAILABLE for every association method until 0086 exists", async () => {
+    const missing = () =>
+      core(fail(404, { code: "PGRST202", message: "Could not find" })).service;
+    for (const result of [
+      await missing().getAssociation(ASSOCIATION),
+      await missing().rotateAssociationCode({
+        associationId: ASSOCIATION,
+        clientRequestId: REQ,
+      }),
+    ]) {
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.code).toBe("NOT_AVAILABLE");
+    }
   });
 });
 
