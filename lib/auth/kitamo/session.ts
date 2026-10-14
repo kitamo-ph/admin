@@ -200,6 +200,22 @@ export async function signOutSession(
   }
 }
 
+/**
+ * Revokes a refresh token when no access token is at hand (best effort):
+ * GoTrue ends a session only for a bearer, so the refresh token buys one
+ * live access token, which then signs the session out. A token Auth already
+ * refuses is dead anyway. (The lead's R16 admin review, MED 2.)
+ */
+export async function revokeRefreshToken(
+  refreshToken: string,
+  env: NodeJS.ProcessEnv = process.env,
+  fetchImpl: typeof fetch = fetch,
+): Promise<void> {
+  const tokens = await refreshSession(refreshToken, env, fetchImpl);
+  if (tokens !== null)
+    await signOutSession(tokens.access_token, env, fetchImpl);
+}
+
 // ---------------------------------------------------------------------------
 // MFA (TOTP) through Auth's REST: GET /user, POST /factors,
 // DELETE /factors/{id}, POST /factors/{id}/challenge, POST /factors/{id}/verify.

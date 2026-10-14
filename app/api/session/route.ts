@@ -3,6 +3,7 @@ import { z } from "zod";
 import { captchaConfiguration } from "@/lib/auth/kitamo/captcha";
 import {
   accessTokenOf,
+  refreshTokenOf,
   refuse,
   reply,
   sameOrigin,
@@ -13,6 +14,7 @@ import {
   SESSION_COOKIES,
   cookieOptions,
   passwordSignIn,
+  revokeRefreshToken,
   signOutSession,
 } from "@/lib/auth/kitamo/session";
 
@@ -86,7 +88,10 @@ export async function DELETE(request: Request): Promise<Response> {
     return refuse(403, "Open the admin site and try again.");
   }
   const access = accessTokenOf(request);
+  const refresh = refreshTokenOf(request);
+  // An admin past the token's hour has no adm_at: the refresh token revokes the session.
   if (access !== undefined) await signOutSession(access);
+  else if (refresh !== undefined) await revokeRefreshToken(refresh);
   const response = reply(200, { ok: true });
   for (const name of SESSION_COOKIES) {
     response.cookies.set(name, "", cookieOptions(0));

@@ -42,8 +42,17 @@ export function sameOrigin(request: Request): boolean {
 
 /** The access cookie from a route handler's request. */
 export function accessTokenOf(request: Request): string | undefined {
+  return cookieOf(request, ACCESS_COOKIE);
+}
+
+/** The refresh cookie from a route handler's request. */
+export function refreshTokenOf(request: Request): string | undefined {
+  return cookieOf(request, REFRESH_COOKIE);
+}
+
+function cookieOf(request: Request, name: string): string | undefined {
   const cookie = request.headers.get("cookie") ?? "";
-  const match = new RegExp(`(?:^|;\\s*)${ACCESS_COOKIE}=([^;]+)`).exec(cookie);
+  const match = new RegExp(`(?:^|;\\s*)${name}=([^;]+)`).exec(cookie);
   if (match?.[1] === undefined) return undefined;
   try {
     return decodeURIComponent(match[1]);

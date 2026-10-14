@@ -13,6 +13,7 @@ import {
   idleExpired,
   needsRefresh,
   refreshSession,
+  revokeRefreshToken,
   signOutSession,
 } from "@/lib/auth/kitamo/session";
 import {
@@ -29,10 +30,16 @@ import {
  * Defense in depth only; the security boundary is the server (each page
  * resolves the session: the ES256 check, aal2, then Core's km_admin_session).
  *
- * A KitaMo session (R16, copied from Operations' console proxy at dbe4ca6):
- * 30 minutes idle signs out; a token near its end is refreshed; each page
- * view or form post counts as activity. The development role cookie keeps
- * the mock beta's route checks (development and test only).
+ * A KitaMo session (R16, copied from Operations' console proxy at dbe4ca6,
+ * with its 3efc961 fix): 30 minutes idle signs out; a token near its end, or
+ * already gone, is refreshed; each page view or form post counts as
+ * activity. adm_at's cookie ends with its token (about an hour), so an admin
+ * active past the hour arrives without it: then adm_rt and the idle check
+ * decide (the lead's review, MED 2). A refused or failed refresh goes to the
+ * sign-in with every cookie cleared, the refresh token revoked when it still
+ * can be. The pages still check the token (ES256, aal2: an aal1 token after a
+ * refresh goes back to the authenticator step). The development role cookie
+ * keeps the mock beta's route checks (development and test only).
  */
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname, search } = request.nextUrl;
@@ -44,7 +51,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   const access = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
-  if (access !== undefined && refresh !== undefined) {
+  if (refresh !== undefined) {
     return kitamoSession(request, access, refresh);
   }
 
@@ -68,18 +75,21 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
 async function kitamoSession(
   request: NextRequest,
-  access: string,
+  access: string | undefined,
   refresh: string,
 ): Promise<NextResponse> {
   const now = Date.now();
   if (idleExpired(request.cookies.get(SEEN_COOKIE)?.value, now)) {
-    await signOutSession(access);
+    await endSession(access, refresh);
     return toSignIn(request, "idle");
   }
   let renewed = null;
-  if (needsRefresh(access, now)) {
+  if (access === undefined || needsRefresh(access, now)) {
     renewed = await refreshSession(refresh);
-    if (renewed === null) return toSignIn(request, "expired");
+    if (renewed === null) {
+      await endSession(access, refresh);
+      return toSignIn(request, "expired");
+    }
     request.cookies.set(ACCESS_COOKIE, renewed.access_token);
     request.cookies.set(REFRESH_COOKIE, renewed.refresh_token);
   }
@@ -103,6 +113,15 @@ async function kitamoSession(
     cookieOptions(IDLE_MS / 1000 + 60),
   );
   return response;
+}
+
+/** Ends the Auth session (best effort): by the access token, or else by the refresh token. */
+async function endSession(
+  access: string | undefined,
+  refresh: string,
+): Promise<void> {
+  if (access !== undefined) await signOutSession(access);
+  else await revokeRefreshToken(refresh);
 }
 
 function toSignIn(request: NextRequest, why: "idle" | "expired"): NextResponse {
