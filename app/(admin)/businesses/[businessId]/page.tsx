@@ -15,6 +15,7 @@ import {
   Panel,
   StateBanner,
 } from "@/components/ui/primitives";
+import { CALENDAR_DAYS } from "@/lib/admin/r16-messages";
 import { LEVEL_LABELS, REASON_LABELS } from "@/lib/admin/r16-rules";
 import { coreIdSchema } from "@/lib/admin/r16-schemas";
 import { requireAdmin } from "@/lib/auth/server";
@@ -259,7 +260,7 @@ export default async function BusinessPage({
 
       <Panel
         className="mt-6"
-        description="Business days in the business's timezone. Voided sales are left out; returns count on the day they were made."
+        description={`${CALENDAR_DAYS} Voided sales are left out; returns count on the day they were made.`}
         title="The last 14 days"
       >
         <DataTable label="Daily totals" minWidth="40rem">

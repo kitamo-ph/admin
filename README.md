@@ -43,7 +43,7 @@ This repository creates no tables and applies no migrations; Core's
 - ESLint and Prettier
 - Vercel-compatible Next.js configuration
 
-Node.js `>=20.19.0` is required.
+Node.js 22.x is required (`engines` pins it, so Vercel builds on 22.x).
 
 ## Local setup
 

@@ -10,6 +10,15 @@ export const UNCONFIRMED =
   "We couldn't confirm this. Check the list before trying again.";
 
 /**
+ * How Core groups days for the Summary's 14 days and the Records window
+ * (0084: `(happened_at at time zone b.timezone)::date`, and `p_from`/`p_to`
+ * as midnights in that timezone): calendar days, not KitaMo's business day,
+ * which starts at the stall's day start (R20, ADMIN-MARKETING-GOLIVE §4).
+ */
+export const CALENDAR_DAYS =
+  "Calendar days, midnight to midnight, in the business's timezone (not KitaMo's business day).";
+
+/**
  * What the administrator reads when Core refuses (spec §3.2). KM005 is one
  * "Not permitted" for every case: Core never says why, so neither does this.
  */

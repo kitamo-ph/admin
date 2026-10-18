@@ -12,6 +12,7 @@ import {
   Panel,
   StateBanner,
 } from "@/components/ui/primitives";
+import { CALENDAR_DAYS } from "@/lib/admin/r16-messages";
 import {
   coreIdSchema,
   recordsKindSchema,
@@ -206,7 +207,9 @@ export default async function RecordsPageView({
           <button className="km-button" type="submit">
             Show
           </button>
-          <p className="km-hint w-full">At most 31 days, not in the future.</p>
+          <p className="km-hint w-full">
+            At most 31 days, not in the future. {CALENDAR_DAYS}
+          </p>
         </form>
       ) : null}
 
