@@ -45,7 +45,7 @@ beforeEach(() => {
           init?.body === undefined ? undefined : JSON.parse(String(init.body)),
       });
       if (url.includes("grant_type=refresh_token")) return refreshAnswer();
-      if (url.endsWith("/auth/v1/logout"))
+      if (url.endsWith("/auth/v1/logout?scope=local"))
         return new Response(null, { status: 204 });
       return new Response("{}", { status: 404 });
     },
@@ -115,7 +115,8 @@ describe("the proxy past the token's hour", () => {
     // The revocation: a refresh for a bearer, then the sign-out with it.
     expect(calls.map((call) => call.url)).toEqual([
       `${AUTH}/auth/v1/token?grant_type=refresh_token`,
-      `${AUTH}/auth/v1/logout`,
+      // scope=local: only this session ends (no scope is global, gate 0, 2026-10-20).
+      `${AUTH}/auth/v1/logout?scope=local`,
     ]);
     expect(calls[1]?.auth).toMatch(/^Bearer h\./);
   });
