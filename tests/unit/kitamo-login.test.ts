@@ -78,6 +78,19 @@ describe("the vendored kitamo-login", () => {
     ).toEqual({ ok: false, reason: "refused" });
   });
 
+  it("refuses any token issued to an OAuth client (R22: the add-on sites' sign-in)", async () => {
+    const key = await makeKey("k1");
+    for (const clientId of ["insights-client", "", null]) {
+      expect(
+        await verifyKitamoToken(
+          await signToken(key, { client_id: clientId }),
+          env,
+          jwksFetch(key),
+        ),
+      ).toEqual({ ok: false, reason: "refused" });
+    }
+  });
+
   it("answers unavailable when KitaMo's keys can't be read or the URL is unset", async () => {
     const key = await makeKey("k2");
     const down: typeof fetch = async () => new Response("", { status: 503 });

@@ -18,7 +18,10 @@ export function resetLoginForTests(): void {
 
 export type TokenCheck =
   | { ok: true; claims: KitamoClaims }
-  /** A forged, stale, anonymous (staff) or malformed token: sign in again. */
+  /**
+   * A forged, stale, anonymous (staff) or malformed token, or one issued to an
+   * OAuth client (an add-on site's sign-in, R22): sign in again.
+   */
   | { ok: false; reason: "refused" }
   /** KitaMo's keys could not be read, or the site is not configured. */
   | { ok: false; reason: "unavailable" };
@@ -53,6 +56,10 @@ export async function verifyKitamoToken(
     const claims = await current.verifier.verify(token, {
       allowAnonymous: false,
     });
+    // R22: tokens Auth issues to the add-on sites (Insights, Operations,
+    // Marketing) carry `client_id`. Admin is never an OAuth client, so it
+    // takes only its own password + TOTP sessions, never one of those.
+    if (claims.client_id !== undefined) return { ok: false, reason: "refused" };
     return { ok: true, claims };
   } catch (error) {
     if (error instanceof KitamoLoginError && error.reason !== "jwks") {
