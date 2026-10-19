@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { LegalLinks } from "./legal-links";
 import { AdminNavLink } from "./nav-link";
 
 type NavigationItem = {
@@ -240,6 +241,7 @@ export function AdminShell({
           {kitamo
             ? "KitaMo Admin · read-only toward businesses · every access needs a reason, lasts 30 minutes, and is shown to the business"
             : "Mock operational environment · Fictional data only · No merchant transactions"}
+          <LegalLinks className="mt-2" />
         </footer>
       </div>
     </div>

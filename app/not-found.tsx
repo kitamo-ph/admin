@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { LegalLinks } from "@/components/layout/legal-links";
+
 export default function NotFound() {
   return (
     <main className="grid min-h-screen place-items-center p-6">
@@ -23,6 +25,7 @@ export default function NotFound() {
         >
           Go to overview
         </Link>
+        <LegalLinks className="mt-6 text-xs text-[var(--km-color-text-secondary)]" />
       </section>
     </main>
   );

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { LegalLinks } from "./legal-links";
+
 export function PublicShell({
   eyebrow,
   title,
@@ -78,6 +80,7 @@ export function PublicShell({
             {description}
           </p>
           {children ? <div className="mt-8">{children}</div> : null}
+          <LegalLinks className="mt-10 text-xs text-[var(--km-color-text-secondary)]" />
         </div>
       </section>
     </main>

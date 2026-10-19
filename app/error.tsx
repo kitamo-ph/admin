@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { LegalLinks } from "@/components/layout/legal-links";
+
 export default function ErrorBoundary({
   error,
   reset,
@@ -52,6 +54,7 @@ export default function ErrorBoundary({
             Reference: <code>{error.digest}</code>
           </p>
         ) : null}
+        <LegalLinks className="mt-6 text-xs text-[var(--km-color-text-secondary)]" />
       </section>
     </main>
   );
