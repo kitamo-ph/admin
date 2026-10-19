@@ -281,6 +281,50 @@ function failureOf(result: { status: number; body: unknown }): MfaFailure {
   return "unavailable";
 }
 
+export type MfaStep =
+  "token" | "list" | "unenroll" | "enroll" | "challenge" | "verify" | "aal2";
+
+/**
+ * One server log line per failed MFA step: the step, Auth's HTTP status (0
+ * when Auth did not answer: network, timeout or no Auth settings), Auth's
+ * error_code, and a short detail such as which field of a 200 reply was
+ * refused. Never the token, the secret, the QR code or the reply body.
+ */
+export function logMfaFailure(
+  step: MfaStep,
+  status: number,
+  errorCode: string,
+  detail?: string,
+): void {
+  const code =
+    errorCode === ""
+      ? "none"
+      : /^[A-Za-z0-9_]{1,64}$/.test(errorCode)
+        ? errorCode
+        : "other";
+  console.error(
+    `KitaMo Admin MFA failure: step=${step} status=${status} error_code=${code}` +
+      (detail === undefined ? "" : ` detail=${detail}`),
+  );
+}
+
+/** Logs the failed step once, then maps it as failureOf does. */
+function failed(
+  step: MfaStep,
+  result: { status: number; body: unknown } | null,
+  detail?: string,
+): MfaFailure {
+  logMfaFailure(
+    step,
+    result?.status ?? 0,
+    result === null ? "" : errorCodeOf(result.body),
+    result === null ? "no_answer" : detail,
+  );
+  return result === null || detail !== undefined
+    ? "unavailable"
+    : failureOf(result);
+}
+
 /** The user's TOTP factors (GET /auth/v1/user → factors[]). */
 export async function listTotpFactors(
   accessToken: string,
@@ -293,11 +337,10 @@ export async function listTotpFactors(
     env,
     fetchImpl,
   );
-  if (result === null) return "unavailable";
-  if (result.status !== 200) return failureOf(result);
+  if (result === null || result.status !== 200) return failed("list", result);
   const factors = (result.body as { factors?: unknown } | null)?.factors;
   if (factors === undefined || factors === null) return [];
-  if (!Array.isArray(factors)) return "unavailable";
+  if (!Array.isArray(factors)) return failed("list", result, "bad_factors");
   return factors.flatMap((factor: unknown) => {
     if (factor === null || typeof factor !== "object") return [];
     const value = factor as Record<string, unknown>;
@@ -326,7 +369,10 @@ export async function unenrollFactor(
     env,
     fetchImpl,
   );
-  return result !== null && result.status >= 200 && result.status < 300;
+  if (result !== null && result.status >= 200 && result.status < 300)
+    return true;
+  failed("unenroll", result);
+  return false;
 }
 
 /** POST /auth/v1/factors {factor_type: 'totp'}: the QR code and secret. */
@@ -349,42 +395,85 @@ export async function enrollTotp(
     env,
     fetchImpl,
   );
-  if (result === null) return "unavailable";
-  if (result.status !== 200 && result.status !== 201) return failureOf(result);
+  if (result === null || (result.status !== 200 && result.status !== 201))
+    return failed("enroll", result);
   const body = result.body as {
     id?: unknown;
     totp?: { qr_code?: unknown; secret?: unknown };
   } | null;
+  const id = body?.id;
+  const secret = body?.totp?.secret;
+  if (typeof id !== "string" || !UUID.test(id))
+    return failed("enroll", result, "bad_id");
   const qrCode = safeQrCode(body?.totp?.qr_code);
-  if (
-    typeof body?.id !== "string" ||
-    !UUID.test(body.id) ||
-    qrCode === null ||
-    typeof body.totp?.secret !== "string" ||
-    !/^[A-Z2-7=]{16,128}$/.test(body.totp.secret)
-  )
-    return "unavailable";
-  return { factorId: body.id, qrCode, secret: body.totp.secret };
+  if (qrCode === null) return failed("enroll", result, "bad_qr_code");
+  // GoTrue's secret is base32 without padding (32 characters for its 20 bytes).
+  if (typeof secret !== "string" || !/^[A-Z2-7=]{16,128}$/.test(secret))
+    return failed("enroll", result, "bad_secret");
+  return { factorId: id, qrCode, secret };
 }
 
 /**
- * Auth answers the QR code as `data:image/svg+xml;utf-8,<svg…>`. Only an
- * SVG data URI is accepted, re-encoded so it is a valid URL for <img src>.
+ * The longest QR code accepted. GoTrue draws one <rect> per QR module (about
+ * 72 characters each): the admin's otpauth URI at error level H is a 65×65
+ * code, about 310 KB. A million characters is room for 117×117.
+ */
+const QR_CODE_MAX = 1_000_000;
+
+/**
+ * Auth's REST reply carries the QR code as the SVG document itself (auth-js
+ * adds `data:image/svg+xml;utf-8,` in the browser); a data URI is accepted
+ * too. Only an SVG is accepted, re-encoded as a data URI that is a valid URL
+ * for <img src>, where it is only ever shown.
  */
 export function safeQrCode(value: unknown): string | null {
-  if (typeof value !== "string" || value.length > 64_000) return null;
+  if (typeof value !== "string" || value.length > QR_CODE_MAX) return null;
+  const svgUri = (svg: string) =>
+    `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  if (startsAsSvg(value)) return svgUri(value);
   const match = /^data:image\/svg\+xml(;[a-z0-9=-]+)*,([\s\S]+)$/i.exec(value);
   if (match === null) return null;
   const encoded = /;base64(;|$)/i.test(match[1] ?? "");
-  if (encoded) return `data:image/svg+xml;base64,${match[2]}`;
+  if (encoded) {
+    const data = match[2] ?? "";
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(data)) return null;
+    if (!startsAsSvg(Buffer.from(data, "base64").toString("utf8"))) return null;
+    return `data:image/svg+xml;base64,${data}`;
+  }
   let svg = match[2] ?? "";
   try {
     svg = decodeURIComponent(svg);
   } catch {
     // Not percent-encoded: use it as it is.
   }
-  if (!/^\s*(<\?xml[^>]*>\s*)?<svg[\s>]/i.test(svg)) return null;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  return startsAsSvg(svg) ? svgUri(svg) : null;
+}
+
+/**
+ * True when the text is an SVG document: an optional XML declaration, then
+ * any number of comments and whitespace, then `<svg`. GoTrue's SVGo starts
+ * with `<?xml version="1.0"?>` and `<!-- Generated by SVGo -->`. A plain scan
+ * rather than a regex, so a long reply cannot make it backtrack.
+ */
+function startsAsSvg(text: string): boolean {
+  let at = skipSpace(text, 0);
+  if (text.startsWith("<?xml", at)) {
+    const end = text.indexOf("?>", at);
+    if (end === -1) return false;
+    at = skipSpace(text, end + 2);
+  }
+  while (text.startsWith("<!--", at)) {
+    const end = text.indexOf("-->", at + 4);
+    if (end === -1) return false;
+    at = skipSpace(text, end + 3);
+  }
+  return /^<svg[\s>]/i.test(text.slice(at, at + 5));
+}
+
+function skipSpace(text: string, at: number): number {
+  let next = at;
+  while (next < text.length && /\s/.test(text.charAt(next))) next += 1;
+  return next;
 }
 
 /** POST /factors/{id}/challenge then /verify: new tokens at aal2. */
@@ -402,12 +491,14 @@ export async function challengeAndVerify(
     env,
     fetchImpl,
   );
-  if (challenge === null) return "unavailable";
-  if (challenge.status !== 200 && challenge.status !== 201)
-    return failureOf(challenge);
+  if (
+    challenge === null ||
+    (challenge.status !== 200 && challenge.status !== 201)
+  )
+    return failed("challenge", challenge);
   const challengeId = (challenge.body as { id?: unknown } | null)?.id;
   if (typeof challengeId !== "string" || !UUID.test(challengeId))
-    return "unavailable";
+    return failed("challenge", challenge, "bad_challenge_id");
   const verify = await authCall(
     `/factors/${factorId}/verify`,
     {
@@ -418,7 +509,6 @@ export async function challengeAndVerify(
     env,
     fetchImpl,
   );
-  if (verify === null) return "unavailable";
-  if (verify.status !== 200) return failureOf(verify);
-  return tokensOf(verify.body) ?? "unavailable";
+  if (verify === null || verify.status !== 200) return failed("verify", verify);
+  return tokensOf(verify.body) ?? failed("verify", verify, "bad_tokens");
 }

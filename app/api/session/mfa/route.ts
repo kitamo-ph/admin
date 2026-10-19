@@ -11,6 +11,7 @@ import { isAal2, verifyKitamoToken } from "@/lib/auth/kitamo/login";
 import {
   challengeAndVerify,
   listTotpFactors,
+  logMfaFailure,
   signOutSession,
 } from "@/lib/auth/kitamo/session";
 
@@ -25,7 +26,8 @@ const Verify = z.strictObject({
 /**
  * The authenticator step (spec §5.1 step 3): challenge and verify the TOTP
  * factor, which returns new tokens at aal2. The factor must be this user's
- * own TOTP factor, as KitaMo's Auth lists it.
+ * own TOTP factor, as KitaMo's Auth lists it. Each failed step writes one
+ * server log line (logMfaFailure).
  */
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) {
@@ -41,6 +43,7 @@ export async function POST(request: Request): Promise<Response> {
   }
   const check = await verifyKitamoToken(access);
   if (!check.ok) {
+    logMfaFailure("token", 0, "", check.reason);
     return check.reason === "refused"
       ? refuse(401, "Your sign-in has ended. Sign in again.")
       : refuse(503, "KitaMo sign-in is not answering. Try again in a moment.");
@@ -56,6 +59,7 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
   if (!factors.some((factor) => factor.id === parsed.data.factorId)) {
+    logMfaFailure("list", 200, "", "factor_not_listed");
     return refuse(400, "Set up the authenticator app again.");
   }
   const result = await challengeAndVerify(
@@ -86,6 +90,7 @@ export async function POST(request: Request): Promise<Response> {
   }
   const upgraded = await verifyKitamoToken(result.access_token);
   if (!upgraded.ok || !isAal2(upgraded.claims)) {
+    logMfaFailure("aal2", 0, "", upgraded.ok ? "not_aal2" : upgraded.reason);
     await signOutSession(result.access_token);
     return refuse(
       503,

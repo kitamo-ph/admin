@@ -8,6 +8,7 @@ import { isAal2, verifyKitamoToken } from "@/lib/auth/kitamo/login";
 import {
   enrollTotp,
   listTotpFactors,
+  logMfaFailure,
   unenrollFactor,
 } from "@/lib/auth/kitamo/session";
 
@@ -19,7 +20,7 @@ export const dynamic = "force-dynamic";
  * {factor_type: 'totp'} and its QR code. Only when the account has no
  * verified TOTP factor; an unfinished earlier setup is removed first.
  * Nothing here says whether the account is the admin: Core decides that at
- * aal2.
+ * aal2. Each failed step writes one server log line (logMfaFailure).
  */
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) {
@@ -31,6 +32,7 @@ export async function POST(request: Request): Promise<Response> {
   }
   const check = await verifyKitamoToken(access);
   if (!check.ok) {
+    logMfaFailure("token", 0, "", check.reason);
     return check.reason === "refused"
       ? refuse(401, "Your sign-in has ended. Sign in again.")
       : refuse(503, "KitaMo sign-in is not answering. Try again in a moment.");
