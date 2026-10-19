@@ -189,7 +189,9 @@ export async function signOutSession(
   const base = authBase(env);
   if (base === null) return;
   try {
-    await fetchImpl(`${base.url}/auth/v1/logout`, {
+    // scope=local: this session only. Auth's /logout without a scope is GLOBAL (gate 0, 2026-10-20):
+    // it would sign the person out of KitaMo and every other device too.
+    await fetchImpl(`${base.url}/auth/v1/logout?scope=local`, {
       method: "POST",
       headers: { apikey: base.anon, Authorization: `Bearer ${accessToken}` },
       signal: AbortSignal.timeout(3_000),
