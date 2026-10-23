@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
+import "./kitamo-tokens.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#f7f6f2",
+  themeColor: "#f5f5f2",
 };
 
 export default function RootLayout({

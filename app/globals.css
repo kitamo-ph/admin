@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 /*
- * KitaMo's look (R16, Q-L12): the tokens and fonts copied from Operations'
- * align/kitamo-feel @ 2daaf50 (web/kitamo-tokens.css, itself a copy of
- * seller-web's app/globals.css :root and public/fonts: Schibsted Grotesk and
- * the peso glyph from Hanken Grotesk, SIL OFL, see public/fonts/OFL.txt).
+ * KitaMo's look (R16, Q-L12): the fonts copied from Operations'
+ * align/kitamo-feel @ 2daaf50 (seller-web's public/fonts: Schibsted Grotesk and
+ * the peso glyph from Hanken Grotesk, SIL OFL, see public/fonts/OFL.txt). The
+ * --km tokens are in app/kitamo-tokens.css (imported first, app/layout.tsx):
+ * the design system's file, byte-identical to seller-web app/kitamo-tokens.css.
  * A copy, not an import; a shared UI package is parked for after Nov 1.
  * They replace the mock beta's forest and gold tokens.
  */
@@ -39,47 +40,6 @@
     U+2215, U+FEFF, U+FFFD;
 }
 
-:root {
-  color-scheme: light;
-  --km-color-page: #f7f6f2;
-  --km-color-surface: #ffffff;
-  --km-color-muted: #f1f0ea;
-  --km-color-text: #161a17;
-  --km-color-text-secondary: #545b55;
-  --km-color-border: #dcdbd3;
-  --km-color-border-strong: #c9c8bf;
-  --km-color-control-edge: #858379;
-  --km-color-action: #006b3c;
-  --km-color-action-hover: #005a32;
-  --km-color-action-pressed: #004e2c;
-  --km-color-action-foreground: #ffffff;
-  --km-color-select: #0d4f33;
-  --km-color-select-soft: #e1efe6;
-  --km-color-accent: #e3a008;
-  --km-color-accent-foreground: #2c2100;
-  --km-color-focus: #1d4ed8;
-  --km-color-success: #17643e;
-  --km-color-warning: #8a5a00;
-  --km-color-warning-ink: #6d4100;
-  --km-color-info: #185b84;
-  --km-color-destructive: #a5322a;
-  --km-color-disabled: #e4e3dc;
-  --km-color-disabled-foreground: #5f5c55;
-  --km-color-info-soft: #e7f1f6;
-  --km-color-warning-soft: #fde8c8;
-  --km-color-success-soft: #e5f2e9;
-  --km-color-destructive-soft: #fbe9e7;
-
-  --km-font-body:
-    "Schibsted Grotesk", "Segoe UI", Roboto, ui-sans-serif, system-ui,
-    -apple-system, BlinkMacSystemFont, sans-serif;
-  --km-radius-control: 0.625rem;
-  --km-radius-surface: 0.875rem;
-  --km-radius-status: 999px;
-  --km-control-height: 2.75rem;
-  --km-control-height-primary: 3.5rem;
-}
-
 /* The mock beta's token names, re-pointed at KitaMo's (older pages use them). */
 :root {
   --forest-950: var(--km-color-text);
@@ -105,7 +65,7 @@
   --info-soft: var(--km-color-info-soft);
   --success: var(--km-color-success);
   --success-soft: var(--km-color-success-soft);
-  --shadow-card: 0 1px 2px rgb(22 26 23 / 5%);
+  --shadow-card: var(--km-shadow-1);
 }
 
 @theme inline {
