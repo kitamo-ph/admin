@@ -358,6 +358,68 @@ a {
     color: var(--km-color-text-secondary);
   }
 
+  /*
+   * The lead's pass-2 review (the export's "filled fields with the label inside", as Operations did): a
+   * .km-label that holds a .control is itself the field. A muted fill with the 1 px control edge (ds-06), its
+   * words small on top (12 px, 4.7:1 on the fill) and the control borderless inside; the focus ring moves to
+   * the box. Same words as before; a legend (Level, Change to, Evidence, Kind) keeps its bold line above.
+   */
+  .km-label:has(.control) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    min-height: 3.25rem;
+    border: 1px solid var(--km-color-control-edge);
+    border-radius: var(--km-radius-control);
+    background: var(--km-color-muted);
+    padding: 0.3125rem 0.875rem;
+    color: var(--km-color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.3;
+    cursor: text;
+  }
+
+  .km-label:has(select.control) {
+    cursor: pointer;
+  }
+
+  .km-label:has(textarea.control) {
+    justify-content: flex-start;
+    padding-block: 0.5rem;
+  }
+
+  .km-label:has(.control):hover {
+    border-color: var(--km-color-text-secondary);
+  }
+
+  .km-label:has(.control:focus-visible) {
+    outline: 3px solid var(--km-color-focus);
+    outline-offset: 2px;
+  }
+
+  .km-label:has(.control) .control {
+    min-height: 1.625rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--km-color-text);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .km-label:has(.control) textarea.control {
+    min-height: 4.5rem;
+  }
+
+  .km-label:has(.control) .control:focus,
+  .km-label:has(.control) .control:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
   .skeleton {
     animation: shimmer 1.5s ease-in-out infinite;
     background: linear-gradient(

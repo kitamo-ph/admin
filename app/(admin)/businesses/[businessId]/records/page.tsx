@@ -198,7 +198,8 @@ export default async function RecordsPageView({
               type="date"
             />
           </label>
-          <button className="km-button" type="submit">
+          {/* As tall as the filled date fields beside it (the pass-2 review). */}
+          <button className="km-button min-h-[3.25rem]" type="submit">
             Show
           </button>
           <p className="km-hint w-full">

@@ -52,37 +52,36 @@ export default async function BusinessesPage({
       </StateBanner>
 
       {/* The design pass (Adm Site canvas, Businesses): one search field with its icon and the Search capsule,
-          no box around them. "Business name" stays a persistent label, the field 52 px (mkt-adm-12). */}
+          no box around them. "Business name" stays a persistent label (mkt-adm-12): since the pass-2 review,
+          inside the 52 px filled field, over the typed words, with the magnifier at its left. */}
       <form
         className="mb-6 flex max-w-[35rem] flex-wrap items-end gap-3"
         method="get"
         role="search"
       >
-        <label className="km-label min-w-56 flex-1">
+        <label className="km-label relative min-w-56 flex-1 pl-11">
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[var(--km-color-text-secondary)]"
+            fill="none"
+            height="20"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            width="20"
+          >
+            <path d="M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zM16 16l5 5" />
+          </svg>
           Business name
-          <span className="relative block">
-            <svg
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--km-color-text-secondary)]"
-              fill="none"
-              height="20"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="20"
-            >
-              <path d="M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zM16 16l5 5" />
-            </svg>
-            <input
-              className="control km-input min-h-[3.25rem] pl-10"
-              defaultValue={search}
-              maxLength={60}
-              name="q"
-              type="search"
-            />
-          </span>
+          <input
+            className="control km-input"
+            defaultValue={search}
+            maxLength={60}
+            name="q"
+            type="search"
+          />
         </label>
         <button className="km-button min-h-[3.25rem]" type="submit">
           Search
