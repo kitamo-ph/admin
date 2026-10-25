@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { LegalLinks } from "@/components/layout/legal-links";
+import { ReadOnlyLine } from "@/components/layout/read-only-line";
 
 export default function ErrorBoundary({
   error,
@@ -21,6 +22,8 @@ export default function ErrorBoundary({
   return (
     <main className="grid min-h-screen place-items-center p-6">
       <section className="w-full max-w-lg rounded-2xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-8 shadow-[var(--shadow-card)]">
+        {/* The lead's decision on 84963c8: the full-screen states carry the read-only line too. */}
+        <ReadOnlyLine className="mb-6" />
         <div className="mb-5 grid size-11 place-items-center rounded-xl bg-[var(--km-color-destructive-soft)] text-xl text-[var(--km-color-destructive)]">
           !
         </div>
@@ -35,17 +38,10 @@ export default function ErrorBoundary({
           if the issue continues.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            className="rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
-            onClick={reset}
-            type="button"
-          >
+          <button className="km-button" onClick={reset} type="button">
             Try again
           </button>
-          <a
-            className="rounded-lg border border-[var(--km-color-border-strong)] px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
-            href="/overview"
-          >
+          <a className="km-button-secondary" href="/overview">
             Return to overview
           </a>
         </div>

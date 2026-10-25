@@ -44,6 +44,7 @@ export default async function AccessDeniedPage({
   return (
     <PublicShell
       eyebrow="Access denied"
+      readOnlyLine
       title="This area is outside your assigned access"
       description="Your administrator role does not include the capability required for this page. Direct links are checked independently of the navigation."
     >

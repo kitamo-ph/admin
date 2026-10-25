@@ -118,6 +118,66 @@ test.describe("KitaMo sign-in", () => {
     ).toBeVisible();
   });
 
+  test("at phone width: the read-only line, More's sections and Privacy · Terms, no flag pre-chosen", async ({
+    page,
+  }) => {
+    // The design pass (mkt-adm-01, a legal HIGH; the lead's review of 84963c8): the KitaMo session below the
+    // laptop width, where the sidebar gives way to the bottom bar and its More sheet.
+    await page.setViewportSize({ width: 375, height: 812 });
+    await signIn(page, account("enrolled"));
+    await expect(page).toHaveURL(/\/overview$/);
+    const line = page
+      .getByText("Read-only toward businesses · every view is logged", {
+        exact: true,
+      })
+      .filter({ visible: true });
+    await expect(line).toHaveCount(1);
+    await expect(
+      page.getByRole("contentinfo").getByRole("link", { name: "Privacy" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("contentinfo").getByRole("link", { name: "Terms" }),
+    ).toBeVisible();
+
+    const tabs = page.getByRole("navigation", { name: "Admin tabs" });
+    await expect(tabs).toBeVisible();
+    for (const name of ["Overview", "Businesses", "Flags", "Access log"]) {
+      await expect(tabs.getByRole("link", { name })).toBeVisible();
+    }
+    const more = tabs.locator("summary");
+    await more.click();
+    const sheet = tabs.getByRole("region", { name: "More" });
+    await expect(sheet).toBeVisible();
+    await expect(
+      sheet.getByRole("link", { name: "Associations" }),
+    ).toBeVisible();
+    await expect(sheet.getByRole("link", { name: "Privacy" })).toBeVisible();
+    await expect(sheet.getByRole("link", { name: "Terms" })).toBeVisible();
+    // The parked mock-first sections are not part of a KitaMo session.
+    await expect(sheet.getByRole("link", { name: "Users" })).toHaveCount(0);
+    // Escape closes it; so does Close.
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    await more.click();
+    await sheet.getByRole("button", { name: "Close" }).click();
+    await expect(sheet).toBeHidden();
+    // A section inside it opens that page and closes the sheet.
+    await more.click();
+    await sheet.getByRole("link", { name: "Associations" }).click();
+    await expect(page).toHaveURL(/\/associations$/);
+    await expect(sheet).toBeHidden();
+    await expect(line).toHaveCount(1);
+
+    // Flags: the review's choices start with nothing chosen.
+    await tabs.getByRole("link", { name: "Flags" }).click();
+    await expect(page).toHaveURL(/\/flags$/);
+    await expect(
+      page.getByRole("group", { name: "Change to" }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
+    await expect(line).toHaveCount(1);
+  });
+
   test("an enrolled admin goes straight to the code, and a wrong code is refused", async ({
     page,
   }) => {
@@ -374,6 +434,10 @@ test.describe("R16 pages through the Core adapter", () => {
 
     await page.goto("/flags");
     // The design pass: "Change to" is a radio list, nothing pre-chosen.
+    await expect(
+      page.getByRole("group", { name: "Change to" }).first(),
+    ).toBeVisible();
+    await expect(page.getByRole("radio", { checked: true })).toHaveCount(0);
     await page
       .getByRole("group", { name: "Change to" })
       .first()

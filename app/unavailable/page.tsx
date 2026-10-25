@@ -11,6 +11,7 @@ export default function UnavailablePage() {
   return (
     <PublicShell
       eyebrow="Service unavailable"
+      readOnlyLine
       title="Operational data cannot be reached right now"
       description="The request failed safely before any administrative change was made. Try again after a short wait."
     >

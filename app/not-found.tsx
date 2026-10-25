@@ -1,11 +1,14 @@
 import Link from "next/link";
 
 import { LegalLinks } from "@/components/layout/legal-links";
+import { ReadOnlyLine } from "@/components/layout/read-only-line";
 
 export default function NotFound() {
   return (
     <main className="grid min-h-screen place-items-center p-6">
       <section className="w-full max-w-lg rounded-2xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-8 shadow-[var(--shadow-card)]">
+        {/* The lead's decision on 84963c8: the full-screen states carry the read-only line too. */}
+        <ReadOnlyLine className="mb-6" />
         <div className="mb-5 grid size-12 place-items-center rounded-xl bg-[var(--km-color-warning-soft)] font-bold text-[var(--km-color-warning)]">
           404
         </div>
@@ -18,11 +21,7 @@ export default function NotFound() {
         <p className="mt-3 text-[var(--km-color-text-secondary)]">
           Check the address or return to the operational overview.
         </p>
-        <Link
-          className="mt-6 inline-flex rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
-          href="/overview"
-          prefetch={false}
-        >
+        <Link className="km-button mt-6" href="/overview" prefetch={false}>
           Go to overview
         </Link>
         <LegalLinks className="mt-6 text-xs text-[var(--km-color-text-secondary)]" />

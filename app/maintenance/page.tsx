@@ -11,6 +11,7 @@ export default function MaintenancePage() {
   return (
     <PublicShell
       eyebrow="Planned maintenance"
+      readOnlyLine
       title="Administrative tools are temporarily paused"
       description="The operational data source is in a controlled maintenance window. Merchant activity in the Android application is not changed by this admin-platform state."
     >

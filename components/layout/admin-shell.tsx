@@ -3,6 +3,7 @@ import Link from "next/link";
 import { LegalLinks } from "./legal-links";
 import { AdminNavLink } from "./nav-link";
 import { PhoneTabs } from "./phone-tabs";
+import { ReadOnlyLine } from "./read-only-line";
 
 type NavigationItem = {
   href: string;
@@ -169,11 +170,13 @@ export function AdminShell({
           </div>
 
           <div className="hidden lg:block">
-            <p className="text-xs font-semibold tracking-[0.09em] uppercase">
-              {kitamo
-                ? "Read-only toward businesses · every view is logged"
-                : "Internal operations"}
-            </p>
+            {kitamo ? (
+              <ReadOnlyLine />
+            ) : (
+              <p className="text-xs font-semibold tracking-[0.09em] uppercase">
+                Internal operations
+              </p>
+            )}
           </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-3">
@@ -197,12 +200,16 @@ export function AdminShell({
           </div>
         </header>
         {/* The design pass (mkt-adm-01, a legal HIGH): the line on every signed-in page at EVERY width, so below
-            the laptop width too, under the header and above the access banner. */}
-        <p className="border-b border-[var(--km-color-border)] px-4 py-2 text-xs font-semibold tracking-[0.09em] uppercase sm:px-8 lg:hidden">
-          {kitamo
-            ? "Read-only toward businesses · every view is logged"
-            : "Internal operations"}
-        </p>
+            the laptop width too, under the header and above the access banner (the canvas's phone line). */}
+        <div className="border-b border-[var(--km-color-border)] px-4 py-2 sm:px-8 lg:hidden">
+          {kitamo ? (
+            <ReadOnlyLine />
+          ) : (
+            <p className="text-xs font-semibold tracking-[0.09em] text-[var(--km-color-text-secondary)] uppercase">
+              Internal operations
+            </p>
+          )}
+        </div>
         {banner}
         <main id="main-content" tabIndex={-1}>
           {children}

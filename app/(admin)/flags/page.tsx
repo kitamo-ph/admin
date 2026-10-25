@@ -94,7 +94,7 @@ export default async function FlagsPage({
             <li key={flag.flagId}>
               <Panel>
                 <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-                  <div className="grid gap-2">
+                  <div className="grid content-start gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge value={flag.status} />
                       <span className="km-lead">A lead, not proof</span>

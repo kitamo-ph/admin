@@ -15,6 +15,8 @@ export function LiveHiddenBar({
   live: number;
   hidden: number;
 }) {
+  // With no business at all the empty track gets the 3:1 control edge, so it shows (the lead's review of 84963c8).
+  const empty = live + hidden === 0;
   return (
     <div
       className="grid gap-2"
@@ -23,7 +25,9 @@ export function LiveHiddenBar({
     >
       <div
         aria-hidden="true"
-        className="flex h-2.5 gap-0.5 overflow-hidden rounded-full bg-[var(--km-color-muted)]"
+        className={`flex h-2.5 gap-0.5 overflow-hidden rounded-full bg-[var(--km-color-muted)] ${
+          empty ? "border border-[var(--km-color-control-edge)]" : ""
+        }`}
       >
         {live > 0 ? (
           <span

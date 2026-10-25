@@ -1,17 +1,21 @@
 import Link from "next/link";
 
 import { LegalLinks } from "./legal-links";
+import { ReadOnlyLine } from "./read-only-line";
 
 export function PublicShell({
   eyebrow,
   title,
   description,
   children,
+  readOnlyLine = false,
 }: {
   eyebrow: string;
   title: string;
   description: string;
   children?: React.ReactNode;
+  /** The lead's decision on 84963c8: a plain state a signed-in admin reaches carries the read-only line. */
+  readOnlyLine?: boolean;
 }) {
   return (
     <main className="relative grid min-h-screen overflow-hidden bg-[var(--km-color-page)] lg:grid-cols-[minmax(22rem,0.85fr)_minmax(30rem,1.15fr)]">
@@ -70,6 +74,7 @@ export function PublicShell({
           </span>
         </div>
         <div className="w-full max-w-[30rem] pt-14 lg:pt-0">
+          {readOnlyLine ? <ReadOnlyLine className="mb-6" /> : null}
           <p className="text-xs font-bold tracking-[0.14em] text-[var(--km-color-warning)] uppercase">
             {eyebrow}
           </p>
