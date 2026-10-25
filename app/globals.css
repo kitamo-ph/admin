@@ -390,8 +390,9 @@ a {
   justify-content: center;
   gap: 0.5rem;
   border: 1px solid transparent;
-  border-radius: var(--km-radius-control);
-  padding: 0.55rem 1rem;
+  /* Design system v3 (ds-05): every button is a capsule. */
+  border-radius: var(--km-radius-button);
+  padding: 0.55rem 1.125rem;
   font-weight: 650;
   text-align: center;
   cursor: pointer;

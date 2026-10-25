@@ -14,23 +14,25 @@ export function PageHeader({
   description: string;
   actions?: React.ReactNode;
 }) {
+  // The design pass (Adm Site canvas): the title at 26 px on a phone, up to 34 px on a laptop; the page's
+  // action a capsule beside it (full width on a phone); the description stays visible (mkt-adm-15).
   return (
-    <header className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+    <header className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
       <div className="max-w-3xl">
         {eyebrow ? (
-          <p className="mb-1.5 text-xs font-bold tracking-[0.13em] text-[var(--km-color-warning)] uppercase">
+          <p className="mb-1.5 text-xs font-bold tracking-[0.08em] text-[var(--km-color-text-secondary)] uppercase">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="text-2xl font-semibold tracking-[-0.025em] text-[var(--km-color-text)] sm:text-[1.8rem]">
+        <h1 className="text-[1.625rem] leading-[1.12] font-bold tracking-[-0.022em] text-balance text-[var(--km-color-text)] lg:text-[clamp(1.75rem,2.4vw,2.125rem)]">
           {title}
         </h1>
-        <p className="mt-2 max-w-2xl leading-6 text-[var(--km-color-text-secondary)]">
+        <p className="mt-2 max-w-[62ch] text-[0.9375rem] leading-6 text-[var(--km-color-text-secondary)]">
           {description}
         </p>
       </div>
       {actions ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 *:flex-1 md:*:flex-none">
           {actions}
         </div>
       ) : null}
@@ -44,20 +46,38 @@ export function Breadcrumbs({
   items: Array<{ label: string; href?: string }>;
 }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-4">
-      <ol className="flex flex-wrap items-center gap-2 text-xs font-medium text-[var(--km-color-text-secondary)]">
+    <nav aria-label="Breadcrumb" className="mb-2">
+      <ol className="flex flex-wrap items-center gap-x-2 text-[0.9375rem] font-medium text-[var(--km-color-text-secondary)]">
         {items.map((item, index) => (
           <li
-            className="flex items-center gap-2"
+            className="flex min-w-0 items-center gap-2"
             key={`${item.label}-${index}`}
           >
             {index > 0 ? <span aria-hidden="true">/</span> : null}
             {item.href ? (
+              // The design pass (the canvas's back link): a 44 px target in the action colour, a chevron first.
               <Link
-                className="rounded hover:text-[var(--km-color-text)] hover:underline"
+                className={`inline-flex min-h-11 items-center gap-0.5 rounded-lg pr-2 text-[var(--km-color-action)] hover:underline ${
+                  index === 0 ? "-ml-1.5" : "pl-2"
+                }`}
                 href={item.href}
                 prefetch={false}
               >
+                {index === 0 ? (
+                  <svg
+                    aria-hidden="true"
+                    fill="none"
+                    height="20"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.25"
+                    viewBox="0 0 24 24"
+                    width="20"
+                  >
+                    <path d="M15 5l-7 7 7 7" />
+                  </svg>
+                ) : null}
                 {item.label}
               </Link>
             ) : (
@@ -86,14 +106,15 @@ export function Panel({
   className?: string;
 }) {
   return (
+    // Design system v3 (ds-05): a card is a border and a 16 px radius, nothing more; its title is 20 px bold.
     <section
-      className={`min-w-0 rounded-xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] shadow-[var(--shadow-card)] ${className}`}
+      className={`min-w-0 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] ${className}`}
     >
       {title || description || action ? (
         <header className="flex flex-col justify-between gap-3 border-b border-[var(--km-color-border)] px-5 py-4 sm:flex-row sm:items-center">
           <div>
             {title ? (
-              <h2 className="font-semibold tracking-[-0.01em] text-[var(--km-color-text)]">
+              <h2 className="text-xl leading-tight font-bold text-[var(--km-color-text)]">
                 {title}
               </h2>
             ) : null}
@@ -133,7 +154,7 @@ export function MetricCard({
   };
 
   return (
-    <article className="min-w-0 rounded-xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-5 shadow-[var(--shadow-card)]">
+    <article className="min-w-0 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-5">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-[var(--km-color-text-secondary)]">
           {label}
@@ -245,27 +266,28 @@ export function StateBanner({
   children: React.ReactNode;
 }) {
   const tones = {
-    info: "border-[var(--km-color-info)] bg-[var(--km-color-info-soft)] text-[var(--km-color-info)]",
+    info: "border-transparent bg-[var(--km-color-info-soft)] text-[var(--km-color-info)]",
     warning:
-      "border-[var(--km-color-accent)] bg-[var(--km-color-warning-soft)] text-[var(--km-color-warning-ink)]",
+      "border-transparent bg-[var(--km-color-warning-soft)] text-[var(--km-color-warning-ink)]",
+    // A failure keeps its red edge: never colour alone.
     danger:
       "border-[var(--km-color-destructive)] bg-[var(--km-color-destructive-soft)] text-[var(--km-color-destructive)]",
     success:
-      "border-[var(--km-color-success)] bg-[var(--km-color-success-soft)] text-[var(--km-color-success)]",
+      "border-transparent bg-[var(--km-color-success-soft)] text-[var(--km-color-success)]",
   };
 
   return (
+    // The design pass (the canvas's callouts): a soft fill and a 12 px radius, the title in bold and the
+    // sentence after it on the same line, at full colour. Same words.
     <aside
-      className={`mb-5 flex gap-3 rounded-xl border px-4 py-3.5 ${tones[tone]}`}
+      className={`mb-5 rounded-xl border px-3.5 py-3 text-sm leading-[1.4] ${tones[tone]}`}
       role={tone === "danger" ? "alert" : "status"}
     >
-      <span aria-hidden="true" className="mt-0.5 font-bold">
-        {tone === "danger" ? "!" : "i"}
-      </span>
-      <div>
-        <p className="text-sm font-semibold">{title}</p>
-        <div className="mt-0.5 text-sm opacity-85">{children}</div>
-      </div>
+      <p>
+        <strong className="font-bold">{title}</strong>
+        {/[.!?]$/.test(title) ? " " : " · "}
+        {children}
+      </p>
     </aside>
   );
 }

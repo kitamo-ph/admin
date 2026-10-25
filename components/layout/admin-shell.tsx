@@ -96,16 +96,16 @@ function Navigation({ allowedHrefs }: { allowedHrefs: string[] }) {
   const visible = navigation.filter((item) => allowedHrefs.includes(item.href));
 
   return (
-    <nav aria-label="Admin navigation" className="mt-8 flex-1">
+    <nav aria-label="Admin navigation" className="mt-4 flex-1">
       {groups.map((group) => {
         const items = visible.filter((item) => item.group === group);
         if (items.length === 0) return null;
         return (
-          <div className="mb-6" key={group}>
-            <p className="mb-2 px-3 text-[0.65rem] font-bold tracking-[0.15em] text-[var(--km-color-text-secondary)] uppercase">
+          <div className="mb-5" key={group}>
+            <p className="mb-1.5 px-3 text-[0.65rem] font-bold tracking-[0.15em] text-[var(--km-color-text-secondary)] uppercase">
               {group}
             </p>
-            <ul className="grid gap-1">
+            <ul className="grid gap-0.5">
               {items.map((item) => (
                 <li key={item.href}>
                   <AdminNavLink
@@ -147,18 +147,25 @@ export function AdminShell({
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
-      <aside className="hidden min-h-screen border-r border-[var(--km-color-border)] bg-[var(--km-color-surface)] px-4 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
-        <div className="px-2">
+      {/* The design pass (KM Sidebar): the muted column, the mark and name at the top, the sections, then who
+          is signed in and, for a KitaMo session, the idle lock's note (the canvas's new sidebar note). */}
+      <aside className="hidden min-h-screen overflow-y-auto bg-[var(--km-color-muted)] px-3 pt-5 pb-4 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
+        <div className="px-3">
           <Brand />
         </div>
         <Navigation allowedHrefs={allowedHrefs} />
-        <div className="border-t border-[var(--km-color-border)] px-2 pt-4">
+        <div className="border-t border-[var(--km-color-border-strong)] px-3 pt-4">
           <p className="truncate text-sm font-semibold text-[var(--km-color-text)]">
             {adminName}
           </p>
           <p className="truncate text-xs text-[var(--km-color-text-secondary)]">
             {roleLabel}
           </p>
+          {kitamo ? (
+            <p className="mt-2 text-xs text-[var(--km-color-text-secondary)]">
+              Locks after 30 minutes without use
+            </p>
+          ) : null}
         </div>
       </aside>
 
@@ -214,11 +221,11 @@ export function AdminShell({
         <main id="main-content" tabIndex={-1}>
           {children}
         </main>
-        <footer className="border-t border-[var(--km-color-border)] px-4 py-5 text-center text-xs text-[var(--km-color-text-secondary)] sm:px-8">
+        <footer className="border-t border-[var(--km-color-border)] px-4 pt-3 pb-4 text-[0.8125rem] leading-[1.4] text-[var(--km-color-text-secondary)] sm:px-8">
           {kitamo
             ? "KitaMo Admin · read-only toward businesses · every access needs a reason, lasts 30 minutes, and is shown to the business"
             : "Mock operational environment · Fictional data only · No merchant transactions"}
-          <LegalLinks className="mt-2" />
+          <LegalLinks className="-ml-1" />
         </footer>
         <PhoneTabs
           more={navigation
