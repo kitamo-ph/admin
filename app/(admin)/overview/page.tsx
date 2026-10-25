@@ -188,11 +188,12 @@ export default async function OverviewPage() {
           <ul className="divide-y divide-[var(--km-color-border)]">
             {state.accesses.map((access) => (
               <li
-                className="km-panel-x flex flex-wrap items-center justify-between gap-3 py-3"
+                className="km-panel-x flex flex-wrap items-center justify-between gap-x-3 py-1.5"
                 key={access.accessId}
               >
+                {/* The pass-2 review (ds-11): a 44 px target. */}
                 <Link
-                  className="font-semibold underline underline-offset-4"
+                  className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4"
                   href={`/businesses/${access.businessId}`}
                   prefetch={false}
                 >

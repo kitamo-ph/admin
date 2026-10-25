@@ -102,8 +102,9 @@ export default async function FlagsPage({
                     </div>
                     <h2 className="text-xl leading-tight font-bold">
                       {titleCase(flag.kind)} ·{" "}
+                      {/* The pass-2 review (ds-11): a 44 px target. */}
                       <Link
-                        className="underline underline-offset-4"
+                        className="inline-flex min-h-11 items-center underline underline-offset-4"
                         href={`/businesses/${flag.businessId}`}
                         prefetch={false}
                       >

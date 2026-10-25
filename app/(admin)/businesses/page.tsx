@@ -132,8 +132,9 @@ export default async function BusinessesPage({
                 {result.data.rows.map((row) => (
                   <tr key={row.businessId}>
                     <td data-title="">
+                      {/* The pass-2 review (ds-11): the only way in, so a 44 px block, not a 24 px line. */}
                       <Link
-                        className="font-semibold underline underline-offset-4"
+                        className="flex min-h-11 items-center font-semibold underline underline-offset-4"
                         href={`/businesses/${row.businessId}`}
                         prefetch={false}
                       >

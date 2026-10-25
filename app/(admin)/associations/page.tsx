@@ -90,8 +90,10 @@ export default async function AssociationsPage({
                   {result.data.map((association) => (
                     <tr key={association.associationId}>
                       <td data-title="">
+                        {/* The pass-2 review (ds-11): the only way in, so a 44 px block, underlined as Businesses'
+                            names are (it was ink, underlined only on hover, and read as plain text). */}
                         <Link
-                          className="font-semibold underline-offset-4 hover:underline"
+                          className="flex min-h-11 items-center font-semibold underline underline-offset-4"
                           href={`/associations/${association.associationId}`}
                           prefetch={false}
                         >

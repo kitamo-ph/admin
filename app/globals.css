@@ -336,6 +336,14 @@ a {
     }
   }
 
+  /* The pass-2 review (ds-11): a card's title link is a 44 px block; in the Pro table its cell gives back the
+     extra height, so a row stays about 56 px. */
+  @media (min-width: 1024px) {
+    .data-table-cards td[data-title] {
+      padding-block: 0.375rem;
+    }
+  }
+
   .control {
     min-height: var(--km-control-height);
     border: 1px solid var(--km-color-control-edge);
