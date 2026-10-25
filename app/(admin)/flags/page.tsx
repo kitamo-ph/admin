@@ -57,15 +57,17 @@ export default async function FlagsPage({
         title="Flags"
       />
       <Notice value={query.notice} />
-      <nav aria-label="Flag filters" className="mb-5 flex flex-wrap gap-2">
+      {/* The design pass (Adm Site canvas, Flags): the filters as 44 px chips that wrap; the chosen one in ink,
+          the others keep the 3:1 control edge (ds-06). */}
+      <nav aria-label="Flag filters" className="mb-5 flex flex-wrap gap-1.5">
         {FILTERS.map((filter) => (
           <Link
             aria-current={filter.status === status ? "page" : undefined}
-            className={
+            className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] ${
               filter.status === status
-                ? "km-button km-button-small"
-                : "km-button-secondary km-button-small"
-            }
+                ? "border-[var(--km-color-text)] bg-[var(--km-color-text)] font-semibold text-[var(--km-color-page)]"
+                : "border-[var(--km-color-control-edge)] bg-[var(--km-color-surface)] font-medium text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
+            }`}
             href={
               filter.status === null
                 ? "/flags"
@@ -89,17 +91,19 @@ export default async function FlagsPage({
           />
         </Panel>
       ) : (
-        <ul className="grid gap-4">
+        // The design pass: one column of flag cards (the canvas's 760 px): the pills, the flag, its evidence as
+        // tiles, then the review. The details no longer stretch beside a taller review form.
+        <ul className="grid max-w-[47.5rem] gap-4">
           {result.data.map((flag) => (
             <li key={flag.flagId}>
               <Panel>
-                <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-                  <div className="grid content-start gap-2">
+                <div className="grid gap-4 p-4 sm:p-5">
+                  <div className="grid content-start gap-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge value={flag.status} />
                       <span className="km-lead">A lead, not proof</span>
                     </div>
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="text-xl leading-tight font-bold">
                       {titleCase(flag.kind)} ·{" "}
                       <Link
                         className="underline underline-offset-4"
@@ -132,10 +136,12 @@ export default async function FlagsPage({
           ))}
         </ul>
       )}
-      <StateBanner tone="info" title="Flags never act alone">
-        Opening records because of a flag still needs a reason sheet, and the
-        business sees that check.
-      </StateBanner>
+      <div className="mt-5 max-w-[47.5rem]">
+        <StateBanner tone="info" title="Flags never act alone">
+          Opening records because of a flag still needs a reason sheet, and the
+          business sees that check.
+        </StateBanner>
+      </div>
     </div>
   );
 }
@@ -149,26 +155,36 @@ function EvidenceSummary({ evidence }: { evidence: FlagEvidence }) {
       </p>
     );
   }
+  // The design pass (the canvas's evidence tiles): each piece a small tile, its name over its value.
   return (
-    <dl className="grid gap-1 text-sm">
+    <dl className="grid grid-cols-2 gap-2 text-sm">
       {evidence.check ? (
-        <div className="flex gap-2">
-          <dt className="font-semibold">Check</dt>
-          <dd>{evidence.check}</dd>
-        </div>
+        <EvidenceTile label="Check" value={evidence.check} />
       ) : null}
       {counts.map(([key, value]) => (
-        <div className="flex gap-2" key={key}>
-          <dt className="font-semibold">{titleCase(key)}</dt>
-          <dd>{formatNumber(value)}</dd>
-        </div>
+        <EvidenceTile
+          key={key}
+          label={titleCase(key)}
+          value={formatNumber(value)}
+        />
       ))}
       {evidence.record_ids?.length ? (
-        <div className="flex gap-2">
-          <dt className="font-semibold">Records named</dt>
-          <dd>{formatNumber(evidence.record_ids.length)}</dd>
-        </div>
+        <EvidenceTile
+          label="Records named"
+          value={formatNumber(evidence.record_ids.length)}
+        />
       ) : null}
     </dl>
+  );
+}
+
+function EvidenceTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 rounded-xl bg-[var(--km-color-muted)] px-3 py-2.5">
+      <dt className="text-xs font-semibold text-[var(--km-color-text-secondary)]">
+        {label}
+      </dt>
+      <dd className="text-[0.9375rem] font-semibold break-words">{value}</dd>
+    </div>
   );
 }

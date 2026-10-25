@@ -154,11 +154,12 @@ export function FlagReviewForm({
       <input name="returnTo" type="hidden" value={returnTo} />
       {/* The design pass: the flag's own next states as a radio list (open: Reviewing, Dismiss, Confirm;
           reviewing: Dismiss, Confirm; closed: Reopen; mkt-adm-05). */}
-      <fieldset className="grid gap-1">
-        <legend className="km-label">Change to</legend>
+      {/* The canvas's choice rows: 52 px, an edge, the chosen one in the action colour. */}
+      <fieldset className="grid gap-1.5">
+        <legend className="km-label mb-1.5">Change to</legend>
         {options.map((option) => (
           <label
-            className="flex min-h-11 cursor-pointer items-center gap-2"
+            className="flex min-h-[3.25rem] cursor-pointer items-center gap-3 rounded-xl border border-[var(--km-color-border-strong)] px-3.5 font-semibold has-[:checked]:border-[var(--km-color-action)] has-[:checked]:shadow-[inset_0_0_0_1px_var(--km-color-action)]"
             key={option}
           >
             <input
@@ -189,9 +190,10 @@ export function FlagReviewForm({
           {state.message}
         </p>
       ) : null}
+      {/* The canvas: "Save the review" is the card's one primary capsule, full width on a phone. */}
       <div>
         <button
-          className="km-button-secondary"
+          className="km-button min-h-14 w-full sm:min-h-11 sm:w-auto"
           disabled={pending}
           type="submit"
         >
