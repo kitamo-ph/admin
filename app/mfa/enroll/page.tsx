@@ -34,8 +34,11 @@ export default async function MfaEnrollPage({
         cannot use this site; don&apos;t set this up on one.
       </p>
       <MfaEnrollForm returnTo={returnTo} />
-      <div className="mt-6">
-        <SignOutButton label="Use another account" />
+      <div className="mt-3 grid">
+        <SignOutButton
+          className="km-button-secondary min-h-[3.25rem]"
+          label="Use another account"
+        />
       </div>
     </PublicShell>
   );

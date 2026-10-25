@@ -217,7 +217,7 @@ export function KitamoSignInForm({
         </p>
       ) : null}
       <button
-        className="km-button"
+        className="km-button min-h-14"
         disabled={
           pending ||
           captcha.mode === "unavailable" ||

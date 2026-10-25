@@ -34,8 +34,8 @@ export default async function AccessDeniedPage({
             <li>the admin site is switched off for now.</li>
           </ul>
         </div>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <SignOutButton label="Sign out" className="km-button" />
+        <div className="mt-6 grid gap-3">
+          <SignOutButton label="Sign out" className="km-button min-h-14" />
         </div>
       </PublicShell>
     );
@@ -48,21 +48,17 @@ export default async function AccessDeniedPage({
       title="This area is outside your assigned access"
       description="Your administrator role does not include the capability required for this page. Direct links are checked independently of the navigation."
     >
-      <div className="rounded-xl border border-[var(--km-color-accent)] bg-[var(--km-color-warning-soft)] p-4 text-sm text-[var(--km-color-warning-ink)]">
+      <div className="rounded-xl bg-[var(--km-color-warning-soft)] px-3.5 py-3 text-sm leading-[1.45] text-[var(--km-color-warning-ink)]">
         If this access is necessary for support work, contact a KitaMo super
         administrator. Role changes are not available from this platform.
       </div>
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Link
-          className="rounded-lg bg-[var(--km-color-action)] px-4 py-2.5 font-semibold text-white hover:bg-[var(--km-color-action-hover)]"
-          href="/overview"
-          prefetch={false}
-        >
+      <div className="mt-6 grid gap-3">
+        <Link className="km-button min-h-14" href="/overview" prefetch={false}>
           Return to overview
         </Link>
         {switchingEnabled ? (
           <Link
-            className="rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
+            className="km-button-secondary min-h-[3.25rem]"
             href="/sign-in"
             prefetch={false}
           >

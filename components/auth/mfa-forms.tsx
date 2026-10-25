@@ -78,7 +78,7 @@ export function MfaCodeForm({
           {error}
         </p>
       ) : null}
-      <button className="km-button" disabled={pending} type="submit">
+      <button className="km-button min-h-14" disabled={pending} type="submit">
         {pending ? "Checking…" : "Continue"}
       </button>
     </form>
@@ -135,7 +135,7 @@ export function MfaEnrollForm({ returnTo }: { returnTo: string }) {
           </p>
         ) : null}
         <button
-          className="km-button"
+          className="km-button min-h-14"
           disabled={pending}
           onClick={start}
           type="button"

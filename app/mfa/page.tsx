@@ -31,8 +31,11 @@ export default async function MfaPage({
       description="Open the authenticator app on your phone and enter the 6-digit code for KitaMo Admin."
     >
       <MfaCodeForm factorId={verified.id} returnTo={returnTo} />
-      <div className="mt-6">
-        <SignOutButton label="Use another account" />
+      <div className="mt-3 grid">
+        <SignOutButton
+          className="km-button-secondary min-h-[3.25rem]"
+          label="Use another account"
+        />
       </div>
     </PublicShell>
   );

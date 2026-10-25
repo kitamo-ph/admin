@@ -65,27 +65,34 @@ export function PublicShell({
         </p>
       </section>
 
-      <section className="relative grid place-items-center p-5 sm:p-10">
-        <div className="absolute top-5 left-5 flex items-center gap-2 lg:hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element -- KitaMo's static mark */}
-          <img alt="" height={30} src="/kitamo-mark.png" width={30} />
-          <span className="font-bold text-[var(--km-color-text)]">
+      {/* The design pass (Adm Site canvas, plain states): one centred 420 px column, the mark and name first
+          (below the laptop width; the panel shows them above it), a secondary eyebrow, a 30 px title, the
+          state's own words, then its capsule action and Privacy · Terms as 44 px links. */}
+      <section className="relative grid place-items-center px-5 py-14 sm:p-10">
+        <div className="w-full max-w-[26.25rem]">
+          <p className="mb-10 flex items-center gap-2.5 text-[1.0625rem] font-bold text-[var(--km-color-text)] lg:hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element -- KitaMo's static mark */}
+            <img
+              alt=""
+              className="rounded-lg"
+              height={32}
+              src="/kitamo-mark.png"
+              width={32}
+            />
             KitaMo Admin
-          </span>
-        </div>
-        <div className="w-full max-w-[30rem] pt-14 lg:pt-0">
+          </p>
           {readOnlyLine ? <ReadOnlyLine className="mb-6" /> : null}
-          <p className="text-xs font-bold tracking-[0.14em] text-[var(--km-color-warning)] uppercase">
+          <p className="text-xs font-bold tracking-[0.08em] text-[var(--km-color-text-secondary)] uppercase">
             {eyebrow}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[var(--km-color-text)]">
+          <h1 className="mt-2 text-[1.875rem] leading-[1.15] font-bold tracking-[-0.02em] text-balance text-[var(--km-color-text)]">
             {title}
           </h1>
-          <p className="mt-3 leading-7 text-[var(--km-color-text-secondary)]">
+          <p className="mt-2 text-[0.9375rem] leading-[1.45] text-pretty text-[var(--km-color-text-secondary)]">
             {description}
           </p>
-          {children ? <div className="mt-8">{children}</div> : null}
-          <LegalLinks className="mt-10 text-xs text-[var(--km-color-text-secondary)]" />
+          {children ? <div className="mt-6">{children}</div> : null}
+          <LegalLinks className="mt-8 -ml-1 text-[0.9375rem] text-[var(--km-color-text-secondary)]" />
         </div>
       </section>
     </main>

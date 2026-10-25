@@ -15,13 +15,14 @@ export default function MaintenancePage() {
       title="Administrative tools are temporarily paused"
       description="The operational data source is in a controlled maintenance window. Merchant activity in the Android application is not changed by this admin-platform state."
     >
-      <div className="rounded-xl border border-[var(--km-color-info)] bg-[var(--km-color-info-soft)] p-4 text-sm text-[var(--km-color-info)]">
+      <div className="rounded-xl bg-[var(--km-color-info-soft)] px-3.5 py-3 text-sm leading-[1.45] text-[var(--km-color-info)]">
         Read and update actions remain unavailable until the maintenance window
         ends. This page intentionally exposes no infrastructure details.
       </div>
       {/* /health is parked (a KitaMo session gets 404). */}
+      {/* The canvas: the state's one action is the primary capsule (was a white outlined button). */}
       <Link
-        className="mt-6 inline-flex rounded-lg border border-[var(--km-color-border-strong)] bg-white px-4 py-2.5 font-semibold text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
+        className="km-button mt-6 min-h-14 w-full"
         href="/overview"
         prefetch={false}
       >
