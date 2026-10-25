@@ -331,7 +331,7 @@ export function KeyValueGrid({
 
 const TABLE_LAYOUTS = {
   scroll: "data-table",
-  /** Below 768 px, each row a card with every field labelled (each cell's data-label; one data-title). */
+  /** Below 1024 px (Simple), each row a card with every field labelled (each cell's data-label; one data-title). */
   cards: "data-table data-table-cards",
   /** The first column stays put while the rest scroll. */
   sticky: "data-table data-table-sticky",
@@ -339,7 +339,7 @@ const TABLE_LAYOUTS = {
 
 /**
  * A table that scrolls sideways when it is wider than its panel, with a cue while columns are hidden
- * (TableScroll). The design pass: "cards" turns each row into a card below 768 px.
+ * (TableScroll). The design pass: "cards" turns each row into a card below 1024 px (Simple).
  */
 export function DataTable({
   label,

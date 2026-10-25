@@ -268,11 +268,13 @@ a {
   }
 
   /*
-   * The design pass (mkt-adm-02's phone clause, the canvases' phone lists): below 768 px a "cards" table shows
-   * each row as a card with EVERY field, labelled. The cell marked data-title leads the card; every other cell
-   * shows its column's name (data-label) beside its value. Nothing is dropped and nothing scrolls sideways.
+   * The design pass (mkt-adm-02's phone clause, the canvases' phone lists): in Simple, below 1024 px (the
+   * Simple/Pro width, mkt-adm-13; was below 768 px until the lead's pass-2 review, so 768-1023 px mixed the
+   * Simple shell with Pro tables), a "cards" table shows each row as a card with EVERY field, labelled. The cell
+   * marked data-title leads the card; every other cell shows its column's name (data-label) beside its value.
+   * Nothing is dropped and nothing scrolls sideways.
    */
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     .data-table-cards {
       min-width: 0 !important;
     }
@@ -310,9 +312,10 @@ a {
       overflow-wrap: anywhere;
     }
 
+    /* The label takes 2/5 of a phone card, at most 12rem on a wider Simple screen (768-1023 px). */
     .data-table-cards td[data-label] {
       display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      grid-template-columns: minmax(0, min(40%, 12rem)) minmax(0, 1fr);
       gap: 0.75rem;
       align-items: baseline;
       justify-items: start;
