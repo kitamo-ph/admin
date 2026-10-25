@@ -58,7 +58,7 @@ export default async function AccessLogPage({
                 title="No accesses"
               />
             ) : (
-              <DataTable label="Accesses" minWidth="72rem">
+              <DataTable label="Accesses" layout="cards" minWidth="60rem">
                 <thead>
                   <tr>
                     <th scope="col">Opened</th>
@@ -66,41 +66,56 @@ export default async function AccessLogPage({
                     <th scope="col">Business</th>
                     <th scope="col">Level</th>
                     <th scope="col">Reason</th>
-                    <th scope="col">Written reason</th>
+                    <th className="wrap" scope="col">
+                      Written reason
+                    </th>
                     <th scope="col">Evidence</th>
                     <th scope="col">Ended</th>
-                    <th scope="col">Disclosure held until</th>
+                    <th className="wrap" scope="col">
+                      Disclosure held until
+                    </th>
                     <th scope="col">Reads</th>
                   </tr>
                 </thead>
                 <tbody>
                   {result.data.accesses.map((entry) => (
                     <tr key={entry.accessId}>
-                      <td>{formatDateTime(entry.openedAt)}</td>
-                      <td>{entry.adminLabel}</td>
-                      <td>{entry.businessName ?? "Deleted business"}</td>
-                      <td>{LEVEL_LABELS[entry.level]}</td>
-                      <td>{REASON_LABELS[entry.reasonCode]}</td>
-                      <td className="max-w-80 whitespace-normal">
+                      <td data-label="Opened">
+                        {formatDateTime(entry.openedAt)}
+                      </td>
+                      <td data-label="Admin">{entry.adminLabel}</td>
+                      <td data-title="">
+                        {entry.businessName ?? "Deleted business"}
+                      </td>
+                      <td data-label="Level">{LEVEL_LABELS[entry.level]}</td>
+                      <td data-label="Reason">
+                        {REASON_LABELS[entry.reasonCode]}
+                      </td>
+                      <td
+                        className="max-w-80 whitespace-normal"
+                        data-label="Written reason"
+                      >
                         {entry.reasonText ?? "Removed with the business"}
                       </td>
-                      <td>
+                      <td data-label="Evidence">
                         {entry.flagId
                           ? `Flag ${entry.flagId.slice(0, 8)}`
                           : (entry.reference ?? "—")}
                       </td>
-                      <td>
+                      <td data-label="Ended">
                         {titleCase(entry.endedHow)}
                         {entry.endedAt
                           ? ` · ${formatDateTime(entry.endedAt)}`
                           : ""}
                       </td>
-                      <td>
+                      <td data-label="Disclosure held until">
                         {entry.withheldUntil
                           ? formatDateTime(entry.withheldUntil)
                           : "Not held"}
                       </td>
-                      <td>{formatNumber(entry.reads)}</td>
+                      <td className="num" data-label="Reads">
+                        {formatNumber(entry.reads)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -133,7 +148,7 @@ export default async function AccessLogPage({
                 title="No reads"
               />
             ) : (
-              <DataTable label="Reads" minWidth="40rem">
+              <DataTable label="Reads" layout="cards" minWidth="40rem">
                 <thead>
                   <tr>
                     <th scope="col">When</th>
@@ -146,17 +161,19 @@ export default async function AccessLogPage({
                 <tbody>
                   {result.data.reads.map((read, index) => (
                     <tr key={`${read.at}-${index}`}>
-                      <td>{formatDateTime(read.at)}</td>
-                      <td>
+                      <td data-label="When">{formatDateTime(read.at)}</td>
+                      <td data-title="">
                         <code>{read.fn}</code>
                       </td>
-                      <td>
+                      <td data-label="Business">
                         {read.businessId
                           ? read.businessId.slice(0, 8)
                           : "Directory"}
                       </td>
-                      <td>{read.accessId ? read.accessId.slice(0, 8) : "—"}</td>
-                      <td>
+                      <td data-label="Under access">
+                        {read.accessId ? read.accessId.slice(0, 8) : "—"}
+                      </td>
+                      <td className="num" data-label="Rows">
                         {read.rowsReturned === null
                           ? "—"
                           : formatNumber(read.rowsReturned)}

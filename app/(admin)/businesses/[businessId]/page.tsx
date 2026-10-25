@@ -283,7 +283,7 @@ export default async function BusinessPage({
         description={`${CALENDAR_DAYS} Voided sales are left out; returns count on the day they were made.`}
         title="The last 14 days"
       >
-        <DataTable label="Daily totals" minWidth="40rem">
+        <DataTable label="Daily totals" layout="sticky" minWidth="40rem">
           <thead>
             <tr>
               <th scope="col">Day</th>
@@ -296,10 +296,12 @@ export default async function BusinessPage({
           <tbody>
             {summary.days.map((day) => (
               <tr key={day.day}>
-                <td>{formatBusinessDay(day.day)}</td>
-                <td>{formatNumber(day.salesCount)}</td>
+                <td className="whitespace-nowrap">
+                  {formatBusinessDay(day.day)}
+                </td>
+                <td className="num">{formatNumber(day.salesCount)}</td>
                 <td className="money">{formatPesos(day.salesCents)}</td>
-                <td>{formatNumber(day.returnsCount)}</td>
+                <td className="num">{formatNumber(day.returnsCount)}</td>
                 <td className="money">{formatPesos(day.returnsCents)}</td>
               </tr>
             ))}

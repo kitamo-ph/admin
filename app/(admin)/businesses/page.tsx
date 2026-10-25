@@ -93,7 +93,11 @@ export default async function BusinessesPage({
               title="No businesses found"
             />
           ) : (
-            <DataTable label="Business directory" minWidth="60rem">
+            <DataTable
+              label="Business directory"
+              layout="cards"
+              minWidth="60rem"
+            >
               <thead>
                 <tr>
                   <th scope="col">Business</th>
@@ -110,7 +114,7 @@ export default async function BusinessesPage({
               <tbody>
                 {result.data.rows.map((row) => (
                   <tr key={row.businessId}>
-                    <td>
+                    <td data-title="">
                       <Link
                         className="font-semibold underline underline-offset-4"
                         href={`/businesses/${row.businessId}`}
@@ -119,16 +123,28 @@ export default async function BusinessesPage({
                         {row.name}
                       </Link>
                     </td>
-                    <td>{formatBusinessDay(row.createdOn)}</td>
-                    <td>{formatBusinessDay(row.lastSaleDay)}</td>
-                    <td>{formatNumber(row.sales7d)}</td>
-                    <td>{formatNumber(row.stallCount)}</td>
-                    <td>{formatNumber(row.staffCount)}</td>
-                    <td>
+                    <td data-label="Created">
+                      {formatBusinessDay(row.createdOn)}
+                    </td>
+                    <td data-label="Last sale">
+                      {formatBusinessDay(row.lastSaleDay)}
+                    </td>
+                    <td className="num" data-label="Sales, 7 days">
+                      {formatNumber(row.sales7d)}
+                    </td>
+                    <td className="num" data-label="Stalls">
+                      {formatNumber(row.stallCount)}
+                    </td>
+                    <td className="num" data-label="Staff">
+                      {formatNumber(row.staffCount)}
+                    </td>
+                    <td data-label="Apps on">
                       {row.appsOn.length === 0 ? "None" : row.appsOn.join(", ")}
                     </td>
-                    <td>{formatNumber(row.openFlags)}</td>
-                    <td>
+                    <td className="num" data-label="Open flags">
+                      {formatNumber(row.openFlags)}
+                    </td>
+                    <td data-label="State">
                       <Badge
                         tone={row.hidden ? "neutral" : "success"}
                         value={row.hidden ? "hidden" : "live"}

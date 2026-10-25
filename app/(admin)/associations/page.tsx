@@ -72,7 +72,7 @@ export default async function AssociationsPage({
                 title="No associations"
               />
             ) : (
-              <DataTable label="Associations" minWidth="44rem">
+              <DataTable label="Associations" layout="cards" minWidth="44rem">
                 <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -86,7 +86,7 @@ export default async function AssociationsPage({
                 <tbody>
                   {result.data.map((association) => (
                     <tr key={association.associationId}>
-                      <td>
+                      <td data-title="">
                         <Link
                           className="font-semibold underline-offset-4 hover:underline"
                           href={`/associations/${association.associationId}`}
@@ -95,11 +95,19 @@ export default async function AssociationsPage({
                           {association.name}
                         </Link>
                       </td>
-                      <td>{ASSOCIATION_KIND_LABELS[association.kind]}</td>
-                      <td>{titleCase(association.status)}</td>
-                      <td>{formatNumber(association.memberStallCount)}</td>
-                      <td>{formatNumber(association.officerCount)}</td>
-                      <td>
+                      <td data-label="Kind">
+                        {ASSOCIATION_KIND_LABELS[association.kind]}
+                      </td>
+                      <td data-label="Status">
+                        {titleCase(association.status)}
+                      </td>
+                      <td className="num" data-label="Member stalls">
+                        {formatNumber(association.memberStallCount)}
+                      </td>
+                      <td className="num" data-label="Officers">
+                        {formatNumber(association.officerCount)}
+                      </td>
+                      <td data-label="Code rotated">
                         {association.codeRotatedAt
                           ? formatDateTime(association.codeRotatedAt)
                           : "Never"}

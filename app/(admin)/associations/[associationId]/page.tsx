@@ -130,7 +130,7 @@ export default async function AssociationPage({
               title="No officers"
             />
           ) : (
-            <DataTable label="Officers" minWidth="40rem">
+            <DataTable label="Officers" layout="cards" minWidth="40rem">
               <thead>
                 <tr>
                   <th scope="col">Officer</th>
@@ -143,14 +143,16 @@ export default async function AssociationPage({
               <tbody>
                 {association.officers.map((officer) => (
                   <tr key={officer.officerId}>
-                    <td>{officer.label}</td>
-                    <td>{formatDateTime(officer.addedAt)}</td>
-                    <td>
+                    <td data-title="">{officer.label}</td>
+                    <td data-label="Added">
+                      {formatDateTime(officer.addedAt)}
+                    </td>
+                    <td data-label="Accepted">
                       {officer.acceptedAt
                         ? formatDateTime(officer.acceptedAt)
                         : "Not yet"}
                     </td>
-                    <td>
+                    <td data-label="Ended">
                       {officer.endedAt ? formatDateTime(officer.endedAt) : "—"}
                     </td>
                     {canUpdate && live ? (

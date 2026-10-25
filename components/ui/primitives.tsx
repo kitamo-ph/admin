@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { TableScroll } from "@/components/ui/table-scroll";
 import { titleCase } from "@/lib/format";
 
 export function PageHeader({
@@ -290,21 +291,39 @@ export function KeyValueGrid({
   );
 }
 
+const TABLE_LAYOUTS = {
+  scroll: "data-table",
+  /** Below 768 px, each row a card with every field labelled (each cell's data-label; one data-title). */
+  cards: "data-table data-table-cards",
+  /** The first column stays put while the rest scroll. */
+  sticky: "data-table data-table-sticky",
+} as const;
+
+/**
+ * A table that scrolls sideways when it is wider than its panel, with a cue while columns are hidden
+ * (TableScroll). The design pass: "cards" turns each row into a card below 768 px.
+ */
 export function DataTable({
   label,
   children,
   minWidth = "48rem",
+  layout = "scroll",
 }: {
   label: string;
   children: React.ReactNode;
   minWidth?: string;
+  layout?: keyof typeof TABLE_LAYOUTS;
 }) {
   return (
-    <div className="table-scroll">
-      <table className="data-table" aria-label={label} style={{ minWidth }}>
+    <TableScroll>
+      <table
+        aria-label={label}
+        className={TABLE_LAYOUTS[layout]}
+        style={{ minWidth }}
+      >
         {children}
       </table>
-    </div>
+    </TableScroll>
   );
 }
 
