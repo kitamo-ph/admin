@@ -146,8 +146,15 @@ test.describe("KitaMo sign-in", () => {
     }
     const more = tabs.locator("summary");
     await more.click();
-    const sheet = tabs.getByRole("region", { name: "More" });
+    // The pass-2 review: a modal dialog, focus on Close, the page behind inert.
+    const sheet = tabs.getByRole("dialog", { name: "More" });
     await expect(sheet).toBeVisible();
+    await expect(sheet).toHaveAttribute("aria-modal", "true");
+    await expect(sheet.getByRole("button", { name: "Close" })).toBeFocused();
+    await expect(page.locator("main#main-content")).toHaveAttribute(
+      "inert",
+      "",
+    );
     await expect(
       sheet.getByRole("link", { name: "Associations" }),
     ).toBeVisible();
@@ -155,9 +162,13 @@ test.describe("KitaMo sign-in", () => {
     await expect(sheet.getByRole("link", { name: "Terms" })).toBeVisible();
     // The parked mock-first sections are not part of a KitaMo session.
     await expect(sheet.getByRole("link", { name: "Users" })).toHaveCount(0);
-    // Escape closes it; so does Close.
+    // Escape closes it, back to More, and the page is live again; so does Close.
     await page.keyboard.press("Escape");
     await expect(sheet).toBeHidden();
+    await expect(more).toBeFocused();
+    await expect(page.locator("main#main-content")).not.toHaveAttribute(
+      "inert",
+    );
     await more.click();
     await sheet.getByRole("button", { name: "Close" }).click();
     await expect(sheet).toBeHidden();

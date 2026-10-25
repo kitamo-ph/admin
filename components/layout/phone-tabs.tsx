@@ -77,6 +77,34 @@ const rowClass =
   "flex min-h-[3.25rem] items-center gap-3 px-3.5 text-[var(--km-color-text)] hover:bg-[var(--km-color-border)]";
 
 /**
+ * While More is open it is a modal sheet (the lead's pass-2 review; the canvas's role="dialog"): everything
+ * outside it goes inert, from the More tab and the other tabs up through the page to <body>, so Tab and a
+ * screen reader stay in the sheet. The scrim is the sheet's sibling inside <details>, so a tap on it still
+ * closes. Returns what it made inert (only what was not inert already).
+ */
+function inertOutside(details: HTMLElement, more: HTMLElement | null) {
+  const shut: Element[] = [];
+  const mark = (element: Element) => {
+    if (element.hasAttribute("inert")) return;
+    element.setAttribute("inert", "");
+    shut.push(element);
+  };
+  if (more) mark(more);
+  let node: HTMLElement = details;
+  while (node.parentElement && node.parentElement !== document.body) {
+    for (const sibling of node.parentElement.children) {
+      if (sibling !== node) mark(sibling);
+    }
+    node = node.parentElement;
+  }
+  return shut;
+}
+
+function release(shut: Element[]) {
+  for (const element of shut) element.removeAttribute("inert");
+}
+
+/**
  * The design pass (Oct 24, Admin on a phone; KM Bottom Bar, admin variant): below the laptop width, the main
  * sections as a bottom bar (Overview, Businesses, Flags, Access log, whichever this admin may open) and More,
  * a sheet with every other section this admin may open (Associations among them) and Privacy · Terms. Sign out
@@ -84,7 +112,8 @@ const rowClass =
  *
  * More is a <details>, so it opens without JavaScript. The bar persists across navigation, so the sheet closes
  * whenever the page changes, on Escape (back to More), on the Close button and on a tap outside it (the scrim;
- * the lead's review of 84963c8). prefetch is off, as in the sidebar (each prefetch is a Vercel invocation).
+ * the lead's review of 84963c8). Open, it is a modal dialog (the pass-2 review): focus moves to Close and the
+ * page behind is inert. prefetch is off, as in the sidebar (each prefetch is a Vercel invocation).
  */
 export function PhoneTabs({
   tabs,
@@ -96,10 +125,15 @@ export function PhoneTabs({
   const pathname = usePathname();
   const sheet = useRef<HTMLDetailsElement>(null);
   const summary = useRef<HTMLElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const shut = useRef<Element[]>([]);
   const [open, setOpen] = useState(false);
   const moreActive = more.some((item) => isActive(pathname, item.href));
 
+  // The page comes back before anything is focused or the sheet closes.
   const close = () => {
+    release(shut.current);
+    shut.current = [];
     if (sheet.current) sheet.current.open = false;
   };
   const closeToMore = () => {
@@ -109,18 +143,38 @@ export function PhoneTabs({
 
   // A new page closes the sheet: a section link inside it, the browser's back, or a link elsewhere.
   useEffect(() => {
+    release(shut.current);
+    shut.current = [];
     if (sheet.current) sheet.current.open = false;
   }, [pathname]);
 
+  // Open: the rest of the page inert and focus on Close. Escape closes back to More; so does a widening to
+  // the laptop width, where the bar (and with it the sheet) is hidden.
   useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
+    if (!open || sheet.current === null) return;
+    shut.current = inertOutside(sheet.current, summary.current);
+    closeButton.current?.focus();
+    const shutDown = (focusMore: boolean) => {
+      release(shut.current);
+      shut.current = [];
       if (sheet.current) sheet.current.open = false;
-      summary.current?.focus();
+      if (focusMore) summary.current?.focus();
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") shutDown(true);
+    };
+    const laptop = window.matchMedia("(min-width: 1024px)");
+    const onWidth = () => {
+      if (laptop.matches) shutDown(false);
     };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    laptop.addEventListener("change", onWidth);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      laptop.removeEventListener("change", onWidth);
+      release(shut.current);
+      shut.current = [];
+    };
   }, [open]);
 
   return (
@@ -162,16 +216,18 @@ export function PhoneTabs({
               </span>
               More
             </summary>
-            {/* The scrim: a tap outside the sheet closes it. Keyboard users have Escape and Close. */}
+            {/* The scrim: a tap outside the sheet closes it, focus back on More (focus was in the sheet).
+                Keyboard users have Escape and Close. */}
             <div
               aria-hidden="true"
               className="fixed inset-0 z-40 bg-[var(--km-color-overlay)]"
-              onClick={close}
+              onClick={closeToMore}
             />
             <div
               aria-labelledby="phone-more-title"
+              aria-modal="true"
               className="fixed inset-x-0 bottom-0 z-50 flex max-h-[calc(100dvh-4rem)] flex-col gap-3 overflow-y-auto rounded-t-[var(--km-radius-sheet)] bg-[var(--km-color-surface)] px-4 pt-2 pb-[calc(1.75rem+env(safe-area-inset-bottom))] shadow-[var(--km-shadow-2)]"
-              role="region"
+              role="dialog"
             >
               <span
                 aria-hidden="true"
@@ -185,6 +241,7 @@ export function PhoneTabs({
                   aria-label="Close"
                   className="-mr-2 grid size-11 place-items-center rounded-full text-[var(--km-color-text-secondary)]"
                   onClick={closeToMore}
+                  ref={closeButton}
                   type="button"
                 >
                   <span className="grid size-[1.875rem] place-items-center rounded-full bg-[var(--km-color-muted)]">

@@ -17,6 +17,15 @@ describe("the design pass-2 review fixes", () => {
     );
   });
 
+  it("makes More a modal dialog: focus moves in, the page behind is inert", () => {
+    const tabs = read("components/layout/phone-tabs.tsx");
+    expect(tabs).toContain('role="dialog"');
+    expect(tabs).toContain('aria-modal="true"');
+    expect(tabs).toContain('element.setAttribute("inert", "")');
+    expect(tabs).toContain("closeButton.current?.focus()");
+    expect(tabs).not.toContain('role="region"');
+  });
+
   it("gives global-error the read-only line and Privacy · Terms, inline", () => {
     const page = read("app/global-error.tsx");
     expect(page).toContain("{READ_ONLY_LINE}");
