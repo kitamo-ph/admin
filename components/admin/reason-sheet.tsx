@@ -105,25 +105,34 @@ export function ReasonSheet({
       <input name="businessId" type="hidden" value={businessId} />
       <input name="requestId" type="hidden" value={requestId} />
 
+      {/* The design pass (the canvas's reason sheet, approved as drawn): each level a 64 px choice card, its
+          name over its kind; the chosen one with the action edge. The words are the code's. */}
       <fieldset className="grid gap-2">
         <legend className="km-label mb-1">Level</legend>
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-2 sm:grid-cols-2">
           {levels.map((option) => (
             <label
-              className="km-button-secondary km-button-small cursor-pointer has-[:checked]:border-[var(--km-color-action)] has-[:checked]:bg-[var(--km-color-select-soft)]"
+              className="flex min-h-16 cursor-pointer items-start gap-3 rounded-xl border border-[var(--km-color-border-strong)] px-3 py-2.5 has-[:checked]:border-[var(--km-color-action)] has-[:checked]:shadow-[inset_0_0_0_1px_var(--km-color-action)]"
               key={option}
             >
               <input
                 checked={level === option}
-                className="size-4 accent-[var(--km-color-action)]"
+                className="mt-0.5 size-5 shrink-0 accent-[var(--km-color-action)]"
                 name="level"
                 onChange={() => setLevel(option)}
                 type="radio"
                 value={option}
               />
-              {option === "summary"
-                ? "Summary (counts and totals)"
-                : "Records (break-glass)"}
+              <span className="grid">
+                <span className="font-bold">
+                  {option === "summary" ? "Summary" : "Records"}
+                </span>{" "}
+                <span className="text-[0.8125rem] text-[var(--km-color-text-secondary)]">
+                  {option === "summary"
+                    ? "(counts and totals)"
+                    : "(break-glass)"}
+                </span>
+              </span>
             </label>
           ))}
         </div>
@@ -166,10 +175,28 @@ export function ReasonSheet({
           value={reasonText}
         />
       </label>
-      <p className="km-hint" id="sheet-reasonText-count">
-        {length} of at least {REASON_TEXT_MIN} characters. The business sees the
-        reason code and the time, never this text.
-      </p>
+      {/* The canvas's reason-length bar: decoration only; the sentence under it says the count. */}
+      <div className="-mt-3 grid gap-1">
+        <span
+          aria-hidden="true"
+          className="block h-1 overflow-hidden rounded-full bg-[var(--km-color-border-strong)]"
+        >
+          <span
+            className={`block h-full rounded-full ${
+              length >= REASON_TEXT_MIN
+                ? "bg-[var(--km-color-action)]"
+                : "bg-[var(--km-color-control-edge)]"
+            }`}
+            style={{
+              width: `${Math.min(length / REASON_TEXT_MIN, 1) * 100}%`,
+            }}
+          />
+        </span>
+        <p className="km-hint" id="sheet-reasonText-count">
+          {length} of at least {REASON_TEXT_MIN} characters. The business sees
+          the reason code and the time, never this text.
+        </p>
+      </div>
       {errors.reasonText ? (
         <p className="km-error" id="sheet-reasonText-error">
           {errors.reasonText}
@@ -276,8 +303,12 @@ export function ReasonSheet({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-3">
-        <button className="km-button" disabled={pending} type="submit">
+      <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+        <button
+          className="km-button min-h-14 sm:min-h-11"
+          disabled={pending}
+          type="submit"
+        >
           {pending
             ? "Opening…"
             : level === "records"
