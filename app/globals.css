@@ -96,22 +96,29 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-button,
-input,
-select,
-textarea {
-  color: inherit;
-  font: inherit;
+/*
+ * The element resets sit in Tailwind's base layer (the lead's review of 84963c8): unlayered, they beat every
+ * colour and type utility on a link or a button (Tailwind v4's utilities are layered), so a green
+ * "Return to overview" showed dark text on green (2.65:1) and inactive tab labels lost their grey.
+ */
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    color: inherit;
+    font: inherit;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 button,
 a {
   -webkit-tap-highlight-color: transparent;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 ::selection {
