@@ -45,48 +45,70 @@ export function Breadcrumbs({
 }: {
   items: Array<{ label: string; href?: string }>;
 }) {
+  // The lead's pass-2 review (the canvas's single back-crumb): below 640 px only the parent shows, as a 44 px
+  // "‹ Parent" back link, so the trail no longer wraps ("/ Records" alone on a line). The page's own crumb is
+  // its title or eyebrow, and the other levels are the bottom bar's; from 640 px the whole trail shows.
+  const back = items.reduce(
+    (last, item, index) => (item.href ? index : last),
+    -1,
+  );
   return (
     <nav aria-label="Breadcrumb" className="mb-2">
       <ol className="flex flex-wrap items-center gap-x-2 text-[0.9375rem] font-medium text-[var(--km-color-text-secondary)]">
-        {items.map((item, index) => (
-          <li
-            className="flex min-w-0 items-center gap-2"
-            key={`${item.label}-${index}`}
-          >
-            {index > 0 ? <span aria-hidden="true">/</span> : null}
-            {item.href ? (
-              // The design pass (the canvas's back link): a 44 px target in the action colour, a chevron first.
-              <Link
-                className={`inline-flex min-h-11 items-center gap-0.5 rounded-lg pr-2 text-[var(--km-color-action)] hover:underline ${
-                  index === 0 ? "-ml-1.5" : "pl-2"
-                }`}
-                href={item.href}
-                prefetch={false}
-              >
-                {index === 0 ? (
-                  <svg
-                    aria-hidden="true"
-                    fill="none"
-                    height="20"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.25"
-                    viewBox="0 0 24 24"
-                    width="20"
-                  >
-                    <path d="M15 5l-7 7 7 7" />
-                  </svg>
-                ) : null}
-                {item.label}
-              </Link>
-            ) : (
-              <span aria-current="page" className="text-[var(--km-color-text)]">
-                {item.label}
-              </span>
-            )}
-          </li>
-        ))}
+        {items.map((item, index) => {
+          const onPhone = back === -1 || index === back;
+          const chevron = index === 0 || index === back;
+          return (
+            <li
+              className={`${onPhone ? "flex" : "hidden sm:flex"} min-w-0 items-center gap-2`}
+              key={`${item.label}-${index}`}
+            >
+              {index > 0 ? (
+                <span
+                  aria-hidden="true"
+                  className={index === back ? "hidden sm:inline" : ""}
+                >
+                  /
+                </span>
+              ) : null}
+              {item.href ? (
+                // The design pass (the canvas's back link): a 44 px target in the action colour, a chevron first.
+                <Link
+                  className={`inline-flex min-h-11 items-center gap-0.5 rounded-lg pr-2 text-[var(--km-color-action)] hover:underline ${
+                    index === 0 ? "-ml-1.5" : "-ml-1.5 sm:ml-0 sm:pl-2"
+                  }`}
+                  href={item.href}
+                  prefetch={false}
+                >
+                  {chevron ? (
+                    <svg
+                      aria-hidden="true"
+                      className={index === 0 ? "" : "sm:hidden"}
+                      fill="none"
+                      height="20"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2.25"
+                      viewBox="0 0 24 24"
+                      width="20"
+                    >
+                      <path d="M15 5l-7 7 7 7" />
+                    </svg>
+                  ) : null}
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  aria-current="page"
+                  className="text-[var(--km-color-text)]"
+                >
+                  {item.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
