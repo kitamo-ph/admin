@@ -16,4 +16,13 @@ describe("the design pass-2 review fixes", () => {
       "<TableScroll label={label}>",
     );
   });
+
+  it("gives global-error the read-only line and Privacy · Terms, inline", () => {
+    const page = read("app/global-error.tsx");
+    expect(page).toContain("{READ_ONLY_LINE}");
+    expect(page).toContain("href={PRIVACY_URL}");
+    expect(page).toContain("href={TERMS_URL}");
+    // It replaces the root layout, so it relies on no stylesheet class.
+    expect(page).not.toContain("className=");
+  });
 });
