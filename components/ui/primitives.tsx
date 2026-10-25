@@ -297,14 +297,18 @@ export function KeyValueGrid({
 }: {
   items: Array<{ label: string; value: React.ReactNode }>;
 }) {
+  // The design pass (the canvas's facts): two columns of label over value, a rule between the rows.
   return (
-    <dl className="grid grid-cols-1 gap-x-8 gap-y-5 p-5 sm:grid-cols-2 lg:grid-cols-3">
+    <dl className="grid grid-cols-2 gap-x-4 px-5 pt-1 pb-3">
       {items.map((item) => (
-        <div key={item.label}>
-          <dt className="text-xs font-semibold tracking-[0.04em] text-[var(--km-color-text-secondary)] uppercase">
+        <div
+          className="min-w-0 border-t border-[var(--km-color-border)] py-2.5 [&:nth-child(-n+2)]:border-t-0"
+          key={item.label}
+        >
+          <dt className="text-xs font-semibold text-[var(--km-color-text-secondary)]">
             {item.label}
           </dt>
-          <dd className="mt-1.5 min-w-0 font-medium text-[var(--km-color-text)]">
+          <dd className="mt-0.5 min-w-0 text-[0.9375rem] font-semibold break-words text-[var(--km-color-text)]">
             {item.value}
           </dd>
         </div>

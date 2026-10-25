@@ -205,7 +205,7 @@ export default async function BusinessPage({
         </Panel>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <Panel title="Business">
           <KeyValueGrid
             items={[
@@ -243,38 +243,36 @@ export default async function BusinessPage({
           ) : null}
         </Panel>
 
+        {/* The design pass (Adm Site canvas, Summary): each count a row, its label left and its pill right. */}
         <Panel
           description="Counts from each record's own time; a lead for a flag, never proof."
           title="Health"
         >
-          <KeyValueGrid
-            items={[
-              {
-                label: "Stock-use issues, 7 days",
-                value: <HealthCount count={summary.health.stockUseIssues7d} />,
-              },
-              {
-                label: "Ticket issues, 7 days",
-                value: <HealthCount count={summary.health.ticketIssues7d} />,
-              },
-              {
-                label: "Problem reports, 7 days",
-                value: <HealthCount count={summary.health.problemReports7d} />,
-              },
-              {
-                label: "Staff code failures, 1 day",
-                value: (
-                  <HealthCount count={summary.health.staffCodeFailures1d} />
-                ),
-              },
-              {
-                label: "Open correction requests",
-                value: (
-                  <HealthCount count={summary.health.correctionRequestsOpen} />
-                ),
-              },
-            ]}
-          />
+          <ul className="px-5 pb-1">
+            {(
+              [
+                ["Stock-use issues, 7 days", summary.health.stockUseIssues7d],
+                ["Ticket issues, 7 days", summary.health.ticketIssues7d],
+                ["Problem reports, 7 days", summary.health.problemReports7d],
+                [
+                  "Staff code failures, 1 day",
+                  summary.health.staffCodeFailures1d,
+                ],
+                [
+                  "Open correction requests",
+                  summary.health.correctionRequestsOpen,
+                ],
+              ] as const
+            ).map(([label, count]) => (
+              <li
+                className="flex min-h-12 items-center justify-between gap-3 border-t border-[var(--km-color-border)] py-2 text-[0.9375rem] first:border-t-0"
+                key={label}
+              >
+                <span>{label}</span>
+                <HealthCount count={count} />
+              </li>
+            ))}
+          </ul>
         </Panel>
       </div>
 
@@ -309,27 +307,41 @@ export default async function BusinessPage({
         </DataTable>
       </Panel>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid items-start gap-6 xl:grid-cols-2">
         <Panel title="Apps with access">
           {summary.apps.length === 0 ? (
             <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
               No app has access.
             </p>
           ) : (
+            // The design pass: each app a row, its initial, its name, then its scope and since when.
             <ul className="divide-y divide-[var(--km-color-border)]">
               {summary.apps.map((app) => (
                 <li
-                  className="px-5 py-3 text-sm"
+                  className="flex min-h-14 items-center gap-3 px-5 py-2.5"
                   key={`${app.grantee}-${app.scope}`}
                 >
-                  <strong>{app.grantee}</strong> · {app.scope} · since{" "}
-                  {formatDateTime(app.since)}
+                  <span
+                    aria-hidden="true"
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--km-color-muted)] text-sm font-bold"
+                  >
+                    {app.grantee.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="min-w-0">
+                    <strong className="block font-semibold">
+                      {app.grantee}
+                    </strong>
+                    <span className="block text-[0.8125rem] text-[var(--km-color-text-secondary)]">
+                      {app.scope} · since {formatDateTime(app.since)}
+                    </span>
+                  </span>
                 </li>
               ))}
             </ul>
           )}
         </Panel>
 
+        {/* The design pass (the canvas's Flags card): the flags, then "Raise a flag" in the same card. */}
         <Panel
           description="A lead, not proof. Never shown to the business."
           title="Flags"
@@ -355,23 +367,24 @@ export default async function BusinessPage({
               ))}
             </ul>
           )}
+          <div className="border-t border-[var(--km-color-border)] px-5 pt-4 pb-5">
+            <h3 className="mb-3 text-[0.9375rem] font-bold">Raise a flag</h3>
+            <RaiseFlagForm
+              businessId={businessId}
+              healthCounts={healthCounts}
+              requestId={requestId}
+            />
+          </div>
         </Panel>
       </div>
 
-      <Panel className="mt-6 max-w-3xl" title="Raise a flag">
-        <div className="p-5">
-          <RaiseFlagForm
-            businessId={businessId}
-            healthCounts={healthCounts}
-            requestId={requestId}
-          />
-        </div>
-      </Panel>
-
-      <StateBanner tone="info" title="Read-only">
-        Nothing here changes the business. When you are done, close the access
-        from the banner above.
-      </StateBanner>
+      <div className="mt-6">
+        <StateBanner tone="info" title="Read-only">
+          {" "}
+          Nothing here changes the business. When you are done, close the access
+          from the banner above.
+        </StateBanner>
+      </div>
     </div>
   );
 }
