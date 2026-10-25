@@ -58,11 +58,16 @@ export function CreateAssociationForm({ requestId }: { requestId: string }) {
         />
       </label>
       <FieldError message={state.errors?.name} />
+      {/* The design pass (the canvas's Create card): the two kinds as 56 px choice cards side by side;
+          nothing is pre-chosen; the chosen one takes the action edge. */}
       <fieldset className="grid gap-2">
-        <legend className="km-label">Kind</legend>
-        <div className="flex flex-wrap gap-4">
+        <legend className="km-label mb-1">Kind</legend>
+        <div className="grid grid-cols-2 gap-2">
           {associationKindSchema.options.map((kind) => (
-            <label className="flex min-h-11 items-center gap-2" key={kind}>
+            <label
+              className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border border-[var(--km-color-border-strong)] px-3.5 font-semibold has-[:checked]:border-[var(--km-color-action)] has-[:checked]:shadow-[inset_0_0_0_1px_var(--km-color-action)]"
+              key={kind}
+            >
               <input
                 className="size-5 accent-[var(--km-color-action)]"
                 name="kind"
@@ -103,7 +108,11 @@ export function CreateAssociationForm({ requestId }: { requestId: string }) {
       <FieldError message={state.errors?.letterReference} />
       <Alert message={state.message} />
       <div>
-        <button className="km-button" disabled={pending} type="submit">
+        <button
+          className="km-button min-h-14 w-full sm:min-h-11 sm:w-auto"
+          disabled={pending}
+          type="submit"
+        >
           {pending ? "Creating…" : "Create the association"}
         </button>
       </div>
@@ -162,7 +171,11 @@ export function AddOfficerForm({
       <FieldError message={state.errors?.label} />
       <Alert message={state.message} />
       <div>
-        <button className="km-button" disabled={pending} type="submit">
+        <button
+          className="km-button min-h-14 w-full sm:min-h-11 sm:w-auto"
+          disabled={pending}
+          type="submit"
+        >
           {pending ? "Adding…" : "Add the officer"}
         </button>
       </div>
@@ -277,11 +290,8 @@ export function CloseAssociationForm({
       <FieldError message={state.errors?.confirm} />
       <Alert message={state.message} />
       <div>
-        <button
-          className="km-button-secondary"
-          disabled={pending}
-          type="submit"
-        >
+        {/* The canvas: closing reads as destructive (red words on a capsule), never colour alone. */}
+        <button className="km-button-danger" disabled={pending} type="submit">
           {pending ? "Closing…" : "Close the association"}
         </button>
       </div>
