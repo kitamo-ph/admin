@@ -1,7 +1,7 @@
 /*
  * KitaMo tokens v3: the Claude Design pass, new look (2026-10-23).
  * Every v1/v2 name is kept: the code takes the new values with one file swap.
- * v2 is kept as kitamo-tokens-v2.css.
+ * v2 was this file at seller-web 78fa0da (extra/design-w-app).
  *
  * The look: a white page, no boxes around content, hairline rows, filled
  * fields with the label inside, capsule buttons, one green for the main action.
@@ -15,35 +15,35 @@
 
   /* Ground */
   --km-color-page: #ffffff;
-  --km-color-surface: #ffffff; /* sheets, menus, the selected segment */
-  --km-color-muted: #f1f2f4; /* field fill, segmented track, desktop sidebar, pressed rows */
-  --km-color-text: #17181a; /* 17.6:1, 15.5:1 on muted */
-  --km-color-text-secondary: #686b70; /* 5.4:1, 4.7:1 on muted */
-  --km-color-border: #e4e5e8; /* hairline rows, decorative only */
+  --km-color-surface: #ffffff;          /* sheets, menus, the selected segment */
+  --km-color-muted: #f1f2f4;  /* field fill, segmented track, desktop sidebar, pressed rows */
+  --km-color-text: #17181a;  /* 17.6:1, 15.5:1 on muted */
+  --km-color-text-secondary: #686b70;  /* 5.4:1, 4.7:1 on muted */
+  --km-color-border: #e4e5e8;  /* hairline rows, decorative only */
   --km-color-border-strong: #d3d5d9;
-  --km-color-control-edge: #85878c; /* edges that must show (checkbox, hint ring): 3.6:1, 3.2:1 on muted */
+  --km-color-control-edge: #85878c;  /* edges that must show (checkbox, hint ring): 3.6:1, 3.2:1 on muted */
 
   /* The one green: the main action of a screen, back links, the checked box */
-  --km-color-action: #0a7a40; /* white on it 5.4:1; as text 5.4:1, 4.8:1 on muted */
+  --km-color-action: #0a7a40;           /* white on it 5.4:1; as text 5.4:1, 4.8:1 on muted */
   --km-color-action-hover: #086c39;
   --km-color-action-pressed: #075f32;
   --km-color-action-foreground: #ffffff;
-  --km-color-select: #0d4f33; /* a product in the sale; white on it 9.6:1 */
+  --km-color-select: #0d4f33;           /* a product in the sale; white on it 9.6:1 */
   --km-color-select-soft: #e3f3e9;
-  --km-color-segment: #ffffff; /* new: the selected segment, the active sidebar item */
+  --km-color-segment: #ffffff;          /* new: the selected segment, the active sidebar item */
   --km-color-stripe: transparent;
   --km-color-tab-rule: #17181a;
-  --km-color-accent: #e3a008; /* the logo's yellow: the Pilot label */
+  --km-color-accent: #e3a008;           /* the logo's yellow: the Pilot label */
   --km-color-accent-foreground: #2c2100;
-  --km-color-focus: #1a5fd0; /* 5.9:1 */
-  --km-color-success: #17643e; /* 6.6:1 */
-  --km-color-warning: #b25000; /* 5.2:1, always with a word */
+  --km-color-focus: #1a5fd0;  /* 5.9:1 */
+  --km-color-success: #17643e;          /* 6.6:1 */
+  --km-color-warning: #b25000;          /* 5.2:1, always with a word */
   --km-color-warning-ink: #7a3a00;
   --km-color-info: #1a5fd0;
-  --km-color-destructive: #c4122f; /* 6.0:1; white on it 6.0:1 */
+  --km-color-destructive: #c4122f;  /* 6.0:1; white on it 6.0:1 */
   --km-color-destructive-foreground: #ffffff;
   --km-color-disabled: #f1f2f4;
-  --km-color-disabled-foreground: #686b70; /* 4.7:1 on the disabled fill */
+  --km-color-disabled-foreground: #686b70;  /* 4.7:1 on the disabled fill */
   --km-color-trend-bar: #d3d5d9;
   --km-color-info-soft: #e8f1fc;
   --km-color-warning-soft: #fff1e0;
@@ -52,13 +52,13 @@
   --km-color-overlay: rgb(0 0 0 / 0.32);
 
   /* Charts (v3, Insights): one data blue, apart from the green of actions */
-  --km-color-chart: #1f6f9a; /* bars, share of sales: 5.5:1 on page */
-  --km-color-heat-0: #eef1f4; /* busiest hours: the fewest orders */
+  --km-color-chart: #1f6f9a;            /* bars, share of sales: 5.5:1 on page */
+  --km-color-heat-0: #eef1f4;           /* busiest hours: the fewest orders */
   --km-color-heat-1: #d3e4ee;
   --km-color-heat-2: #a9cbe0;
   --km-color-heat-3: #6fa6c9;
   --km-color-heat-4: #2f7cab;
-  --km-color-heat-5: #134c6b; /* the most; darker means more, in light and dark */
+  --km-color-heat-5: #134c6b;           /* the most; darker means more, in light and dark */
 
   --km-status-available-background: #e5f2e9;
   --km-status-available-border: #76a88a;
@@ -84,21 +84,21 @@
   --km-font-weight-extra-bold: 700;
   --km-reading-line-height: 1.7;
   --km-reading-letter-spacing: -0.006em;
-  --km-text-display: 2.5rem; /* 40, 700 */
+  --km-text-display: 2.5rem;            /* 40, 700 */
   --km-leading-display: 1.05;
-  --km-text-title-1: 2rem; /* 32, 700: the page title (34 on desktop) */
+  --km-text-title-1: 2rem;              /* 32, 700: the page title (34 on desktop) */
   --km-leading-title-1: 1.12;
-  --km-text-title-2: 1.25rem; /* 20, 700: sections */
+  --km-text-title-2: 1.25rem;           /* 20, 700: sections */
   --km-leading-title-2: 1.25;
-  --km-text-title-3: 1.0625rem; /* 17, 600: sub-sections, row money, buttons */
+  --km-text-title-3: 1.0625rem;         /* 17, 600: sub-sections, row money, buttons */
   --km-leading-title-3: 1.3;
-  --km-text-body: 1.0625rem; /* 17, 400-500: rows, fields */
+  --km-text-body: 1.0625rem;            /* 17, 400-500: rows, fields */
   --km-leading-body: 1.35;
-  --km-text-callout: 0.9375rem; /* 15, 500-600: segments, sidebar, secondary lines */
+  --km-text-callout: 0.9375rem;         /* 15, 500-600: segments, sidebar, secondary lines */
   --km-leading-callout: 1.35;
-  --km-text-footnote: 0.8125rem; /* 13: table headers, hints */
+  --km-text-footnote: 0.8125rem;        /* 13: table headers, hints */
   --km-leading-footnote: 1.35;
-  --km-text-caption: 0.75rem; /* 12, 500: the label inside a field, bottom-bar labels */
+  --km-text-caption: 0.75rem;           /* 12, 500: the label inside a field, bottom-bar labels */
   --km-leading-caption: 1.2;
   --km-tracking-display: -0.03em;
   --km-tracking-title: -0.022em;
@@ -120,18 +120,18 @@
   --km-page-gutter: clamp(1rem, 4vw, 3.5rem);
   --km-section-space: clamp(1.75rem, 4vw, 2.5rem);
   --km-space-component: clamp(1rem, 2vw, 1.5rem);
-  --km-header-height: 3.25rem; /* 52 */
+  --km-header-height: 3.25rem;          /* 52 */
   --km-tabbar-height: 4rem;
   --km-site-header-height: 4rem;
 
   /* Shape */
-  --km-radius-small: 0.5rem; /* 8: the selected segment */
-  --km-radius-control: 0.625rem; /* 10: fields, the segmented track */
-  --km-radius-surface: 1rem; /* 16: sheets' inner cards, hint callouts */
+  --km-radius-small: 0.5rem;            /* 8: the selected segment */
+  --km-radius-control: 0.625rem;        /* 10: fields, the segmented track */
+  --km-radius-surface: 1rem;            /* 16: sheets' inner cards, hint callouts */
   --km-radius-sheet: 1.25rem;
   --km-radius-status: 999px;
-  --km-radius-button: 999px; /* new: every button is a capsule */
-  --km-control-height: 2.75rem; /* 44 */
+  --km-radius-button: 999px;            /* new: every button is a capsule */
+  --km-control-height: 2.75rem;         /* 44 */
   --km-control-height-checkout: 3.5rem; /* 56: pay, save, sign in */
   --km-border-width: 1px;
   --km-focus-width: 3px;
@@ -159,38 +159,38 @@
   --km-color-page: #0f1011;
   --km-color-surface: #1a1b1d;
   --km-color-muted: #26282b;
-  --km-color-text: #f3f4f5; /* 17.3:1 page, 15.6:1 surface */
-  --km-color-text-secondary: #a0a3a8; /* 7.5:1 page, 6.8:1 surface, 5.9:1 muted */
+  --km-color-text: #f3f4f5;  /* 17.3:1 page, 15.6:1 surface */
+  --km-color-text-secondary: #a0a3a8;  /* 7.5:1 page, 6.8:1 surface, 5.9:1 muted */
   --km-color-border: #2a2c2f;
   --km-color-border-strong: #3a3c40;
-  --km-color-control-edge: #7d8085; /* 4.8:1 page, 4.4:1 surface, 3.7:1 muted */
-  --km-color-action: #3dbb72; /* as text 7.7:1 */
+  --km-color-control-edge: #7d8085;  /* 4.8:1 page, 4.4:1 surface, 3.7:1 muted */
+  --km-color-action: #3dbb72;  /* as text 7.7:1 */
   --km-color-action-hover: #52c784;
   --km-color-action-pressed: #33a866;
-  --km-color-action-foreground: #04170c; /* 7.5:1 on action */
+  --km-color-action-foreground: #04170c;  /* 7.5:1 on action */
   --km-color-select: #63c995;
   --km-color-select-soft: #173a26;
-  --km-color-segment: #4a4c50; /* text on it 7.8:1 */
+  --km-color-segment: #4a4c50;  /* text on it 7.8:1 */
   --km-color-stripe: transparent;
   --km-color-tab-rule: #f3f4f5;
   --km-color-accent: #f2b632;
   --km-color-accent-foreground: #2c2100;
-  --km-color-focus: #6aa5ff; /* 7.6:1 */
-  --km-color-success: #4cc47f; /* 8.3:1 */
-  --km-color-warning: #f0a23a; /* 9.0:1 */
+  --km-color-focus: #6aa5ff;  /* 7.6:1 */
+  --km-color-success: #4cc47f;  /* 8.3:1 */
+  --km-color-warning: #f0a23a;  /* 9.0:1 */
   --km-color-warning-ink: #f7c983;
   --km-color-info: #6aa5ff;
-  --km-color-destructive: #ff7a70; /* 7.5:1 */
-  --km-color-destructive-foreground: #2b0705; /* 7.4:1 on destructive */
+  --km-color-destructive: #ff7a70;  /* 7.5:1 */
+  --km-color-destructive-foreground: #2b0705;  /* 7.4:1 on destructive */
   --km-color-disabled: #26282b;
-  --km-color-disabled-foreground: #9a9da2; /* 5.4:1 */
+  --km-color-disabled-foreground: #9a9da2;  /* 5.4:1 */
   --km-color-trend-bar: #3a3c40;
   --km-color-info-soft: #0b2540;
   --km-color-warning-soft: #36270b;
   --km-color-success-soft: #0f2a1a;
   --km-color-destructive-soft: #3a1212;
   --km-color-overlay: rgb(0 0 0 / 0.6);
-  --km-color-chart: #6cb6e0; /* 8.6:1 on page */
+  --km-color-chart: #6cb6e0;  /* 8.6:1 on page */
   --km-color-heat-0: #cfd5da;
   --km-color-heat-1: #b5ccdb;
   --km-color-heat-2: #8db5cf;
@@ -211,8 +211,7 @@
   --km-status-future-text: #cbb8e8;
   --km-shadow-1: none;
   --km-shadow-2: 0 8px 24px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
-  --km-shadow-3:
-    0 16px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
+  --km-shadow-3: 0 16px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -221,31 +220,31 @@
     --km-color-page: #0f1011;
     --km-color-surface: #1a1b1d;
     --km-color-muted: #26282b;
-    --km-color-text: #f3f4f5; /* 17.3:1 page, 15.6:1 surface */
-    --km-color-text-secondary: #a0a3a8; /* 7.5:1 page, 6.8:1 surface, 5.9:1 muted */
+    --km-color-text: #f3f4f5;  /* 17.3:1 page, 15.6:1 surface */
+    --km-color-text-secondary: #a0a3a8;  /* 7.5:1 page, 6.8:1 surface, 5.9:1 muted */
     --km-color-border: #2a2c2f;
     --km-color-border-strong: #3a3c40;
-    --km-color-control-edge: #7d8085; /* 4.8:1 page, 4.4:1 surface, 3.7:1 muted */
-    --km-color-action: #3dbb72; /* as text 7.7:1 */
+    --km-color-control-edge: #7d8085;  /* 4.8:1 page, 4.4:1 surface, 3.7:1 muted */
+    --km-color-action: #3dbb72;  /* as text 7.7:1 */
     --km-color-action-hover: #52c784;
     --km-color-action-pressed: #33a866;
-    --km-color-action-foreground: #04170c; /* 7.5:1 on action */
+    --km-color-action-foreground: #04170c;  /* 7.5:1 on action */
     --km-color-select: #63c995;
     --km-color-select-soft: #173a26;
-    --km-color-segment: #4a4c50; /* text on it 7.8:1 */
+    --km-color-segment: #4a4c50;  /* text on it 7.8:1 */
     --km-color-stripe: transparent;
     --km-color-tab-rule: #f3f4f5;
     --km-color-accent: #f2b632;
     --km-color-accent-foreground: #2c2100;
-    --km-color-focus: #6aa5ff; /* 7.6:1 */
-    --km-color-success: #4cc47f; /* 8.3:1 */
-    --km-color-warning: #f0a23a; /* 9.0:1 */
+    --km-color-focus: #6aa5ff;  /* 7.6:1 */
+    --km-color-success: #4cc47f;  /* 8.3:1 */
+    --km-color-warning: #f0a23a;  /* 9.0:1 */
     --km-color-warning-ink: #f7c983;
     --km-color-info: #6aa5ff;
-    --km-color-destructive: #ff7a70; /* 7.5:1 */
-    --km-color-destructive-foreground: #2b0705; /* 7.4:1 on destructive */
+    --km-color-destructive: #ff7a70;  /* 7.5:1 */
+    --km-color-destructive-foreground: #2b0705;  /* 7.4:1 on destructive */
     --km-color-disabled: #26282b;
-    --km-color-disabled-foreground: #9a9da2; /* 5.4:1 */
+    --km-color-disabled-foreground: #9a9da2;  /* 5.4:1 */
     --km-color-trend-bar: #3a3c40;
     --km-color-info-soft: #0b2540;
     --km-color-warning-soft: #36270b;
@@ -272,9 +271,7 @@
     --km-status-future-border: #7d69a0;
     --km-status-future-text: #cbb8e8;
     --km-shadow-1: none;
-    --km-shadow-2:
-      0 8px 24px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
-    --km-shadow-3:
-      0 16px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
+    --km-shadow-2: 0 8px 24px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
+    --km-shadow-3: 0 16px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
   }
 }

@@ -5,3 +5,5 @@ package-lock.json
 playwright-report
 test-results
 lib/auth/vendor
+# The shared design tokens: a byte-for-byte copy of seller-web's app/kitamo-tokens.css (edit it only there; tokens-check.sh compares the copies).
+app/kitamo-tokens.css
