@@ -114,6 +114,13 @@ body {
     color: inherit;
     text-decoration: none;
   }
+
+  /* In the base layer too, so a capsule or a round button keeps its shape when focused. */
+  :focus-visible {
+    border-radius: 0.25rem;
+    outline: 3px solid var(--km-color-focus);
+    outline-offset: 2px;
+  }
 }
 
 button,
@@ -126,447 +133,448 @@ a {
   color: var(--km-color-text);
 }
 
-:focus-visible {
-  border-radius: 0.25rem;
-  outline: 3px solid var(--km-color-focus);
-  outline-offset: 2px;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.skip-link {
-  position: fixed;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 100;
-  transform: translateY(-180%);
-  border-radius: 0.5rem;
-  background: var(--paper);
-  padding: 0.65rem 1rem;
-  color: var(--km-color-text);
-  font-weight: 700;
-  box-shadow: var(--shadow-card);
-}
-
-.skip-link:focus {
-  transform: translateY(0);
-}
-
-.admin-page {
-  width: min(100%, 96rem);
-  margin-inline: auto;
-  padding: 1.75rem 2rem 3rem;
-}
-
-.table-scroll {
-  width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-}
-
-.data-table {
-  width: 100%;
-  min-width: 48rem;
-  border-collapse: collapse;
-}
-
-/* Figures line up in their column; text cells keep their own punctuation (tabular-nums on the whole table
-   spaced "Sep 13 , 2026", the lead's review of 84963c8). */
-.data-table .num {
-  font-variant-numeric: lining-nums tabular-nums;
-}
-
-.data-table th {
-  border-bottom: 1px solid var(--line);
-  padding: 0.7rem 0.75rem;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-align: left;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* A long header may take two lines, so a wide table fits the laptop width (the Access log at 1440). */
-.data-table th.wrap {
-  white-space: normal;
-}
-
-.data-table td {
-  border-bottom: 1px solid var(--km-color-border);
-  padding: 0.85rem 0.75rem;
-  vertical-align: middle;
-}
-
-.data-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.data-table tbody tr {
-  transition: background-color 120ms ease;
-}
-
-.data-table tbody tr:hover {
-  background: var(--km-color-muted);
-}
-
-/* The day column stays put while the figures scroll (a phone's daily totals). */
-.data-table-sticky th:first-child,
-.data-table-sticky td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: var(--km-color-surface);
-  box-shadow: inset -1px 0 0 var(--km-color-border);
-}
-
-.data-table-sticky tbody tr:hover td:first-child {
-  background: var(--km-color-muted);
-}
-
 /*
- * The design pass (mkt-adm-02's phone clause, the canvases' phone lists): below 768 px a "cards" table shows
- * each row as a card with EVERY field, labelled. The cell marked data-title leads the card; every other cell
- * shows its column's name (data-label) beside its value. Nothing is dropped and nothing scrolls sideways.
+ * KitaMo's component classes sit in Tailwind's components layer (the design pass, after the lead's review of
+ * 84963c8): unlayered, they beat every utility put beside them (a hint's mt-4, a field's pl-10, a level
+ * chip's has-[:checked] fill), so the utilities never showed.
  */
-@media (max-width: 767px) {
-  .data-table-cards {
-    min-width: 0 !important;
-  }
-
-  .data-table-cards,
-  .data-table-cards tbody {
-    display: block;
-  }
-
-  .data-table-cards thead {
+@layer components {
+  .sr-only {
     position: absolute;
     width: 1px;
     height: 1px;
+    padding: 0;
+    margin: -1px;
     overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
+    border: 0;
   }
 
-  .data-table-cards tbody tr {
-    display: grid;
-    gap: 0.375rem;
+  .skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    transform: translateY(-180%);
+    border-radius: 0.5rem;
+    background: var(--paper);
+    padding: 0.65rem 1rem;
+    color: var(--km-color-text);
+    font-weight: 700;
+    box-shadow: var(--shadow-card);
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+
+  .admin-page {
+    width: min(100%, 96rem);
+    margin-inline: auto;
+    padding: 1.75rem 2rem 3rem;
+  }
+
+  .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .data-table {
+    width: 100%;
+    min-width: 48rem;
+    border-collapse: collapse;
+  }
+
+  /* Figures line up in their column; text cells keep their own punctuation (tabular-nums on the whole table
+     spaced "Sep 13 , 2026", the lead's review of 84963c8). */
+  .data-table .num {
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .data-table th {
+    border-bottom: 1px solid var(--line);
+    padding: 0.7rem 0.75rem;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.055em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* A long header may take two lines, so a wide table fits the laptop width (the Access log at 1440). */
+  .data-table th.wrap {
+    white-space: normal;
+  }
+
+  .data-table td {
     border-bottom: 1px solid var(--km-color-border);
-    padding: 0.875rem 1.25rem;
+    padding: 0.85rem 0.75rem;
+    vertical-align: middle;
   }
 
-  .data-table-cards tbody tr:last-child {
+  .data-table tbody tr:last-child td {
     border-bottom: 0;
   }
 
-  .data-table-cards td {
-    display: block;
-    max-width: none;
-    border: 0;
-    padding: 0;
-    overflow-wrap: anywhere;
+  .data-table tbody tr {
+    transition: background-color 120ms ease;
   }
 
-  .data-table-cards td[data-label] {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    gap: 0.75rem;
-    align-items: baseline;
-    justify-items: start;
+  .data-table tbody tr:hover {
+    background: var(--km-color-muted);
   }
 
-  .data-table-cards td[data-label]::before {
-    content: attr(data-label);
+  /* The day column stays put while the figures scroll (a phone's daily totals). */
+  .data-table-sticky th:first-child,
+  .data-table-sticky td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--km-color-surface);
+    box-shadow: inset -1px 0 0 var(--km-color-border);
+  }
+
+  .data-table-sticky tbody tr:hover td:first-child {
+    background: var(--km-color-muted);
+  }
+
+  /*
+   * The design pass (mkt-adm-02's phone clause, the canvases' phone lists): below 768 px a "cards" table shows
+   * each row as a card with EVERY field, labelled. The cell marked data-title leads the card; every other cell
+   * shows its column's name (data-label) beside its value. Nothing is dropped and nothing scrolls sideways.
+   */
+  @media (max-width: 767px) {
+    .data-table-cards {
+      min-width: 0 !important;
+    }
+
+    .data-table-cards,
+    .data-table-cards tbody {
+      display: block;
+    }
+
+    .data-table-cards thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .data-table-cards tbody tr {
+      display: grid;
+      gap: 0.375rem;
+      border-bottom: 1px solid var(--km-color-border);
+      padding: 0.875rem 1.25rem;
+    }
+
+    .data-table-cards tbody tr:last-child {
+      border-bottom: 0;
+    }
+
+    .data-table-cards td {
+      display: block;
+      max-width: none;
+      border: 0;
+      padding: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .data-table-cards td[data-label] {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 0.75rem;
+      align-items: baseline;
+      justify-items: start;
+    }
+
+    .data-table-cards td[data-label]::before {
+      content: attr(data-label);
+      color: var(--km-color-text-secondary);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      overflow-wrap: normal;
+    }
+
+    .data-table-cards td[data-title] {
+      order: -1;
+      font-size: 1.0625rem;
+      font-weight: 600;
+    }
+  }
+
+  .control {
+    min-height: var(--km-control-height);
+    border: 1px solid var(--km-color-control-edge);
+    border-radius: var(--km-radius-control);
+    background: var(--km-color-surface);
+    padding: 0.55rem 0.75rem;
+    transition:
+      border-color 120ms ease,
+      box-shadow 120ms ease;
+  }
+
+  .control:hover {
+    border-color: var(--km-color-text-secondary);
+  }
+
+  .control:focus {
+    border-color: var(--km-color-focus);
+    box-shadow: 0 0 0 3px rgb(29 78 216 / 18%);
+    outline: none;
+  }
+
+  .control::placeholder {
     color: var(--km-color-text-secondary);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    overflow-wrap: normal;
   }
 
-  .data-table-cards td[data-title] {
-    order: -1;
-    font-size: 1.0625rem;
+  .skeleton {
+    animation: shimmer 1.5s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      var(--km-color-muted) 25%,
+      var(--km-color-surface) 50%,
+      var(--km-color-muted) 75%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* -- KitaMo header (Operations' .top, align/kitamo-feel @ 2daaf50) -------- */
+
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: center;
+    min-height: 4rem;
+    padding: 10px 2rem;
+    border-bottom: 1px solid var(--km-color-border);
+    background: var(--km-color-page);
+  }
+
+  .top p {
+    margin: 0;
+    color: var(--km-color-text-secondary);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--km-color-text);
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .brand img {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* -- R16 controls: 44 px targets, KitaMo's action colour ------------------ */
+
+  .km-button,
+  .km-button-secondary,
+  .km-button-danger {
+    display: inline-flex;
+    min-height: var(--km-control-height);
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid transparent;
+    /* Design system v3 (ds-05): every button is a capsule. */
+    border-radius: var(--km-radius-button);
+    padding: 0.55rem 1.125rem;
+    font-weight: 650;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .km-button {
+    background: var(--km-color-action);
+    color: var(--km-color-action-foreground);
+  }
+
+  .km-button:hover {
+    background: var(--km-color-action-hover);
+  }
+
+  .km-button:active {
+    background: var(--km-color-action-pressed);
+  }
+
+  .km-button-secondary {
+    border-color: var(--km-color-control-edge);
+    background: var(--km-color-surface);
+    color: var(--km-color-text);
+  }
+
+  .km-button-secondary:hover {
+    background: var(--km-color-muted);
+  }
+
+  .km-button-danger {
+    border-color: var(--km-color-destructive);
+    background: var(--km-color-surface);
+    color: var(--km-color-destructive);
+  }
+
+  .km-button-danger:hover {
+    background: var(--km-color-destructive-soft);
+  }
+
+  .km-button-small {
+    min-height: var(--km-control-height);
+    padding: 0.35rem 0.85rem;
+    font-size: 0.875rem;
+  }
+
+  .km-button:disabled,
+  .km-button-secondary:disabled,
+  .km-button-danger:disabled {
+    border-color: transparent;
+    background: var(--km-color-disabled);
+    color: var(--km-color-disabled-foreground);
+    cursor: not-allowed;
+  }
+
+  .km-label {
+    display: grid;
+    gap: 0.375rem;
+    color: var(--km-color-text);
+    font-size: 0.875rem;
+    font-weight: 650;
+  }
+
+  .km-input {
+    width: 100%;
+    font-weight: 400;
+  }
+
+  textarea.km-input {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  .km-hint {
+    margin: 0;
+    color: var(--km-color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .km-error {
+    margin: 0;
+    color: var(--km-color-destructive);
+    font-size: 0.875rem;
     font-weight: 600;
   }
-}
 
-.control {
-  min-height: var(--km-control-height);
-  border: 1px solid var(--km-color-control-edge);
-  border-radius: var(--km-radius-control);
-  background: var(--km-color-surface);
-  padding: 0.55rem 0.75rem;
-  transition:
-    border-color 120ms ease,
-    box-shadow 120ms ease;
-}
+  .km-alert,
+  .km-notice {
+    margin: 0;
+    border: 1px solid var(--km-color-border);
+    border-radius: var(--km-radius-surface);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
 
-.control:hover {
-  border-color: var(--km-color-text-secondary);
-}
+  .km-alert {
+    border-color: var(--km-color-destructive);
+    background: var(--km-color-destructive-soft);
+    color: var(--km-color-destructive);
+    font-weight: 600;
+  }
 
-.control:focus {
-  border-color: var(--km-color-focus);
-  box-shadow: 0 0 0 3px rgb(29 78 216 / 18%);
-  outline: none;
-}
+  .km-notice {
+    background: var(--km-color-info-soft);
+    color: var(--km-color-text);
+  }
 
-.control::placeholder {
-  color: var(--km-color-text-secondary);
-}
+  .km-steps {
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style: decimal;
+  }
 
-.skeleton {
-  animation: shimmer 1.5s ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    var(--km-color-muted) 25%,
-    var(--km-color-surface) 50%,
-    var(--km-color-muted) 75%
-  );
-  background-size: 200% 100%;
+  .km-qr {
+    width: 12rem;
+    height: 12rem;
+    border: 1px solid var(--km-color-border);
+    border-radius: var(--km-radius-surface);
+    background: #ffffff;
+    padding: 0.5rem;
+  }
+
+  /* -- The 30-minute access banner ------------------------------------------- */
+
+  .km-banner-stack {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem 2rem 0;
+  }
+
+  .km-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    border: 1px solid var(--km-color-accent);
+    border-radius: var(--km-radius-surface);
+    background: var(--km-color-warning-soft);
+    padding: 0.5rem 0.875rem;
+    color: var(--km-color-warning-ink);
+  }
+
+  .km-banner p {
+    margin: 0;
+  }
+
+  .km-banner-ended {
+    border-color: var(--km-color-destructive);
+    background: var(--km-color-destructive-soft);
+    color: var(--km-color-destructive);
+  }
+
+  .km-lead {
+    display: inline-flex;
+    border-radius: var(--km-radius-status);
+    background: var(--km-color-muted);
+    padding: 0.125rem 0.5rem;
+    color: var(--km-color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+
+  .money {
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1;
+  }
+
+  @media (max-width: 767px) {
+    .top,
+    .km-banner-stack {
+      padding-inline: 1rem;
+    }
+
+    .admin-page {
+      padding: 1.25rem 1rem 2.5rem;
+    }
+  }
 }
 
 @keyframes shimmer {
   to {
     background-position-x: -200%;
-  }
-}
-
-/* -- KitaMo header (Operations' .top, align/kitamo-feel @ 2daaf50) -------- */
-
-.top {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  align-items: center;
-  min-height: 4rem;
-  padding: 10px 2rem;
-  border-bottom: 1px solid var(--km-color-border);
-  background: var(--km-color-page);
-}
-
-.top p {
-  margin: 0;
-  color: var(--km-color-text-secondary);
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  color: var(--km-color-text);
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.brand img {
-  width: 30px;
-  height: 30px;
-}
-
-/* -- R16 controls: 44 px targets, KitaMo's action colour ------------------ */
-
-.km-button,
-.km-button-secondary,
-.km-button-danger {
-  display: inline-flex;
-  min-height: var(--km-control-height);
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 1px solid transparent;
-  /* Design system v3 (ds-05): every button is a capsule. */
-  border-radius: var(--km-radius-button);
-  padding: 0.55rem 1.125rem;
-  font-weight: 650;
-  text-align: center;
-  cursor: pointer;
-}
-
-.km-button {
-  background: var(--km-color-action);
-  color: var(--km-color-action-foreground);
-}
-
-.km-button:hover {
-  background: var(--km-color-action-hover);
-}
-
-.km-button:active {
-  background: var(--km-color-action-pressed);
-}
-
-.km-button-secondary {
-  border-color: var(--km-color-control-edge);
-  background: var(--km-color-surface);
-  color: var(--km-color-text);
-}
-
-.km-button-secondary:hover {
-  background: var(--km-color-muted);
-}
-
-.km-button-danger {
-  border-color: var(--km-color-destructive);
-  background: var(--km-color-surface);
-  color: var(--km-color-destructive);
-}
-
-.km-button-danger:hover {
-  background: var(--km-color-destructive-soft);
-}
-
-.km-button-small {
-  min-height: var(--km-control-height);
-  padding: 0.35rem 0.85rem;
-  font-size: 0.875rem;
-}
-
-.km-button:disabled,
-.km-button-secondary:disabled,
-.km-button-danger:disabled {
-  border-color: transparent;
-  background: var(--km-color-disabled);
-  color: var(--km-color-disabled-foreground);
-  cursor: not-allowed;
-}
-
-.km-label {
-  display: grid;
-  gap: 0.375rem;
-  color: var(--km-color-text);
-  font-size: 0.875rem;
-  font-weight: 650;
-}
-
-.km-input {
-  width: 100%;
-  font-weight: 400;
-}
-
-textarea.km-input {
-  min-height: 6rem;
-  resize: vertical;
-}
-
-.km-hint {
-  margin: 0;
-  color: var(--km-color-text-secondary);
-  font-size: 0.875rem;
-}
-
-.km-error {
-  margin: 0;
-  color: var(--km-color-destructive);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.km-alert,
-.km-notice {
-  margin: 0;
-  border: 1px solid var(--km-color-border);
-  border-radius: var(--km-radius-surface);
-  padding: 0.75rem 0.875rem;
-  font-size: 0.875rem;
-}
-
-.km-alert {
-  border-color: var(--km-color-destructive);
-  background: var(--km-color-destructive-soft);
-  color: var(--km-color-destructive);
-  font-weight: 600;
-}
-
-.km-notice {
-  background: var(--km-color-info-soft);
-  color: var(--km-color-text);
-}
-
-.km-steps {
-  margin: 0;
-  padding-left: 1.25rem;
-  list-style: decimal;
-}
-
-.km-qr {
-  width: 12rem;
-  height: 12rem;
-  border: 1px solid var(--km-color-border);
-  border-radius: var(--km-radius-surface);
-  background: #ffffff;
-  padding: 0.5rem;
-}
-
-/* -- The 30-minute access banner ------------------------------------------- */
-
-.km-banner-stack {
-  display: grid;
-  gap: 0.5rem;
-  padding: 0.75rem 2rem 0;
-}
-
-.km-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  border: 1px solid var(--km-color-accent);
-  border-radius: var(--km-radius-surface);
-  background: var(--km-color-warning-soft);
-  padding: 0.5rem 0.875rem;
-  color: var(--km-color-warning-ink);
-}
-
-.km-banner p {
-  margin: 0;
-}
-
-.km-banner-ended {
-  border-color: var(--km-color-destructive);
-  background: var(--km-color-destructive-soft);
-  color: var(--km-color-destructive);
-}
-
-.km-lead {
-  display: inline-flex;
-  border-radius: var(--km-radius-status);
-  background: var(--km-color-muted);
-  padding: 0.125rem 0.5rem;
-  color: var(--km-color-text-secondary);
-  font-size: 0.75rem;
-  font-weight: 650;
-}
-
-.money {
-  font-variant-numeric: lining-nums tabular-nums;
-  font-feature-settings: "lnum" 1;
-}
-
-@media (max-width: 767px) {
-  .top,
-  .km-banner-stack {
-    padding-inline: 1rem;
-  }
-
-  .admin-page {
-    padding: 1.25rem 1rem 2.5rem;
   }
 }
 

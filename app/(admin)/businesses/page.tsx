@@ -51,27 +51,45 @@ export default async function BusinessesPage({
         number of rows. It shows no money, email or customer data.
       </StateBanner>
 
+      {/* The design pass (Adm Site canvas, Businesses): one search field with its icon and the Search capsule,
+          no box around them. "Business name" stays a persistent label, the field 52 px (mkt-adm-12). */}
       <form
-        className="mb-5 flex flex-wrap items-end gap-3 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-4"
+        className="mb-6 flex max-w-[35rem] flex-wrap items-end gap-3"
         method="get"
         role="search"
       >
-        <label className="km-label min-w-60 flex-1">
+        <label className="km-label min-w-56 flex-1">
           Business name
-          <input
-            className="control km-input"
-            defaultValue={search}
-            maxLength={60}
-            name="q"
-            type="search"
-          />
+          <span className="relative block">
+            <svg
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--km-color-text-secondary)]"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="20"
+            >
+              <path d="M10.5 18a7.5 7.5 0 1 0 0-15 7.5 7.5 0 0 0 0 15zM16 16l5 5" />
+            </svg>
+            <input
+              className="control km-input min-h-[3.25rem] pl-10"
+              defaultValue={search}
+              maxLength={60}
+              name="q"
+              type="search"
+            />
+          </span>
         </label>
-        <button className="km-button" type="submit">
+        <button className="km-button min-h-[3.25rem]" type="submit">
           Search
         </button>
         {search ? (
           <Link
-            className="km-button-secondary"
+            className="km-button-secondary min-h-[3.25rem]"
             href="/businesses"
             prefetch={false}
           >
