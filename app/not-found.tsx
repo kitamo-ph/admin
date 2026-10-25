@@ -15,6 +15,11 @@ export default function NotFound() {
       readOnlyLine
       title="That admin view does not exist"
     >
+      {/* The lead (Oct 25, rule 1): the code stays, as small text, so support can tell which page someone hit (it
+          was the "404" tile before the pass-2 relayout). "Error 404": new, for the owner. */}
+      <p className="mb-4 text-xs font-semibold tracking-[0.12em] text-[var(--km-color-text-secondary)] uppercase">
+        Error 404
+      </p>
       <Link
         className="km-button min-h-14 w-full"
         href="/overview"

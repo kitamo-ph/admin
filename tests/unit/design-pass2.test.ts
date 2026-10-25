@@ -35,3 +35,12 @@ describe("the design pass-2 review fixes", () => {
     expect(page).not.toContain("className=");
   });
 });
+
+describe("the root 404 keeps its code (the lead, Oct 25, rule 1)", () => {
+  it('shows "Error 404" as small text, so support can tell which page someone hit', () => {
+    expect(readFileSync("app/not-found.tsx", "utf8")).toContain("Error 404");
+    expect(readFileSync("app/error.tsx", "utf8")).toContain(
+      'eyebrow="Something went wrong"',
+    );
+  });
+});
