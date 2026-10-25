@@ -212,10 +212,11 @@ a {
     border-collapse: collapse;
   }
 
-  /* Figures line up in their column; text cells keep their own punctuation (tabular-nums on the whole table
-     spaced "Sep 13 , 2026", the lead's review of 84963c8). */
+  /* Lining figures only, never tabular (the v2 token note; the lead's reviews): Schibsted Grotesk's tabular
+     set makes the comma and the period as wide as a digit, so tnum spaced "Sep 13 , 2026" (84963c8, when it
+     was on the whole table) and still spaced "₱2 , 830 . 50" and "1 , 204" on these cells (pass 2). */
   .data-table .num {
-    font-variant-numeric: lining-nums tabular-nums;
+    font-variant-numeric: lining-nums;
   }
 
   .data-table th {
@@ -321,11 +322,13 @@ a {
       justify-items: start;
     }
 
+    /* A label is words, never figures: no numeric features from its cell ("Sales , 7 days", pass 2). */
     .data-table-cards td[data-label]::before {
       content: attr(data-label);
       color: var(--km-color-text-secondary);
       font-size: 0.8125rem;
       font-weight: 600;
+      font-variant-numeric: normal;
       overflow-wrap: normal;
     }
 
@@ -689,8 +692,9 @@ a {
     font-weight: 650;
   }
 
+  /* Lining, not tabular (see .data-table .num): "₱2,830.50", not "₱2 , 830 . 50". */
   .money {
-    font-variant-numeric: lining-nums tabular-nums;
+    font-variant-numeric: lining-nums;
     font-feature-settings: "lnum" 1;
   }
 
