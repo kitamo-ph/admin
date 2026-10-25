@@ -19,46 +19,48 @@
 
   /* Ground. Hierarchy comes from white surfaces on a near-white page, hairline
      rules and type weight. A soft shadow only where something floats. */
-  --km-color-page: #f5f5f2;             /* near-white; v1 #f7f6f2 read beige */
-  --km-color-surface: #ffffff;          /* header, bottom bar, cards, inputs, tiles */
-  --km-color-muted: #efefea;            /* hover/pressed fill, open cart line, skeletons */
-  --km-color-text: #161a17;             /* 16.1:1, 17.6:1 on white */
-  --km-color-text-secondary: #545b55;   /* 6.4:1, 7.0:1 on white, 6.1:1 on muted */
-  --km-color-border: #e3e3de;           /* decorative hairline rules ONLY */
-  --km-color-border-strong: #cfcfc8;    /* decorative: the totals' double rule */
+  --km-color-page: #f5f5f2; /* near-white; v1 #f7f6f2 read beige */
+  --km-color-surface: #ffffff; /* header, bottom bar, cards, inputs, tiles */
+  --km-color-muted: #efefea; /* hover/pressed fill, open cart line, skeletons */
+  --km-color-text: #161a17; /* 16.1:1, 17.6:1 on white */
+  --km-color-text-secondary: #545b55; /* 6.4:1, 7.0:1 on white, 6.1:1 on muted */
+  --km-color-border: #e3e3de; /* decorative hairline rules ONLY */
+  --km-color-border-strong: #cfcfc8; /* decorative: the totals' double rule */
   /* Every interactive edge (inputs, search, chips, segmented control, stall
      picker, shelf tiles, secondary buttons) needs 3:1 against what it sits on
      (WCAG 1.4.11): 3.5:1 on the page, 3.8:1 on white, 3.3:1 on muted. */
   --km-color-control-edge: #858379;
 
   /* The one green: the main action of a screen, and links. */
-  --km-color-action: #006b3c;           /* white on it 6.6:1; as text 6.1:1 */
+  --km-color-action: #006b3c; /* white on it 6.6:1; as text 6.1:1 */
   --km-color-action-hover: #005a32;
   --km-color-action-pressed: #004e2c;
   --km-color-action-foreground: #ffffff;
-  --km-color-select: #0d4f33;           /* a product in the sale; foreground on it 9.6:1 */
-  --km-color-select-soft: #e1efe6;      /* in-sale tile fill, the active nav capsule */
+  --km-color-select: #0d4f33; /* a product in the sale; foreground on it 9.6:1 */
+  --km-color-select-soft: #e1efe6; /* in-sale tile fill, the active nav capsule */
   /* A business's Your look (lib/brand/theme.ts) sets these two on the shell's
      wrapper with its main colour; KitaMo's own look has no stripe. */
   --km-color-stripe: transparent;
   --km-color-tab-rule: #161a17;
-  --km-color-accent: #e3a008;           /* the logo's yellow: selection, the Pilot label */
-  --km-color-accent-foreground: #2c2100;/* 7.0:1 on accent */
-  --km-color-focus: #1d4ed8;            /* the focus ring, 6.1:1 */
-  --km-color-success: #17643e;          /* 6.6:1 */
-  --km-color-warning: #8a5a00;          /* 5.4:1, always with a word */
-  --km-color-warning-ink: #6d4100;      /* on warning-soft, 7.3:1 */
-  --km-color-info: #185b84;             /* 6.7:1 */
-  --km-color-destructive: #a5322a;      /* 6.2:1 */
+  --km-color-accent: #e3a008; /* the logo's yellow: selection, the Pilot label */
+  --km-color-accent-foreground: #2c2100; /* 7.0:1 on accent */
+  --km-color-focus: #1d4ed8; /* the focus ring, 6.1:1 */
+  --km-color-success: #17643e; /* 6.6:1 */
+  --km-color-warning: #8a5a00; /* 5.4:1, always with a word */
+  --km-color-warning-ink: #6d4100; /* on warning-soft, 7.3:1 */
+  --km-color-info: #185b84; /* 6.7:1 */
+  --km-color-destructive: #a5322a; /* 6.2:1 */
   --km-color-destructive-foreground: #ffffff; /* new: on a destructive fill (badges), 6.8:1 */
   --km-color-disabled: #e6e6e1;
-  --km-color-disabled-foreground: #5f5c55;  /* 5.3:1 on the disabled fill */
-  --km-color-trend-bar: #c6c8bd;        /* past bars in charts, decorative */
+  --km-color-disabled-foreground: #5f5c55; /* 5.3:1 on the disabled fill */
+  --km-color-trend-bar: #c6c8bd; /* past bars in charts, decorative */
   --km-color-info-soft: #e7f1f6;
   --km-color-warning-soft: #fde8c8;
   --km-color-success-soft: #e5f2e9;
   --km-color-destructive-soft: #fbe9e7;
-  --km-color-overlay: rgb(22 26 23 / 0.4);  /* new: the scrim under sheets and dialogs */
+  --km-color-overlay: rgb(
+    22 26 23 / 0.4
+  ); /* new: the scrim under sheets and dialogs */
 
   --km-status-available-background: #e5f2e9;
   --km-status-available-border: #76a88a;
@@ -83,39 +85,39 @@
   --km-font-weight-medium: 600;
   --km-font-weight-bold: 700;
   --km-font-weight-extra-bold: 800;
-  --km-reading-line-height: 1.7;        /* long reading: the legal pages */
+  --km-reading-line-height: 1.7; /* long reading: the legal pages */
   --km-reading-letter-spacing: -0.006em;
   /* new: the scale. Size, then line height. Weights are in the comments. */
-  --km-text-display: 2.5rem;            /* 40px, 800, -0.03em: the figure that answers the page */
+  --km-text-display: 2.5rem; /* 40px, 800, -0.03em: the figure that answers the page */
   --km-leading-display: 1.05;
-  --km-text-title-1: 1.75rem;           /* 28px, 800, -0.02em: page titles on the sites, sign-in */
+  --km-text-title-1: 1.75rem; /* 28px, 800, -0.02em: page titles on the sites, sign-in */
   --km-leading-title-1: 1.15;
-  --km-text-title-2: 1.375rem;          /* 22px, 750, -0.015em: sheets, sections, empty and error */
+  --km-text-title-2: 1.375rem; /* 22px, 750, -0.015em: sheets, sections, empty and error */
   --km-leading-title-2: 1.2;
-  --km-text-title-3: 1.0625rem;         /* 17px, 700: header title, card titles, 56px buttons, row money */
+  --km-text-title-3: 1.0625rem; /* 17px, 700: header title, card titles, 56px buttons, row money */
   --km-leading-title-3: 1.3;
-  --km-text-body: 1rem;                 /* 16px, 400-600: body, rows, inputs (16 stops phone zoom) */
+  --km-text-body: 1rem; /* 16px, 400-600: body, rows, inputs (16 stops phone zoom) */
   --km-leading-body: 1.45;
-  --km-text-callout: 0.90625rem;        /* 14.5px, 560 / 700 chosen: nav, segments, chips, labels */
+  --km-text-callout: 0.90625rem; /* 14.5px, 560 / 700 chosen: nav, segments, chips, labels */
   --km-leading-callout: 1.35;
-  --km-text-footnote: 0.8125rem;        /* 13px, 500: hints, stock left, times */
+  --km-text-footnote: 0.8125rem; /* 13px, 500: hints, stock left, times */
   --km-leading-footnote: 1.35;
-  --km-text-caption: 0.75rem;           /* 12px, 600-700: bottom-bar labels, badges */
+  --km-text-caption: 0.75rem; /* 12px, 600-700: bottom-bar labels, badges */
   --km-leading-caption: 1.2;
   --km-tracking-display: -0.03em;
   --km-tracking-title: -0.015em;
 
   /* Space. new: a 4px scale for everything inside a screen. */
-  --km-space-1: 0.25rem;                /* 4 */
-  --km-space-2: 0.5rem;                 /* 8 */
-  --km-space-3: 0.75rem;                /* 12 */
-  --km-space-4: 1rem;                   /* 16: phone and kiosk gutter */
-  --km-space-5: 1.25rem;                /* 20: card padding */
-  --km-space-6: 1.5rem;                 /* 24 */
-  --km-space-8: 2rem;                   /* 32: desktop gutter */
-  --km-space-10: 2.5rem;                /* 40 */
-  --km-space-12: 3rem;                  /* 48 */
-  --km-space-16: 4rem;                  /* 64 */
+  --km-space-1: 0.25rem; /* 4 */
+  --km-space-2: 0.5rem; /* 8 */
+  --km-space-3: 0.75rem; /* 12 */
+  --km-space-4: 1rem; /* 16: phone and kiosk gutter */
+  --km-space-5: 1.25rem; /* 20: card padding */
+  --km-space-6: 1.5rem; /* 24 */
+  --km-space-8: 2rem; /* 32: desktop gutter */
+  --km-space-10: 2.5rem; /* 40 */
+  --km-space-12: 3rem; /* 48 */
+  --km-space-16: 4rem; /* 64 */
   --km-width-reading: 44rem;
   --km-width-content: 72rem;
   --km-width-wide: 82rem;
@@ -123,39 +125,40 @@
   --km-section-space: clamp(3.5rem, 9vw, 7.5rem);
   --km-space-component: clamp(1rem, 2vw, 1.5rem);
   /* new: the frame. The app budgets its height exactly (853 x 477: 56 + 421). */
-  --km-header-height: 3.5rem;           /* 56 incl. the 1px rule: app, phone and kiosk */
-  --km-tabbar-height: 4rem;             /* 64 + the safe area: the phone's bottom bar */
-  --km-site-header-height: 4rem;        /* 64: the sites at 1024px and up */
+  --km-header-height: 3.5rem; /* 56 incl. the 1px rule: app, phone and kiosk */
+  --km-tabbar-height: 4rem; /* 64 + the safe area: the phone's bottom bar */
+  --km-site-header-height: 4rem; /* 64: the sites at 1024px and up */
 
   /* Shape. */
-  --km-radius-small: 0.5rem;            /* new, 8px: skeleton bars, swatches, small tiles */
-  --km-radius-control: 0.75rem;         /* 12px (v1 10): controls and buttons */
-  --km-radius-surface: 1rem;            /* 16px (v1 14): cards, shelf tiles, dialogs */
-  --km-radius-sheet: 1.25rem;           /* new, 20px: a sheet's top corners */
-  --km-radius-status: 999px;            /* pills: chips, badges, the nav capsule */
-  --km-control-height: 2.75rem;         /* 44px floor everywhere */
+  --km-radius-small: 0.5rem; /* new, 8px: skeleton bars, swatches, small tiles */
+  --km-radius-control: 0.75rem; /* 12px (v1 10): controls and buttons */
+  --km-radius-surface: 1rem; /* 16px (v1 14): cards, shelf tiles, dialogs */
+  --km-radius-sheet: 1.25rem; /* new, 20px: a sheet's top corners */
+  --km-radius-status: 999px; /* pills: chips, badges, the nav capsule */
+  --km-control-height: 2.75rem; /* 44px floor everywhere */
   --km-control-height-checkout: 3.5rem; /* 56px: pay, save, sign in, the sell loop */
   --km-border-width: 1px;
-  --km-focus-width: 3px;                /* new: the ring, outside the control */
-  --km-focus-offset: 2px;               /* new */
+  --km-focus-width: 3px; /* new: the ring, outside the control */
+  --km-focus-offset: 2px; /* new */
 
   /* new: elevation. Two small blurs at most: cheap on the 2 GB tablet. Shelf
      tiles and list rows never take a shadow; cards take level 1, things that
      float (menus, the stall list, toasts) level 2, sheets and dialogs level 3. */
   --km-shadow-1: 0 1px 2px rgb(22 26 23 / 0.05), 0 1px 1px rgb(22 26 23 / 0.03);
-  --km-shadow-2: 0 4px 14px rgb(22 26 23 / 0.10), 0 1px 3px rgb(22 26 23 / 0.06);
-  --km-shadow-3: 0 12px 32px rgb(22 26 23 / 0.16), 0 2px 6px rgb(22 26 23 / 0.08);
+  --km-shadow-2: 0 4px 14px rgb(22 26 23 / 0.1), 0 1px 3px rgb(22 26 23 / 0.06);
+  --km-shadow-3:
+    0 12px 32px rgb(22 26 23 / 0.16), 0 2px 6px rgb(22 26 23 / 0.08);
 
   /* Motion. CSS only, nothing over 240ms, never in the way of a sale. All of
      it goes under prefers-reduced-motion (globals.css). */
   --km-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --km-duration-press: 90ms;
-  --km-duration-fast: 120ms;            /* "quick": colour and border changes */
-  --km-duration-standard: 200ms;        /* "pop" */
-  --km-duration-sheet: 150ms;           /* "sheet-in": tooltips, disclosures */
+  --km-duration-fast: 120ms; /* "quick": colour and border changes */
+  --km-duration-standard: 200ms; /* "pop" */
+  --km-duration-sheet: 150ms; /* "sheet-in": tooltips, disclosures */
   --km-duration-chevron: 180ms;
   --km-duration-settle: 220ms;
-  --km-duration-loop: 900ms;            /* the nav-pending line */
+  --km-duration-loop: 900ms; /* the nav-pending line */
 }
 
 /* Dark. Same names; every pair re-checked for AA. Surfaces get lighter as they
@@ -168,30 +171,30 @@
   --km-color-page: #0e100f;
   --km-color-surface: #181a19;
   --km-color-muted: #232624;
-  --km-color-text: #f1f2ef;             /* 17.0:1, 15.6:1 on surface */
-  --km-color-text-secondary: #a3aaa4;   /* 8.0:1, 7.4:1 on surface, 6.4:1 on muted */
+  --km-color-text: #f1f2ef; /* 17.0:1, 15.6:1 on surface */
+  --km-color-text-secondary: #a3aaa4; /* 8.0:1, 7.4:1 on surface, 6.4:1 on muted */
   --km-color-border: #2c302d;
   --km-color-border-strong: #3b403c;
-  --km-color-control-edge: #767d77;     /* 4.5:1 page, 4.1:1 surface, 3.6:1 muted */
-  --km-color-action: #3fb57a;           /* as text 7.4:1 */
+  --km-color-control-edge: #767d77; /* 4.5:1 page, 4.1:1 surface, 3.6:1 muted */
+  --km-color-action: #3fb57a; /* as text 7.4:1 */
   --km-color-action-hover: #55c28b;
   --km-color-action-pressed: #33a06a;
-  --km-color-action-foreground: #04170c;/* 7.2:1 on action */
-  --km-color-select: #63c995;           /* foreground on it 9.1:1 */
+  --km-color-action-foreground: #04170c; /* 7.2:1 on action */
+  --km-color-select: #63c995; /* foreground on it 9.1:1 */
   --km-color-select-soft: #183626;
   --km-color-stripe: transparent;
   --km-color-tab-rule: #f1f2ef;
   --km-color-accent: #f2b632;
-  --km-color-accent-foreground: #2c2100;/* 8.7:1 */
-  --km-color-focus: #7ea6ff;            /* 8.0:1 */
-  --km-color-success: #5ec48c;          /* 8.9:1 */
-  --km-color-warning: #e8a740;          /* 9.1:1 */
-  --km-color-warning-ink: #f5c878;      /* on warning-soft, 9.3:1 */
-  --km-color-info: #6db6e8;             /* 8.6:1 */
-  --km-color-destructive: #ff8f84;      /* 8.7:1 */
+  --km-color-accent-foreground: #2c2100; /* 8.7:1 */
+  --km-color-focus: #7ea6ff; /* 8.0:1 */
+  --km-color-success: #5ec48c; /* 8.9:1 */
+  --km-color-warning: #e8a740; /* 9.1:1 */
+  --km-color-warning-ink: #f5c878; /* on warning-soft, 9.3:1 */
+  --km-color-info: #6db6e8; /* 8.6:1 */
+  --km-color-destructive: #ff8f84; /* 8.7:1 */
   --km-color-destructive-foreground: #2b0705; /* 8.4:1 on destructive */
   --km-color-disabled: #2a2d2b;
-  --km-color-disabled-foreground: #979d98;  /* 5.0:1 on the disabled fill */
+  --km-color-disabled-foreground: #979d98; /* 5.0:1 on the disabled fill */
   --km-color-trend-bar: #3e443f;
   --km-color-info-soft: #10283a;
   --km-color-warning-soft: #35270c;
@@ -214,7 +217,8 @@
 
   --km-shadow-1: 0 0 0 1px rgb(255 255 255 / 0.02);
   --km-shadow-2: 0 6px 18px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
-  --km-shadow-3: 0 14px 36px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);
+  --km-shadow-3:
+    0 14px 36px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -266,7 +270,9 @@
     --km-status-future-border: #7d69a0;
     --km-status-future-text: #cbb8e8;
     --km-shadow-1: 0 0 0 1px rgb(255 255 255 / 0.02);
-    --km-shadow-2: 0 6px 18px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
-    --km-shadow-3: 0 14px 36px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);
+    --km-shadow-2:
+      0 6px 18px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
+    --km-shadow-3:
+      0 14px 36px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.07);
   }
 }
