@@ -49,7 +49,8 @@ export function PublicShell({
           </span>
         </Link>
         <div className="relative max-w-md">
-          <p className="text-xs font-bold tracking-[0.14em] text-[var(--km-color-accent)] uppercase">
+          {/* The pass-2 review (AA): #b9cec1 on the green, 5.8:1 (the accent was 4.26:1 at 12 px). Same words. */}
+          <p className="text-xs font-bold tracking-[0.14em] text-[#b9cec1] uppercase">
             Internal operations
           </p>
           <p className="mt-5 text-3xl leading-tight font-semibold tracking-[-0.035em]">
@@ -60,7 +61,8 @@ export function PublicShell({
             minutes, read-only, and shown to the business.
           </p>
         </div>
-        <p className="relative text-xs text-[#8eaa99]">
+        {/* The pass-2 review (AA): #b9cec1, 5.8:1 (#8eaa99 was 3.83:1). Same words. */}
+        <p className="relative text-xs text-[#b9cec1]">
           KitaMo&apos;s admin account only
         </p>
       </section>

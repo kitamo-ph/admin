@@ -27,7 +27,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: "light",
-  themeColor: "#f5f5f2",
+  // The page's white (tokens v3, --km-color-page; the pass-2 review): the old #f5f5f2 showed an off-white band.
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
