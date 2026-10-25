@@ -96,6 +96,7 @@ export default async function BusinessPage({
         />
         <Notice value={query.notice} />
         <Panel
+          boxed
           className="max-w-3xl"
           description="Summary shows counts and day totals. Records are break-glass: they need an open flag of this business or a reference."
           title="Reason sheet"
@@ -188,6 +189,7 @@ export default async function BusinessPage({
 
       {query.open === "records" && !records ? (
         <Panel
+          boxed
           className="mb-6 max-w-3xl"
           description="Records are a new access with their own reason and evidence; the summary's access is never stretched to cover them."
           title="Open records (break-glass)"
@@ -237,7 +239,7 @@ export default async function BusinessPage({
             ]}
           />
           {summary.stalls.length > 0 ? (
-            <p className="px-5 pb-5 text-sm text-[var(--km-color-text-secondary)]">
+            <p className="km-panel-x pb-5 text-sm text-[var(--km-color-text-secondary)]">
               Stalls: {summary.stalls.map((stall) => stall.name).join(", ")}
             </p>
           ) : null}
@@ -248,7 +250,7 @@ export default async function BusinessPage({
           description="Counts from each record's own time; a lead for a flag, never proof."
           title="Health"
         >
-          <ul className="px-5 pb-1">
+          <ul className="km-panel-x pb-1">
             {(
               [
                 ["Stock-use issues, 7 days", summary.health.stockUseIssues7d],
@@ -310,7 +312,7 @@ export default async function BusinessPage({
       <div className="mt-6 grid items-start gap-6 xl:grid-cols-2">
         <Panel title="Apps with access">
           {summary.apps.length === 0 ? (
-            <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+            <p className="km-panel-x py-4 text-sm text-[var(--km-color-text-secondary)]">
               No app has access.
             </p>
           ) : (
@@ -318,7 +320,7 @@ export default async function BusinessPage({
             <ul className="divide-y divide-[var(--km-color-border)]">
               {summary.apps.map((app) => (
                 <li
-                  className="flex min-h-14 items-center gap-3 px-5 py-2.5"
+                  className="km-panel-x flex min-h-14 items-center gap-3 py-2.5"
                   key={`${app.grantee}-${app.scope}`}
                 >
                   <span
@@ -347,14 +349,14 @@ export default async function BusinessPage({
           title="Flags"
         >
           {summary.flags.length === 0 ? (
-            <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+            <p className="km-panel-x py-4 text-sm text-[var(--km-color-text-secondary)]">
               No flags.
             </p>
           ) : (
             <ul className="divide-y divide-[var(--km-color-border)]">
               {summary.flags.map((flag) => (
                 <li
-                  className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm"
+                  className="km-panel-x flex flex-wrap items-center gap-3 py-3 text-sm"
                   key={flag.flagId}
                 >
                   <Badge value={flag.status} />
@@ -367,7 +369,7 @@ export default async function BusinessPage({
               ))}
             </ul>
           )}
-          <div className="border-t border-[var(--km-color-border)] px-5 pt-4 pb-5">
+          <div className="km-panel-x border-t border-[var(--km-color-border)] pt-4 pb-5">
             <h3 className="mb-3 text-[0.9375rem] font-bold">Raise a flag</h3>
             <RaiseFlagForm
               businessId={businessId}

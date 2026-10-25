@@ -98,20 +98,32 @@ export function Panel({
   action,
   children,
   className = "",
+  boxed = false,
 }: {
   title?: string;
   description?: string;
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  /** A card at every width: the canvas's sheets and cards (the reason sheet, a flag, the association screens). */
+  boxed?: boolean;
 }) {
   return (
     // Design system v3 (ds-05): a card is a border and a 16 px radius, nothing more; its title is 20 px bold.
+    // The lead's pass-2 review: from 1024 px (Pro) a section draws no box, as the Adm Site canvas does (no fill,
+    // no padding, hairline rows on the white page; .km-panel). Simple keeps the bordered card, and so does a
+    // boxed one (the canvas boxes those at every width). Its children pad with .km-panel-x.
     <section
-      className={`min-w-0 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] ${className}`}
+      className={`min-w-0 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] ${
+        boxed ? "" : "km-panel lg:rounded-none lg:border-0 lg:bg-transparent"
+      } ${className}`}
     >
       {title || description || action ? (
-        <header className="flex flex-col justify-between gap-3 border-b border-[var(--km-color-border)] px-5 py-4 sm:flex-row sm:items-center">
+        <header
+          className={`km-panel-x flex flex-col justify-between gap-3 border-b border-[var(--km-color-border)] py-4 sm:flex-row sm:items-center ${
+            boxed ? "" : "lg:pt-0 lg:pb-3"
+          }`}
+        >
           <div>
             {title ? (
               <h2 className="text-xl leading-tight font-bold text-[var(--km-color-text)]">
@@ -299,7 +311,7 @@ export function KeyValueGrid({
 }) {
   // The design pass (the canvas's facts): two columns of label over value, a rule between the rows.
   return (
-    <dl className="grid grid-cols-2 gap-x-4 px-5 pt-1 pb-3">
+    <dl className="km-panel-x grid grid-cols-2 gap-x-4 pt-1 pb-3">
       {items.map((item) => (
         <div
           className="min-w-0 border-t border-[var(--km-color-border)] py-2.5 [&:nth-child(-n+2)]:border-t-0"
@@ -361,7 +373,7 @@ export function PaginationSummary({
   total: number;
 }) {
   return (
-    <p className="px-5 py-3 text-xs text-[var(--km-color-text-secondary)]">
+    <p className="km-panel-x py-3 text-xs text-[var(--km-color-text-secondary)]">
       Showing <strong className="text-[var(--km-color-text)]">{shown}</strong>{" "}
       of <strong className="text-[var(--km-color-text)]">{total}</strong>{" "}
       records
@@ -397,7 +409,7 @@ export function PaginationControls({
   return (
     <nav
       aria-label="Pagination"
-      className="flex items-center justify-between gap-4 border-t border-[var(--km-color-border)] px-5 py-3"
+      className="km-panel-x flex items-center justify-between gap-4 border-t border-[var(--km-color-border)] py-3"
     >
       <p className="text-xs text-[var(--km-color-text-secondary)]">
         {total === 0

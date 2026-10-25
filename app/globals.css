@@ -175,6 +175,31 @@ a {
     padding: 1.75rem 2rem 3rem;
   }
 
+  /*
+   * The lead's pass-2 review (Pro draws no boxes): a section's inline padding is 20 px inside a card and 0 from
+   * 1024 px, where a section (.km-panel, the Panel) has no box and its title, rows and table meet the page's
+   * edge, as the Adm Site canvas draws Pro. A boxed Panel keeps its 20 px at every width.
+   */
+  .km-panel-x {
+    padding-inline: var(--panel-x, 1.25rem);
+  }
+
+  @media (min-width: 1024px) {
+    .km-panel {
+      --panel-x: 0px;
+    }
+
+    .km-panel .data-table th:first-child,
+    .km-panel .data-table td:first-child {
+      padding-left: 0;
+    }
+
+    .km-panel .data-table th:last-child,
+    .km-panel .data-table td:last-child {
+      padding-right: 0;
+    }
+  }
+
   .table-scroll {
     width: 100%;
     overflow-x: auto;

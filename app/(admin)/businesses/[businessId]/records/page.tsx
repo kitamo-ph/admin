@@ -91,7 +91,7 @@ export default async function RecordsPageView({
           eyebrow="Records"
           title={name}
         />
-        <Panel className="max-w-3xl" title="Open records (break-glass)">
+        <Panel boxed className="max-w-3xl" title="Open records (break-glass)">
           <div className="p-5">
             <ReasonSheet
               businessId={businessId}

@@ -174,20 +174,21 @@ export default async function OverviewPage() {
         <ServiceErrorState error={result.error} />
       )}
 
+      {/* The lead's pass-2 review: as wide as the counts row above it (was 768 px, stopping short of it). */}
       <Panel
-        className="mt-8 max-w-3xl"
+        className="mt-8"
         description="Each lasts 30 minutes from when it was opened. Close it when you are done."
         title="Your open accesses"
       >
         {state.accesses.length === 0 ? (
-          <p className="px-5 py-4 text-sm text-[var(--km-color-text-secondary)]">
+          <p className="km-panel-x py-4 text-sm text-[var(--km-color-text-secondary)]">
             None open. Every look at a business starts with a reason.
           </p>
         ) : (
           <ul className="divide-y divide-[var(--km-color-border)]">
             {state.accesses.map((access) => (
               <li
-                className="flex flex-wrap items-center justify-between gap-3 px-5 py-3"
+                className="km-panel-x flex flex-wrap items-center justify-between gap-3 py-3"
                 key={access.accessId}
               >
                 <Link

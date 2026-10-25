@@ -122,7 +122,7 @@ export default async function AccessLogPage({
               </DataTable>
             )}
             {result.data.accesses.length === 100 ? (
-              <div className="border-t border-[var(--km-color-border)] px-5 py-3">
+              <div className="km-panel-x border-t border-[var(--km-color-border)] py-3">
                 <Link
                   className="km-button-secondary km-button-small"
                   href={`/audit-log?before=${encodeURIComponent(

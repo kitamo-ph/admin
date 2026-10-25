@@ -175,7 +175,7 @@ export default async function BusinessesPage({
           )}
           <nav
             aria-label="Directory pages"
-            className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--km-color-border)] px-5 py-3"
+            className="km-panel-x flex flex-wrap items-center justify-between gap-3 border-t border-[var(--km-color-border)] py-3"
           >
             <p className="text-xs text-[var(--km-color-text-secondary)]">
               {result.data.rows.length} shown

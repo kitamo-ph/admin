@@ -41,6 +41,7 @@ export default async function AssociationsPage({
   const canUpdate = hasPermission(session.role, "associations:update");
   const createPanel = (
     <Panel
+      boxed
       description="After checking a letter from the association."
       title="Create an association"
     >
@@ -58,7 +59,9 @@ export default async function AssociationsPage({
       <Notice value={query.notice} />
       {result.ok ? (
         <div className="grid gap-6">
+          {/* The canvas boxes the association screens at every width (its D relayout). */}
           <Panel
+            boxed
             description={
               result.data.length >= ASSOCIATION_LIST_MAX
                 ? `Showing the first ${ASSOCIATION_LIST_MAX}.`
@@ -121,7 +124,7 @@ export default async function AssociationsPage({
           {canUpdate ? createPanel : null}
         </div>
       ) : result.error.code === "NOT_AVAILABLE" ? (
-        <Panel title="Associations arrive with the HOA level.">
+        <Panel boxed title="Associations arrive with the HOA level.">
           <div className="grid gap-3 p-5 text-sm">
             <p>When KitaMo has the HOA level, this page will:</p>
             <ul className="list-disc pl-5">

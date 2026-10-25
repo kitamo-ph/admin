@@ -49,7 +49,7 @@ export function TableScroll({ children }: { children: React.ReactNode }) {
       {more ? (
         <p
           aria-hidden="true"
-          className="px-5 pt-2 pb-1 text-right text-xs font-semibold text-[var(--km-color-text-secondary)]"
+          className="km-panel-x pt-2 pb-1 text-right text-xs font-semibold text-[var(--km-color-text-secondary)]"
         >
           Scroll for more →
         </p>

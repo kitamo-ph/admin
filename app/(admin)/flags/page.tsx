@@ -92,7 +92,8 @@ export default async function FlagsPage({
         <ul className="grid max-w-[47.5rem] gap-4">
           {result.data.map((flag) => (
             <li key={flag.flagId}>
-              <Panel>
+              {/* The canvas boxes a flag at every width. */}
+              <Panel boxed>
                 <div className="grid gap-4 p-4 sm:p-5">
                   <div className="grid content-start gap-2.5">
                     <div className="flex flex-wrap items-center gap-2">

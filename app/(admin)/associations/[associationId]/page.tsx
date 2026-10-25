@@ -66,7 +66,7 @@ export default async function AssociationPage({
           title="Association"
         />
         {result.error.code === "NOT_AVAILABLE" ? (
-          <Panel title="Associations arrive with the HOA level.">
+          <Panel boxed title="Associations arrive with the HOA level.">
             <p className="p-5 text-sm">
               KitaMo does not have the HOA level yet.
             </p>
@@ -93,7 +93,8 @@ export default async function AssociationPage({
       />
       <Notice value={query.notice} />
       <div className="grid gap-6">
-        <Panel title="The association">
+        {/* The canvas boxes the association screens at every width (its D relayout). */}
+        <Panel boxed title="The association">
           <KeyValueGrid
             items={[
               { label: "Kind", value: kind },
@@ -123,7 +124,7 @@ export default async function AssociationPage({
           />
         </Panel>
 
-        <Panel title="Officers">
+        <Panel boxed title="Officers">
           {association.officers.length === 0 ? (
             <EmptyState
               description="Add an officer by the email of their KitaMo account."
@@ -184,7 +185,7 @@ export default async function AssociationPage({
 
         {canUpdate && live ? (
           <div className="grid gap-6 lg:grid-cols-2">
-            <Panel title="Join code">
+            <Panel boxed title="Join code">
               <div className="p-5">
                 <RotateCodeForm
                   associationId={association.associationId}
@@ -192,7 +193,7 @@ export default async function AssociationPage({
                 />
               </div>
             </Panel>
-            <Panel title="Close">
+            <Panel boxed title="Close">
               <div className="p-5">
                 <CloseAssociationForm
                   associationId={association.associationId}
