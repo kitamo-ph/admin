@@ -62,9 +62,10 @@ for (const viewport of VIEWPORTS) {
         }
 
         if (viewport.width < 1024) {
+          // The design pass: the phone's bottom bar (its tabs and More) in place of the menu button.
           await expect(
-            page.getByText("Open navigation", { exact: true }),
-          ).toBeAttached();
+            page.getByRole("navigation", { name: "Admin tabs" }),
+          ).toBeVisible();
         } else {
           await expect(
             page.getByRole("navigation", { name: "Admin navigation" }),

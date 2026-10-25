@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { LiveHiddenBar } from "@/components/admin/live-hidden-bar";
 import { ServiceErrorState } from "@/components/feedback/service-state";
 import { MetricCard, PageHeader, Panel } from "@/components/ui/primitives";
 import { LEVEL_LABELS, REASON_LABELS } from "@/lib/admin/r16-rules";
@@ -30,43 +31,54 @@ export default async function OverviewPage() {
       />
 
       {result.ok ? (
-        <section
-          aria-label="Business counts"
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
-        >
-          <MetricCard
-            context="Every business KitaMo holds"
-            icon="B"
-            label="Businesses"
-            value={formatNumber(result.data.totals.businesses)}
-          />
-          <MetricCard
-            context="Not hidden by their owner"
-            icon="L"
-            label="Live"
-            tone="success"
-            value={formatNumber(result.data.totals.live)}
-          />
-          <MetricCard
-            context="Hidden by their owner"
-            icon="H"
-            label="Hidden"
-            value={formatNumber(result.data.totals.hidden)}
-          />
-          <MetricCard
-            context="With a sale in the last 7 days"
-            icon="7"
-            label="Active this week"
-            value={formatNumber(result.data.totals.active7d)}
-          />
-          <MetricCard
-            context="Open or under review; a lead, not proof"
-            icon="F"
-            label="With open flags"
-            tone={result.data.totals.withOpenFlags > 0 ? "warning" : "default"}
-            value={formatNumber(result.data.totals.withOpenFlags)}
-          />
-        </section>
+        <>
+          <section
+            aria-label="Business counts"
+            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
+          >
+            <MetricCard
+              context="Every business KitaMo holds"
+              icon="B"
+              label="Businesses"
+              value={formatNumber(result.data.totals.businesses)}
+            />
+            <MetricCard
+              context="Not hidden by their owner"
+              icon="L"
+              label="Live"
+              tone="success"
+              value={formatNumber(result.data.totals.live)}
+            />
+            <MetricCard
+              context="Hidden by their owner"
+              icon="H"
+              label="Hidden"
+              value={formatNumber(result.data.totals.hidden)}
+            />
+            <MetricCard
+              context="With a sale in the last 7 days"
+              icon="7"
+              label="Active this week"
+              value={formatNumber(result.data.totals.active7d)}
+            />
+            <MetricCard
+              context="Open or under review; a lead, not proof"
+              icon="F"
+              label="With open flags"
+              tone={
+                result.data.totals.withOpenFlags > 0 ? "warning" : "default"
+              }
+              value={formatNumber(result.data.totals.withOpenFlags)}
+            />
+          </section>
+          {/* The design pass (Oct 24): the live and hidden counts as one bar, in words. */}
+          <div className="mt-4">
+            <LiveHiddenBar
+              hidden={result.data.totals.hidden}
+              live={result.data.totals.live}
+            />
+          </div>
+        </>
       ) : (
         <ServiceErrorState error={result.error} />
       )}

@@ -140,7 +140,8 @@ export function FlagReviewForm({
     {},
   );
   const options = FLAG_TRANSITIONS[status];
-  const [next, setNext] = useState<FlagStatus>(options[0] ?? "reviewing");
+  // The design pass (Oct 24, Admin Flags): nothing is pre-chosen; choosing only selects; the one button saves.
+  const [next, setNext] = useState<FlagStatus | null>(null);
   return (
     <form
       action={formAction}
@@ -151,21 +152,28 @@ export function FlagReviewForm({
       <input name="from" type="hidden" value={status} />
       <input name="requestId" type="hidden" value={requestId} />
       <input name="returnTo" type="hidden" value={returnTo} />
-      <label className="km-label">
-        Change to
-        <select
-          className="control km-input"
-          name="status"
-          onChange={(event) => setNext(event.target.value as FlagStatus)}
-          value={next}
-        >
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {STATUS_LABELS[option]}
-            </option>
-          ))}
-        </select>
-      </label>
+      {/* The design pass: the flag's own next states as a radio list (open: Reviewing, Dismiss, Confirm;
+          reviewing: Dismiss, Confirm; closed: Reopen; mkt-adm-05). */}
+      <fieldset className="grid gap-1">
+        <legend className="km-label">Change to</legend>
+        {options.map((option) => (
+          <label
+            className="flex min-h-11 cursor-pointer items-center gap-2"
+            key={option}
+          >
+            <input
+              checked={next === option}
+              className="size-5 accent-[var(--km-color-action)]"
+              name="status"
+              onChange={() => setNext(option)}
+              required
+              type="radio"
+              value={option}
+            />
+            {STATUS_LABELS[option]}
+          </label>
+        ))}
+      </fieldset>
       <label className="km-label">
         Note {next === "reviewing" ? "(optional)" : "(10 to 500 characters)"}
         <textarea className="control km-input" maxLength={500} name="note" />

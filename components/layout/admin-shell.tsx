@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LegalLinks } from "./legal-links";
 import { AdminNavLink } from "./nav-link";
+import { PhoneTabs } from "./phone-tabs";
 
 type NavigationItem = {
   href: string;
@@ -71,6 +72,9 @@ const groups = [
   "Administration",
 ] as const;
 
+/** The design pass (KM Bottom Bar): a phone's tabs; every other section this admin may open goes under More. */
+const PHONE_TABS = ["/overview", "/businesses", "/flags", "/audit-log"];
+
 /** KitaMo's mark and name (the header of Operations' align/kitamo-feel @ 2daaf50). */
 function Brand() {
   return (
@@ -87,33 +91,8 @@ function Brand() {
   );
 }
 
-function Navigation({
-  allowedHrefs,
-  mobile = false,
-}: {
-  allowedHrefs: string[];
-  mobile?: boolean;
-}) {
+function Navigation({ allowedHrefs }: { allowedHrefs: string[] }) {
   const visible = navigation.filter((item) => allowedHrefs.includes(item.href));
-
-  if (mobile) {
-    return (
-      <nav
-        aria-label="Mobile admin navigation"
-        className="grid gap-1 px-2 pb-3"
-      >
-        {visible.map((item) => (
-          <AdminNavLink
-            href={item.href}
-            key={item.href}
-            label={item.label}
-            mobile
-            symbol={item.symbol}
-          />
-        ))}
-      </nav>
-    );
-  }
 
   return (
     <nav aria-label="Admin navigation" className="mt-8 flex-1">
@@ -182,26 +161,10 @@ export function AdminShell({
         </div>
       </aside>
 
-      <div className="min-w-0">
+      <div className="min-w-0 pb-20 lg:pb-0">
         <header className="top">
+          {/* Below the laptop width the sections are the bottom bar's (PhoneTabs, the design pass). */}
           <div className="flex items-center gap-3 lg:hidden">
-            <details className="group relative">
-              <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-[var(--km-radius-control)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] text-lg text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]">
-                <span aria-hidden="true">≡</span>
-                <span className="sr-only">Open navigation</span>
-              </summary>
-              <div className="fixed inset-x-3 top-[4.5rem] z-40 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-2 shadow-2xl">
-                <div className="mb-2 flex items-center justify-between border-b border-[var(--km-color-border)] px-3 py-3">
-                  <span className="font-semibold text-[var(--km-color-text)]">
-                    KitaMo Admin
-                  </span>
-                  <span className="text-xs text-[var(--km-color-text-secondary)]">
-                    Navigation
-                  </span>
-                </div>
-                <Navigation allowedHrefs={allowedHrefs} mobile />
-              </div>
-            </details>
             <Brand />
           </div>
 
@@ -233,6 +196,13 @@ export function AdminShell({
             </span>
           </div>
         </header>
+        {/* The design pass (mkt-adm-01, a legal HIGH): the line on every signed-in page at EVERY width, so below
+            the laptop width too, under the header and above the access banner. */}
+        <p className="border-b border-[var(--km-color-border)] px-4 py-2 text-xs font-semibold tracking-[0.09em] uppercase sm:px-8 lg:hidden">
+          {kitamo
+            ? "Read-only toward businesses · every view is logged"
+            : "Internal operations"}
+        </p>
         {banner}
         <main id="main-content" tabIndex={-1}>
           {children}
@@ -243,6 +213,22 @@ export function AdminShell({
             : "Mock operational environment · Fictional data only · No merchant transactions"}
           <LegalLinks className="mt-2" />
         </footer>
+        <PhoneTabs
+          more={navigation
+            .filter(
+              (item) =>
+                allowedHrefs.includes(item.href) &&
+                !PHONE_TABS.includes(item.href),
+            )
+            .map(({ href, label, symbol }) => ({ href, label, symbol }))}
+          tabs={navigation
+            .filter(
+              (item) =>
+                allowedHrefs.includes(item.href) &&
+                PHONE_TABS.includes(item.href),
+            )
+            .map(({ href, label, symbol }) => ({ href, label, symbol }))}
+        />
       </div>
     </div>
   );

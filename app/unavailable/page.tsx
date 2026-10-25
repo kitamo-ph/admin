@@ -14,7 +14,8 @@ export default function UnavailablePage() {
       title="Operational data cannot be reached right now"
       description="The request failed safely before any administrative change was made. Try again after a short wait."
     >
-      <div className="rounded-xl border border-[var(--km-color-destructive)] bg-[var(--km-color-destructive-soft)] p-4 text-sm text-[var(--km-color-destructive)]">
+      {/* The design pass (Oct 24): grey, not red: nothing was changed, so it is no error of the admin's. Same words. */}
+      <div className="rounded-xl border border-[var(--km-color-border)] bg-[var(--km-color-muted)] p-4 text-sm text-[var(--km-color-text)]">
         No merchant records or support reports were changed. Detailed failure
         information is withheld from this public state.
       </div>

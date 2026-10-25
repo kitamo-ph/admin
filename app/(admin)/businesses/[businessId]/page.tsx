@@ -37,6 +37,22 @@ export const metadata: Metadata = {
  * "Raise a flag", and "Open records", which is a new access with its own
  * reason and evidence (never inherited, OQ16).
  */
+/**
+ * The design pass (Oct 24, Admin Summary; the health pills approved word for word): each health count with its word,
+ * "0 none" in green, "N look closer" in amber; never red, never colour alone.
+ */
+function HealthCount({ count }: { count: number }) {
+  return count === 0 ? (
+    <Badge label={`${formatNumber(count)} none`} tone="success" value="none" />
+  ) : (
+    <Badge
+      label={`${formatNumber(count)} look closer`}
+      tone="warning"
+      value="look_closer"
+    />
+  );
+}
+
 export default async function BusinessPage({
   params,
   searchParams,
@@ -235,23 +251,27 @@ export default async function BusinessPage({
             items={[
               {
                 label: "Stock-use issues, 7 days",
-                value: formatNumber(summary.health.stockUseIssues7d),
+                value: <HealthCount count={summary.health.stockUseIssues7d} />,
               },
               {
                 label: "Ticket issues, 7 days",
-                value: formatNumber(summary.health.ticketIssues7d),
+                value: <HealthCount count={summary.health.ticketIssues7d} />,
               },
               {
                 label: "Problem reports, 7 days",
-                value: formatNumber(summary.health.problemReports7d),
+                value: <HealthCount count={summary.health.problemReports7d} />,
               },
               {
                 label: "Staff code failures, 1 day",
-                value: formatNumber(summary.health.staffCodeFailures1d),
+                value: (
+                  <HealthCount count={summary.health.staffCodeFailures1d} />
+                ),
               },
               {
                 label: "Open correction requests",
-                value: formatNumber(summary.health.correctionRequestsOpen),
+                value: (
+                  <HealthCount count={summary.health.correctionRequestsOpen} />
+                ),
               },
             ]}
           />

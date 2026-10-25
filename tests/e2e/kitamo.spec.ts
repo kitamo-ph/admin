@@ -373,10 +373,12 @@ test.describe("R16 pages through the Core adapter", () => {
     }
 
     await page.goto("/flags");
+    // The design pass: "Change to" is a radio list, nothing pre-chosen.
     await page
-      .getByRole("combobox", { name: "Change to" })
+      .getByRole("group", { name: "Change to" })
       .first()
-      .selectOption("dismissed");
+      .getByRole("radio", { name: "Dismiss" })
+      .check();
     await page
       .getByLabel(/Note/)
       .first()
