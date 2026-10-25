@@ -105,7 +105,12 @@ export default async function OverviewPage() {
         eyebrow="KitaMo admin"
         title="Overview"
         actions={
-          <Link className="km-button" href="/businesses" prefetch={false}>
+          // The pass-2 review: the page's one green action is 56 px on a phone (the canvas's topCta).
+          <Link
+            className="km-button min-h-14 md:min-h-11"
+            href="/businesses"
+            prefetch={false}
+          >
             Open the business directory
           </Link>
         }

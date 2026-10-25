@@ -97,7 +97,16 @@ export default async function FlagsPage({
                 <div className="grid gap-4 p-4 sm:p-5">
                   <div className="grid content-start gap-2.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge value={flag.status} />
+                      {/* The pass-2 review (the canvas): an open or reviewing flag in the warning tone, with
+                          its word, so it stands apart from the grey "A lead, not proof". */}
+                      <Badge
+                        tone={
+                          flag.status === "open" || flag.status === "reviewing"
+                            ? "warning"
+                            : undefined
+                        }
+                        value={flag.status}
+                      />
                       <span className="km-lead">A lead, not proof</span>
                     </div>
                     <h2 className="text-xl leading-tight font-bold">

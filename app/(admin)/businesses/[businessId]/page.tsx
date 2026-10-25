@@ -359,7 +359,15 @@ export default async function BusinessPage({
                   className="km-panel-x flex flex-wrap items-center gap-3 py-3 text-sm"
                   key={flag.flagId}
                 >
-                  <Badge value={flag.status} />
+                  {/* As on Flags (the pass-2 review): open or reviewing in the warning tone, with its word. */}
+                  <Badge
+                    tone={
+                      flag.status === "open" || flag.status === "reviewing"
+                        ? "warning"
+                        : undefined
+                    }
+                    value={flag.status}
+                  />
                   <span>
                     {titleCase(flag.kind)} · from {flag.source} ·{" "}
                     {formatDateTime(flag.createdAt)}
