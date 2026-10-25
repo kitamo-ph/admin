@@ -14,10 +14,12 @@ describe("KitaMo's Privacy Policy and Terms on every page (R21)", () => {
     for (const file of [
       "components/layout/admin-shell.tsx",
       "components/layout/public-shell.tsx",
-      "app/not-found.tsx",
-      "app/error.tsx",
     ]) {
       expect(readFileSync(file, "utf8")).toContain("<LegalLinks");
+    }
+    // The lead's pass-2 review: the root not-found and error pages are on PublicShell (its LegalLinks).
+    for (const file of ["app/not-found.tsx", "app/error.tsx"]) {
+      expect(readFileSync(file, "utf8")).toContain("<PublicShell");
     }
   });
 

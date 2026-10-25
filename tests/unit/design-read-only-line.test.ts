@@ -18,10 +18,10 @@ describe("the read-only line on every signed-in page and full-screen state", () 
   });
 
   it("is on the root not-found and error pages and the plain states an admin reaches", () => {
-    for (const file of ["app/not-found.tsx", "app/error.tsx"]) {
-      expect(readFileSync(file, "utf8")).toContain("<ReadOnlyLine");
-    }
+    // The lead's pass-2 review: the root not-found and error pages are on PublicShell too.
     for (const file of [
+      "app/not-found.tsx",
+      "app/error.tsx",
       "app/unavailable/page.tsx",
       "app/maintenance/page.tsx",
       "app/access-denied/page.tsx",

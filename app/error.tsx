@@ -2,9 +2,13 @@
 
 import { useEffect } from "react";
 
-import { LegalLinks } from "@/components/layout/legal-links";
-import { ReadOnlyLine } from "@/components/layout/read-only-line";
+import { PublicShell } from "@/components/layout/public-shell";
 
+/**
+ * A failure in the admin shell itself (a failed admin page renders inside the shell: app/(admin)/error.tsx).
+ * The lead's pass-2 review: on PublicShell, as Unavailable and Maintenance are (the canvas's 420 px column,
+ * full-width capsules, no shadowed card), with the read-only line and Privacy · Terms. Same words.
+ */
 export default function ErrorBoundary({
   error,
   reset,
@@ -20,38 +24,32 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <main className="grid min-h-screen place-items-center p-6">
-      <section className="w-full max-w-lg rounded-2xl border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-8 shadow-[var(--shadow-card)]">
-        {/* The lead's decision on 84963c8: the full-screen states carry the read-only line too. */}
-        <ReadOnlyLine className="mb-6" />
-        <div className="mb-5 grid size-11 place-items-center rounded-xl bg-[var(--km-color-destructive-soft)] text-xl text-[var(--km-color-destructive)]">
-          !
-        </div>
-        <p className="mb-2 text-xs font-bold tracking-[0.12em] text-[var(--km-color-warning)] uppercase">
-          Something went wrong
+    <PublicShell
+      description="No changes were made. Try the request again, or return to the overview if the issue continues."
+      eyebrow="Something went wrong"
+      readOnlyLine
+      title="This view could not be loaded"
+    >
+      <div className="grid gap-3">
+        <button
+          className="km-button min-h-14 w-full"
+          onClick={reset}
+          type="button"
+        >
+          Try again
+        </button>
+        <a
+          className="km-button-secondary min-h-[3.25rem] w-full"
+          href="/overview"
+        >
+          Return to overview
+        </a>
+      </div>
+      {error.digest ? (
+        <p className="mt-6 text-xs text-[var(--km-color-text-secondary)]">
+          Reference: <code>{error.digest}</code>
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight text-[var(--km-color-text)]">
-          This view could not be loaded
-        </h1>
-        <p className="mt-3 text-[var(--km-color-text-secondary)]">
-          No changes were made. Try the request again, or return to the overview
-          if the issue continues.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button className="km-button" onClick={reset} type="button">
-            Try again
-          </button>
-          <a className="km-button-secondary" href="/overview">
-            Return to overview
-          </a>
-        </div>
-        {error.digest ? (
-          <p className="mt-6 text-xs text-[var(--km-color-text-secondary)]">
-            Reference: <code>{error.digest}</code>
-          </p>
-        ) : null}
-        <LegalLinks className="mt-6 text-xs text-[var(--km-color-text-secondary)]" />
-      </section>
-    </main>
+      ) : null}
+    </PublicShell>
   );
 }
