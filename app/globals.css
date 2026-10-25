@@ -450,6 +450,16 @@ a {
     background: var(--km-color-page);
   }
 
+  /* The lead's pass-2 review (KM Header, site-phone): below 1024 px the header is one 56 px row, the mark and
+     name with the role line under them, then Sign out (44 px). */
+  @media (max-width: 1023px) {
+    .top {
+      min-height: 3.5rem;
+      padding-block: 0.25rem;
+      column-gap: 0.75rem;
+    }
+  }
+
   .top p {
     margin: 0;
     color: var(--km-color-text-secondary);

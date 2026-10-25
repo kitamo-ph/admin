@@ -171,9 +171,18 @@ export function AdminShell({
 
       <div className="min-w-0 pb-20 lg:pb-0">
         <header className="top">
-          {/* Below the laptop width the sections are the bottom bar's (PhoneTabs, the design pass). */}
-          <div className="flex items-center gap-3 lg:hidden">
+          {/* Below the laptop width the sections are the bottom bar's (PhoneTabs, the design pass). The lead's
+              pass-2 review (KM Header, site-phone): one 56 px row. The role label is the 12 px line under the
+              name (beside Sign out it wrapped the header to two rows, about 106 px). */}
+          <div className="grid min-w-0 justify-items-start lg:hidden">
             <Brand />
+            <span
+              aria-label={`Signed in as ${adminName}, ${roleLabel}`}
+              className="-mt-0.5 max-w-full truncate pl-10 text-xs leading-tight font-medium text-[var(--km-color-text-secondary)]"
+              title={`${adminName} · ${roleLabel}`}
+            >
+              {roleLabel}
+            </span>
           </div>
 
           <div className="hidden lg:block">
@@ -197,13 +206,6 @@ export function AdminShell({
                 System health
               </Link>
             )}
-            <span
-              aria-label={`Signed in as ${adminName}, ${roleLabel}`}
-              className="text-xs font-semibold text-[var(--km-color-text-secondary)] lg:hidden"
-              title={`${adminName} · ${roleLabel}`}
-            >
-              {roleLabel}
-            </span>
           </div>
         </header>
         {/* The design pass (mkt-adm-01, a legal HIGH): the line on every signed-in page at EVERY width, so below
