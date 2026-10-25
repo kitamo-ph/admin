@@ -353,7 +353,7 @@ export function DataTable({
   layout?: keyof typeof TABLE_LAYOUTS;
 }) {
   return (
-    <TableScroll>
+    <TableScroll label={label}>
       <table
         aria-label={label}
         className={TABLE_LAYOUTS[layout]}

@@ -6,18 +6,31 @@ import { useEffect, useRef, useState } from "react";
  * The scroll cue for a wide table (the lead's review of 84963c8: a table cut on a column edge looked complete).
  * While columns are hidden to the right, a fade on that edge and "Scroll for more →" under the table. The
  * table's parent stays the scroll box (the responsive e2e checks it), and nothing is measured on the server.
+ *
+ * The lead's pass-2 review (keyboard): while the table is wider than its box, the box is a named region in the
+ * tab order (the table's own label), so arrow keys scroll it, with the focus ring. A table that fits is no
+ * extra tab stop.
  */
-export function TableScroll({ children }: { children: React.ReactNode }) {
+export function TableScroll({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   const box = useRef<HTMLDivElement>(null);
+  const [scrolls, setScrolls] = useState(false);
   const [more, setMore] = useState(false);
 
   useEffect(() => {
     const element = box.current;
     if (element === null) return;
-    const update = () =>
+    const update = () => {
+      setScrolls(element.scrollWidth > element.clientWidth + 1);
       setMore(
         element.scrollLeft + element.clientWidth < element.scrollWidth - 1,
       );
+    };
     // The first observation arrives on its own after observe(); fonts loading resize the table, not the box.
     const observer = new ResizeObserver(update);
     observer.observe(element);
@@ -32,7 +45,13 @@ export function TableScroll({ children }: { children: React.ReactNode }) {
   return (
     <>
       <div className="relative">
-        <div className="table-scroll" ref={box}>
+        <div
+          aria-label={scrolls ? label : undefined}
+          className="table-scroll"
+          ref={box}
+          role={scrolls ? "region" : undefined}
+          tabIndex={scrolls ? 0 : undefined}
+        >
           {children}
         </div>
         {more ? (
