@@ -160,15 +160,12 @@ export default async function RecordsPageView({
         title={name}
       />
 
-      <nav aria-label="Record kinds" className="mb-5 flex flex-wrap gap-2">
+      {/* The design pass: the record kinds as the canvas's chips (the chosen one in ink). */}
+      <nav aria-label="Record kinds" className="mb-5 flex flex-wrap gap-1.5">
         {TABS.map((tab) => (
           <Link
             aria-current={tab.kind === kind ? "page" : undefined}
-            className={
-              tab.kind === kind
-                ? "km-button km-button-small"
-                : "km-button-secondary km-button-small"
-            }
+            className="km-chip"
             href={`/businesses/${businessId}/records?kind=${tab.kind}`}
             key={tab.kind}
             prefetch={false}
@@ -179,10 +176,7 @@ export default async function RecordsPageView({
       </nav>
 
       {dated ? (
-        <form
-          className="mb-5 flex flex-wrap items-end gap-3 rounded-[var(--km-radius-surface)] border border-[var(--km-color-border)] bg-[var(--km-color-surface)] p-4"
-          method="get"
-        >
+        <form className="mb-5 flex flex-wrap items-end gap-3" method="get">
           <input name="kind" type="hidden" value={kind} />
           <label className="km-label">
             From

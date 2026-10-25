@@ -432,6 +432,32 @@ a {
     background: var(--km-color-destructive-soft);
   }
 
+  /* The design pass (Adm Site canvas): filter chips, 44 px capsules that wrap; the chosen one (aria-current) in
+     ink, the others white with the 3:1 control edge (ds-06). */
+  .km-chip {
+    display: inline-flex;
+    min-height: var(--km-control-height);
+    align-items: center;
+    border: 1px solid var(--km-color-control-edge);
+    border-radius: var(--km-radius-button);
+    background: var(--km-color-surface);
+    padding: 0 1rem;
+    color: var(--km-color-text);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .km-chip:hover {
+    background: var(--km-color-muted);
+  }
+
+  .km-chip[aria-current="page"] {
+    border-color: var(--km-color-text);
+    background: var(--km-color-text);
+    color: var(--km-color-page);
+    font-weight: 600;
+  }
+
   .km-button-small {
     min-height: var(--km-control-height);
     padding: 0.35rem 0.85rem;

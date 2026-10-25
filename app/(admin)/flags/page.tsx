@@ -63,11 +63,7 @@ export default async function FlagsPage({
         {FILTERS.map((filter) => (
           <Link
             aria-current={filter.status === status ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-full border px-4 text-[0.9375rem] ${
-              filter.status === status
-                ? "border-[var(--km-color-text)] bg-[var(--km-color-text)] font-semibold text-[var(--km-color-page)]"
-                : "border-[var(--km-color-control-edge)] bg-[var(--km-color-surface)] font-medium text-[var(--km-color-text)] hover:bg-[var(--km-color-muted)]"
-            }`}
+            className="km-chip"
             href={
               filter.status === null
                 ? "/flags"
